@@ -106,7 +106,7 @@ export default function HomePage() {
         className="flex-grow"
       >
         <HeroCarousel />
-        <ItemGridSection items={trendingApparelItems} />
+        <ItemGridSection title="Trending Apparel" items={trendingApparelItems} />
       </motion.div>
       <DigitalRainCanvas />
     </div>
