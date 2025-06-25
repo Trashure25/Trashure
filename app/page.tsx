@@ -98,20 +98,22 @@ export default function HomePage() {
   const delay = 0.5 // Declare the delay variable
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-black">
-      <TrashureNavbar />
-      <AnimatedSlogan onSloganAnimationStart={() => setAnimateContent(true)} />
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: animateContent ? 1 : 0 }}
-        transition={{ duration: 1.0, ease: "circOut", delay: delay }}
-        className="flex-grow"
-      >
-        <HeroCarousel />
-        <ItemGridSection items={trendingApparelItems} />
-      </motion.div>
-      <DigitalRainCanvas />
+    <>
+      <div className="min-h-screen flex flex-col bg-white text-black">
+        <TrashureNavbar />
+        <AnimatedSlogan onSloganAnimationStart={() => setAnimateContent(true)} />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: animateContent ? 1 : 0 }}
+          transition={{ duration: 1.0, ease: "circOut", delay: delay }}
+          className="flex-grow"
+        >
+          <HeroCarousel />
+          <ItemGridSection title="Trending Apparel" items={trendingApparelItems} />
+        </motion.div>
+        <DigitalRainCanvas />
+      </div>
       <Footer />
-    </div>
+    </>
   )
 }

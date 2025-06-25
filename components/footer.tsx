@@ -11,10 +11,7 @@ export function Footer() {
           <a href="#" className="font-bold text-black text-sm">HELP & FAQ</a>
           <a href="#" className="font-bold text-black text-sm">TERMS</a>
           <a href="#" className="font-bold text-black text-sm">PRIVACY</a>
-          <a href="#" className="font-bold text-black text-sm">TRUST</a>
-          <a href="#" className="font-bold text-black text-sm">ACCESSIBILITY</a>
           <a href="#" className="font-bold text-black text-sm">CONTACT</a>
-          <a href="#" className="font-bold text-black text-sm">JOBS</a>
           <a href="#" className="font-bold text-black text-sm">IOS APP</a>
         </nav>
         <div className="flex items-center gap-4">
@@ -22,7 +19,7 @@ export function Footer() {
           <a href="#" aria-label="Facebook"><FaFacebook className="w-5 h-5 text-black" /></a>
           <a href="#" aria-label="YouTube"><FaYoutube className="w-5 h-5 text-black" /></a>
           <a href="#" aria-label="LinkedIn"><FaLinkedin className="w-5 h-5 text-black" /></a>
-          <span className="ml-4 text-black text-sm font-semibold">Grailed © 2025</span>
+          <span className="ml-4 text-black text-sm font-semibold">Trashure © 2025</span>
         </div>
       </div>
     </footer>
