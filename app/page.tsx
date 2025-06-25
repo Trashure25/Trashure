@@ -8,6 +8,7 @@ import { HeroCarousel } from "@/components/hero-carousel"
 import { ItemGridSection } from "@/components/item-grid-section"
 import { AnimatedSlogan } from "@/components/animated-slogan"
 import type { Item } from "@/components/item-card"
+import { Footer } from "@/components/footer"
 
 function DigitalRainCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -23,6 +24,7 @@ function DigitalRainCanvas() {
     const columns = Math.floor(canvas.width / fontSize)
     const drops: number[] = Array(columns).fill(1)
     function renderFrame() {
+      if (!ctx || !canvas) return
       ctx.fillStyle = "rgba(255,255,255,0.04)"
       ctx.fillRect(0, 0, canvas.width, canvas.height)
       ctx.fillStyle = "#059669"
@@ -106,9 +108,10 @@ export default function HomePage() {
         className="flex-grow"
       >
         <HeroCarousel />
-        <ItemGridSection title="Trending Apparel" items={trendingApparelItems} />
+        <ItemGridSection items={trendingApparelItems} />
       </motion.div>
       <DigitalRainCanvas />
+      <Footer />
     </div>
   )
 }
