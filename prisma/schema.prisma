@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// Prisma schema for Trashure marketplace
+// Using SQLite for local development
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  passwordHash   String
+  displayName    String
+  handle         String   @unique
+  avatar         String?
+  firstName      String?
+  lastName       String?
+  age            Int?
+  gender         String?
+  address        String?
+  bio            String?  @db.VarChar(120)
+  credits        Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  items          Item[]
+  cart           Cart?
+  messagesSent   Message[] @relation("SentMessages")
+  messagesReceived Message[] @relation("ReceivedMessages")
+  // Add more profile fields as needed
+}
+
+model Cart {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  items     CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  cartId    String
+  item      Item     @relation(fields: [itemId], references: [id])
+  itemId    String
+  quantity  Int      @default(1)
+}
+
+model Item {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  brand       Brand?   @relation(fields: [brandId], references: [id])
+  brandId     String?
+  name        String
+  price       Int      // in credits
+  description String?
+  age         String?
+  condition   String?
+  imageUrl    String?
+  verified    Boolean  @default(false)
+  listedAt    DateTime @default(now())
+  isActive    Boolean  @default(true)
+  cartItems   CartItem[]
+}
+
+model Brand {
+  id    String  @id @default(uuid())
+  name  String  @unique
+  items Item[]
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  sender    User     @relation("SentMessages", fields: [senderId], references: [id])
+  senderId  String
+  receiver  User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiverId String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model CreditTransaction {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  amount    Int      // positive for purchase, negative for spend
+  createdAt DateTime @default(now())
+  type      String   // e.g., 'purchase', 'spend', 'refund'
+}
