@@ -19,22 +19,36 @@ const initialProfile = {
 export default function SignupPage() {
   const [profile, setProfile] = useState(initialProfile)
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setProfile({ ...profile, [e.target.name]: e.target.value })
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const users = JSON.parse(localStorage.getItem("users") || "[]")
-    if (users.find((u: any) => u.email === profile.email)) {
-      setError("Email already exists")
-      return
+    setError("")
+    setLoading(true)
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profile),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || "Sign up failed")
+      } else {
+        setSuccess(true)
+        // Redirect to login page after successful signup
+        window.location.href = "/login"
+      }
+    } catch (err) {
+      setError("Sign up failed. Please try again.")
+    } finally {
+      setLoading(false)
     }
-    users.push(profile)
-    localStorage.setItem("users", JSON.stringify(users))
-    localStorage.setItem("currentUserEmail", profile.email)
-    window.location.href = "/profile"
   }
 
   return (
@@ -61,7 +75,8 @@ export default function SignupPage() {
         {/* Avatar upload can be implemented as a file input or image URL for now */}
         <input name="avatar" placeholder="Avatar Image URL" value={profile.avatar} onChange={handleChange} className="w-full border rounded px-3 py-2" />
         {error && <div className="text-red-500">{error}</div>}
-        <button type="submit" className="w-full bg-green-600 text-white py-2 rounded">Sign Up</button>
+        {success && <div className="text-green-600">Sign up successful! Redirecting to log in...</div>}
+        <button type="submit" className="w-full bg-green-600 text-white py-2 rounded" disabled={loading}>{loading ? "Signing Up..." : "Sign Up"}</button>
       </form>
     </div>
   )
