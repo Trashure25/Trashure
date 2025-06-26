@@ -1,33 +1,22 @@
 "use client"
-import { AvatarUploader } from "./components/AvatarUploader"
-import { ProfileStats } from "./components/ProfileStats"
-import { Reputation } from "./components/Reputation"
-import { StyleFit } from "./components/StyleFit"
-import { InventoryCarousel } from "./components/InventoryCarousel"
-import { Wallet } from "./components/Wallet"
-import { Sustainability } from "./components/Sustainability"
-import { Shipping } from "./components/Shipping"
-import { Social } from "./components/Social"
 
-export default function ProfilePage() {
+export default function DesignersPage() {
   return (
     <div className="container mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold mb-6">My Profile</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <AvatarUploader />
-          <ProfileStats />
-          <Reputation />
-          <StyleFit />
-          <InventoryCarousel />
-        </div>
-        <div>
-          <Wallet />
-          <Sustainability />
-          <Shipping />
-          <Social />
+      <h1 className="text-3xl font-bold mb-6">Designers</h1>
+      {/* Add your designers content here, e.g. search bar, popular designers, etc. */}
+      <div className="mb-6">
+        <input className="w-full border rounded px-4 py-2" placeholder="Search 5 000+ brands..." />
+      </div>
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-2">Popular This Week</h2>
+        <div className="flex gap-2 flex-wrap">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="bg-gray-200 rounded-full px-4 py-2 text-sm font-medium">Brand {i+1}</div>
+          ))}
         </div>
       </div>
+      {/* ...more designer content as needed... */}
     </div>
   )
 } 
