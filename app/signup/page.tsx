@@ -7,6 +7,9 @@ export default function SignupPage() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [phone, setPhone] = useState("")
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -42,6 +45,33 @@ export default function SignupPage() {
           placeholder="Email"
           value={email}
           onChange={e => setEmail(e.target.value)}
+          required
+          className="w-full border rounded px-3 py-2"
+        />
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+          className="w-full border rounded px-3 py-2"
+        />
+        <input
+          name="password"
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={e => setConfirmPassword(e.target.value)}
+          required
+          className="w-full border rounded px-3 py-2"
+        />
+        <input
+          name="email"
+          type="email"
+          placeholder="Phone Number"
+          value={phone}
+          onChange={e => setPhone(e.target.value)}
           required
           className="w-full border rounded px-3 py-2"
         />
