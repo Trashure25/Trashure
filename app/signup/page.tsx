@@ -1,5 +1,6 @@
 "use client"
 import { useState } from "react"
+import { toast } from "@/hooks/use-toast"
 
 export default function SignupPage() {
   const [name, setName] = useState("")
@@ -11,23 +12,80 @@ export default function SignupPage() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
+  function validatePassword(pw: string) {
+    // At least 6 chars, at least one letter, one number, one symbol
+    return (
+      pw.length >= 6 &&
+      /[a-zA-Z]/.test(pw) &&
+      /[0-9]/.test(pw) &&
+      /[^a-zA-Z0-9]/.test(pw)
+    )
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
     setSuccess(false)
+    // Passwords must match
     if (password !== confirmPassword) {
+      toast({
+        title: "Unsuccessful signup",
+        description: "Password does not match confirmation.",
+        variant: "destructive",
+      })
       setError("Passwords do not match.")
       return
     }
+    // Password must meet requirements
+    if (!validatePassword(password)) {
+      toast({
+        title: "Unsuccessful signup",
+        description: "Password must be at least 6 characters and include letters, numbers, and symbols.",
+        variant: "destructive",
+      })
+      setError("Password does not meet requirements.")
+      return
+    }
     setLoading(true)
-    // Simulate account creation (no storage)
-    setTimeout(() => {
-      setSuccess(true)
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          password,
+          displayName: name,
+          handle: email.split("@")[0], // simple handle from email
+          phone,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast({
+          title: "Unsuccessful signup",
+          description: data.error || "Sign up failed.",
+          variant: "destructive",
+        })
+        setError(data.error || "Sign up failed.")
+      } else {
+        toast({
+          title: "Successful sign up!",
+          description: `Welcome, ${name || email}!`,
+          variant: "default",
+        })
+        setSuccess(true)
+        // TODO: redirect to welcome/profile page after success
+      }
+    } catch (err) {
+      toast({
+        title: "Unsuccessful signup",
+        description: "Sign up failed. Please try again.",
+        variant: "destructive",
+      })
+      setError("Sign up failed. Please try again.")
+    } finally {
       setLoading(false)
-      setTimeout(() => {
-        window.location.href = "/"
-      }, 1500)
-    }, 800)
+    }
   }
 
   return (
