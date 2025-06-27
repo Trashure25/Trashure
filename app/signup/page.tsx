@@ -4,18 +4,22 @@ import { useState } from "react"
 export default function SignupPage() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
-  const [success, setSuccess] = useState(false)
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [phone, setPhone] = useState("")
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
     setError("")
     setSuccess(false)
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.")
+      return
+    }
+    setLoading(true)
     // Simulate account creation (no storage)
     setTimeout(() => {
       setSuccess(true)
@@ -58,7 +62,7 @@ export default function SignupPage() {
           className="w-full border rounded px-3 py-2"
         />
         <input
-          name="password"
+          name="confirmPassword"
           type="password"
           placeholder="Confirm Password"
           value={confirmPassword}
@@ -67,8 +71,8 @@ export default function SignupPage() {
           className="w-full border rounded px-3 py-2"
         />
         <input
-          name="email"
-          type="email"
+          name="phone"
+          type="tel"
           placeholder="Phone Number"
           value={phone}
           onChange={e => setPhone(e.target.value)}
@@ -84,7 +88,7 @@ export default function SignupPage() {
         <button
           type="submit"
           className="w-full bg-green-600 text-white py-2 rounded"
-          disabled={loading || !name || !email}
+          disabled={loading || !name || !email || !password || !confirmPassword || !phone}
         >
           {loading ? "Creating Account..." : "Sign Up"}
         </button>

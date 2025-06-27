@@ -37,6 +37,7 @@ model User {
   messagesSent   Message[] @relation("SentMessages")
   messagesReceived Message[] @relation("ReceivedMessages")
   creditTransactions CreditTransaction[]
+  phone          String?
 }
 
 model Cart {
