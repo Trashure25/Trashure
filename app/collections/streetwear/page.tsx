@@ -16,4 +16,4 @@ export default function StreetwearPage() {
       </div>
     </div>
   )
-} 
+}

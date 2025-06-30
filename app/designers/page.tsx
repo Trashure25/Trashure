@@ -19,4 +19,4 @@ export default function DesignersPage() {
       {/* ...more designer content as needed... */}
     </div>
   )
-} 
+}

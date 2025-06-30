@@ -16,4 +16,4 @@ export async function POST(req: Request) {
     await prisma.cartItem.create({ data: { cartId: cart.id, itemId, quantity: quantity || 1 } })
   }
   return NextResponse.json({ success: true })
-} 
+}

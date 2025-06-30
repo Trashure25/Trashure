@@ -13,4 +13,4 @@ export async function POST(req: Request) {
     orderBy: { createdAt: 'asc' }
   })
   return NextResponse.json(messages)
-} 
+}

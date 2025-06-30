@@ -35,4 +35,4 @@ export default function HouseholdPage() {
       </div>
     </div>
   )
-} 
+}

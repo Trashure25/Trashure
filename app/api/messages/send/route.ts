@@ -7,4 +7,4 @@ export async function POST(req: Request) {
     data: { senderId, receiverId, content }
   })
   return NextResponse.json(message)
-} 
+}

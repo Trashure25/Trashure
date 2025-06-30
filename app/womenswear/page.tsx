@@ -33,4 +33,4 @@ export default function WomenswearPage() {
       </div>
     </div>
   )
-} 
+}

@@ -9,4 +9,4 @@ export async function POST(req: Request) {
   if (!cartItem) return NextResponse.json({ error: 'Item not in cart' }, { status: 404 })
   await prisma.cartItem.delete({ where: { id: cartItem.id } })
   return NextResponse.json({ success: true })
-} 
+}

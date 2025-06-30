@@ -14,4 +14,4 @@ export async function POST(req: Request) {
 
   // You would set a cookie or session here for real auth
   return NextResponse.json({ user })
-} 
+}

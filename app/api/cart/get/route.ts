@@ -8,4 +8,4 @@ export async function POST(req: Request) {
     include: { items: { include: { item: true } } }
   })
   return NextResponse.json(cart)
-} 
+}
