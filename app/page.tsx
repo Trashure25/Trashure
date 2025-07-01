@@ -1,54 +1,15 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState } from "react"
 import { motion } from "framer-motion"
 
-import { TrashureNavbar } from "@/components/trashure-navbar"
+import { UpdatedAuthNavbar } from "@/components/updated-auth-navbar"
 import { HeroCarousel } from "@/components/hero-carousel"
 import { ItemGridSection } from "@/components/item-grid-section"
 import { AnimatedSlogan } from "@/components/animated-slogan"
+import { PageTransition } from "@/components/page-transition"
+import { TrashureFooter } from "@/components/trashure-footer"
 import type { Item } from "@/components/item-card"
-import { Footer } from "@/components/footer"
-
-function DigitalRainCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const draw = useCallback(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-    const letters = "TRASHURE010101".split("")
-    const fontSize = 12
-    const columns = Math.floor(canvas.width / fontSize)
-    const drops: number[] = Array(columns).fill(1)
-    function renderFrame() {
-      if (!ctx || !canvas) return
-      ctx.fillStyle = "rgba(255,255,255,0.04)"
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-      ctx.fillStyle = "#059669"
-      ctx.font = `${fontSize}px monospace`
-      drops.forEach((y, idx) => {
-        const text = letters[Math.floor(Math.random() * letters.length)]
-        ctx.fillText(text, idx * fontSize, y * fontSize)
-        if (y * fontSize > canvas.height && Math.random() > 0.975) drops[idx] = 0
-        drops[idx]++
-      })
-    }
-    const id = setInterval(renderFrame, 50)
-    return () => clearInterval(id)
-  }, [])
-  useEffect(() => {
-    const cleanup = draw()
-    window.addEventListener("resize", draw)
-    return () => {
-      cleanup?.()
-      window.removeEventListener("resize", draw)
-    }
-  }, [draw])
-  return <canvas ref={canvasRef} className="fixed inset-0 w-full h-full -z-10" />
-}
 
 const trendingApparelItems: Item[] = [
   {
@@ -95,25 +56,27 @@ const trendingApparelItems: Item[] = [
 
 export default function HomePage() {
   const [animateContent, setAnimateContent] = useState(false)
-  const delay = 0.5 // Declare the delay variable
 
   return (
-    <>
+    <PageTransition>
       <div className="min-h-screen flex flex-col bg-white text-black">
-        <TrashureNavbar />
+        <UpdatedAuthNavbar />
         <AnimatedSlogan onSloganAnimationStart={() => setAnimateContent(true)} />
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: animateContent ? 1 : 0 }}
-          transition={{ duration: 1.0, ease: "circOut", delay: delay }}
+          transition={{ duration: 1.0, ease: "circOut", delay: 0.5 }}
           className="flex-grow"
         >
           <HeroCarousel />
-          <ItemGridSection title="Trending Apparel" items={trendingApparelItems} />
+          <ItemGridSection
+            title="Trending: Sustainable Apparel"
+            subtitle="VINTAGE, STREETWEAR, UPCYCLED BRANDS +MORE"
+            items={trendingApparelItems}
+          />
         </motion.div>
-        <DigitalRainCanvas />
+        <TrashureFooter />
       </div>
-      <Footer />
-    </>
+    </PageTransition>
   )
 }
