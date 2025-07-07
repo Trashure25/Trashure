@@ -1,0 +1,24 @@
+.sloganContainer {
+  /* Styles for the h1 container if needed, though opacity might be handled by parent div */
+}
+
+.sloganContainer.animate .letter {
+  animation-name: popIn;
+  animation-duration: 0.7s; /* Duration of the pop-in for each letter */
+  animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Spring-like easing */
+  animation-fill-mode: forwards; /* Keep the state of the last keyframe */
+  opacity: 0; /* Start hidden, animation will make it visible */
+  transform: translateY(28px) scale(0.75); /* Initial state before animation */
+  display: inline-block; /* Necessary for transform */
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.75);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
