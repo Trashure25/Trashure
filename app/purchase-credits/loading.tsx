@@ -1,11 +1,23 @@
 import { Skeleton } from "@/components/ui/skeleton"
-import { UpdatedAuthNavbar } from "@/components/updated-auth-navbar"
-import { TrashureFooter } from "@/components/trashure-footer"
 
 export default function Loading() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <UpdatedAuthNavbar />
+      {/* Navbar Skeleton */}
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between border-b">
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-8 w-8" />
+            <Skeleton className="h-6 w-24" />
+          </div>
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-20" />
+          </div>
+        </div>
+      </div>
+
+      {/* Page Content Skeleton */}
       <main className="flex-grow container mx-auto px-4 py-12">
         <div className="text-center mb-12">
           <Skeleton className="h-10 w-1/2 mx-auto mb-4" />
@@ -21,7 +33,24 @@ export default function Loading() {
           ))}
         </div>
       </main>
-      <TrashureFooter />
+
+      {/* Footer Skeleton */}
+      <div className="bg-gray-900 text-white py-8">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="space-y-4">
+                <Skeleton className="h-6 w-24" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-4 w-36" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

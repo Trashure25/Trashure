@@ -5,21 +5,14 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-<<<<<<< HEAD
-=======
     "postinstall": "prisma generate",
->>>>>>> ea91cfa36fb5608b7e657f87b9d9845a081e4e99
     "lint": "next lint",
     "start": "next start"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
-<<<<<<< HEAD
-    "@hookform/resolvers": "latest",
-=======
     "@hookform/resolvers": "^3.9.1",
     "@prisma/client": "latest",
->>>>>>> ea91cfa36fb5608b7e657f87b9d9845a081e4e99
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",
     "@radix-ui/react-aspect-ratio": "latest",
@@ -50,10 +43,7 @@
     "@stripe/react-stripe-js": "latest",
     "@stripe/stripe-js": "latest",
     "autoprefixer": "^10.4.20",
-<<<<<<< HEAD
-=======
     "bcryptjs": "latest",
->>>>>>> ea91cfa36fb5608b7e657f87b9d9845a081e4e99
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "latest",
@@ -75,21 +65,14 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "latest",
-<<<<<<< HEAD
-    "zod": "latest"
-=======
     "zod": "^3.24.1"
->>>>>>> ea91cfa36fb5608b7e657f87b9d9845a081e4e99
   },
   "devDependencies": {
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "postcss": "^8.5",
-<<<<<<< HEAD
-=======
     "prisma": "^6.10.1",
->>>>>>> ea91cfa36fb5608b7e657f87b9d9845a081e4e99
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
   }
