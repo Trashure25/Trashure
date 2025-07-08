@@ -3,10 +3,18 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 
+<<<<<<< HEAD
+=======
+import { UpdatedAuthNavbar } from "@/components/updated-auth-navbar"
+>>>>>>> ea91cfa36fb5608b7e657f87b9d9845a081e4e99
 import { HeroCarousel } from "@/components/hero-carousel"
 import { ItemGridSection } from "@/components/item-grid-section"
 import { AnimatedSlogan } from "@/components/animated-slogan"
 import { PageTransition } from "@/components/page-transition"
+<<<<<<< HEAD
+=======
+import { TrashureFooter } from "@/components/trashure-footer"
+>>>>>>> ea91cfa36fb5608b7e657f87b9d9845a081e4e99
 import type { Item } from "@/components/item-card"
 
 const trendingApparelItems: Item[] = [
@@ -57,7 +65,12 @@ export default function HomePage() {
 
   return (
     <PageTransition>
+<<<<<<< HEAD
       <div className="bg-white text-black">
+=======
+      <div className="min-h-screen flex flex-col bg-white text-black">
+        <UpdatedAuthNavbar />
+>>>>>>> ea91cfa36fb5608b7e657f87b9d9845a081e4e99
         <AnimatedSlogan onSloganAnimationStart={() => setAnimateContent(true)} />
         <motion.div
           initial={{ opacity: 0 }}
@@ -72,6 +85,10 @@ export default function HomePage() {
             items={trendingApparelItems}
           />
         </motion.div>
+<<<<<<< HEAD
+=======
+        <TrashureFooter />
+>>>>>>> ea91cfa36fb5608b7e657f87b9d9845a081e4e99
       </div>
     </PageTransition>
   )

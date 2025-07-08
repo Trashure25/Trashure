@@ -1,5 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
+<<<<<<< HEAD
 import { Inter, Oswald } from "next/font/google"
 import "./globals.css"
 import { cn } from "@/lib/utils"
@@ -16,6 +17,17 @@ const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" })
 export const metadata: Metadata = {
   title: "Trashure - Peer-to-Peer Fashion Exchange",
   description: "Trade, buy, and sell unique fashion items, from streetwear to vintage classics.",
+=======
+import { Inter } from "next/font/google"
+import "./globals.css"
+import { CartProvider } from "@/components/cart-provider"
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+
+export const metadata: Metadata = {
+  title: "Trashure - Peer-to-Peer Fashion Exchange",
+  description: "Make your trash treasure. The leading platform for trading fashion and goods.",
+>>>>>>> ea91cfa36fb5608b7e657f87b9d9845a081e4e99
     generator: 'v0.dev'
 }
 
@@ -25,6 +37,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
+<<<<<<< HEAD
     <html lang="en" suppressHydrationWarning>
       <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable, oswald.variable)}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
@@ -37,6 +50,11 @@ export default function RootLayout({
             </CartProvider>
           </AuthProvider>
         </ThemeProvider>
+=======
+    <html lang="en">
+      <body className={inter.className}>
+        <CartProvider>{children}</CartProvider>
+>>>>>>> ea91cfa36fb5608b7e657f87b9d9845a081e4e99
       </body>
     </html>
   )
