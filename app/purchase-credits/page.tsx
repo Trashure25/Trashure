@@ -29,7 +29,7 @@ export default function PurchaseCreditsPage() {
     }
   }, [isLoading, currentUser, router])
 
-  const handlePurchase = (pkg) => {
+  const handlePurchase = (pkg: { dollars: number; credits: number; bonus: number; popular: boolean }) => {
     const amountInCents = pkg.dollars * 100
     const totalCredits = pkg.credits + pkg.bonus
     router.push(`/checkout?amount=${amountInCents}&credits=${totalCredits}`)
@@ -96,7 +96,6 @@ export default function PurchaseCreditsPage() {
             ))}
           </div>
         </main>
-        <TrashureFooter />
       </div>
     </PageTransition>
   )
