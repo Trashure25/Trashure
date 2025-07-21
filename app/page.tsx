@@ -52,30 +52,24 @@ const trendingApparelItems: Item[] = [
 ]
 
 export default function HomePage() {
-  const [contentVisible, setContentVisible] = useState(false)
-
   return (
     <main className="min-h-screen bg-white">
-      {!contentVisible && <AnimatedSlogan onAnimationComplete={() => setContentVisible(true)} />}
-
-      {contentVisible && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.0, ease: "easeIn" }}>
-          <HeroCarousel />
-          <div className="py-8 md:py-12">
-            <div className="container mx-auto px-4">
-              <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-black">
-                Recently Listed by the Community
-              </h2>
-              <UserListingsGrid />
-            </div>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.0, ease: "easeIn" }}>
+        <HeroCarousel />
+        <div className="py-8 md:py-12">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-black">
+              Recently Listed by the Community
+            </h2>
+            <UserListingsGrid />
           </div>
-          <ItemGridSection
-            title="Trending: Eco Threads"
-            subtitle="VINTAGE, STREETWEAR, UPCYCLED BRANDS +MORE"
-            items={trendingApparelItems}
-          />
-        </motion.div>
-      )}
+        </div>
+        <ItemGridSection
+          title="Trending: Eco Threads"
+          subtitle="VINTAGE, STREETWEAR, UPCYCLED BRANDS +MORE"
+          items={trendingApparelItems}
+        />
+      </motion.div>
     </main>
   )
 }
