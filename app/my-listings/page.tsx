@@ -1,102 +1,105 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { auth } from "@/lib/auth"
-import type { User } from "@/lib/database"
+import { useAuth } from "@/contexts/auth-context"
+import type { Listing } from "@/lib/listings"
+import { listingsService } from "@/lib/listings"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Plus, Package, Eye, Edit, Trash2 } from "lucide-react"
-
-// Mock listing data - in a real app this would come from your database
-interface Listing {
-  id: string
-  title: string
-  description: string
-  price: number
-  category: string
-  status: "active" | "sold" | "draft"
-  images: string[]
-  createdAt: string
-}
+import { Plus, Package, Eye, Edit, Trash2, Loader2 } from "lucide-react"
+import { toast } from "@/components/ui/use-toast"
 
 export default function MyListingsPage() {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [listings] = useState<Listing[]>([
-    {
-      id: "1",
-      title: "Vintage Levi's 501 Jeans",
-      description: "Classic vintage Levi's in excellent condition",
-      price: 45,
-      category: "Denim",
-      status: "active",
-      images: ["/placeholder.svg?height=200&width=200"],
-      createdAt: "2024-01-15",
-    },
-    {
-      id: "2",
-      title: "Supreme Box Logo Hoodie",
-      description: "Authentic Supreme hoodie, size M",
-      price: 120,
-      category: "Streetwear",
-      status: "sold",
-      images: ["/placeholder.svg?height=200&width=200"],
-      createdAt: "2024-01-10",
-    },
-  ])
+  const { currentUser, isLoading: authLoading } = useAuth()
+  const [listings, setListings] = useState<Listing[]>([])
+  const [loadingListings, setLoadingListings] = useState(true)
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const currentUser = await auth.getCurrentUser()
-        if (!currentUser) {
-          router.push("/")
-        } else {
-          setUser(currentUser)
-        }
-      } catch (error) {
-        console.error("Failed to fetch user", error)
-        router.push("/")
-      } finally {
-        setLoading(false)
-      }
+    if (!authLoading && !currentUser) {
+      toast({
+        title: "Please log in",
+        description: "You must be logged in to view your listings.",
+        variant: "destructive",
+      })
+      router.push("/login")
+      return
     }
-    fetchUser()
-  }, [router])
 
-  if (loading) {
+    if (currentUser) {
+      const fetchListings = async () => {
+        try {
+          setLoadingListings(true)
+          const userListings = await listingsService.getListingsForUser(currentUser.id)
+          setListings(userListings)
+        } catch (error) {
+          console.error("Failed to fetch listings", error)
+          toast({
+            title: "Error",
+            description: "Could not fetch your listings.",
+            variant: "destructive",
+          })
+        } finally {
+          setLoadingListings(false)
+        }
+      }
+      fetchListings()
+    }
+  }, [currentUser, authLoading, router])
+
+  const handleDeleteListing = async (listingId: string) => {
+    try {
+      await listingsService.deleteListing(listingId)
+      setListings((prev) => prev.filter((listing) => listing.id !== listingId))
+      toast({
+        title: "Success",
+        description: "Listing deleted successfully.",
+        className: "bg-green-100 text-green-800",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Could not delete listing.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleViewListing = (listingId: string) => {
+    router.push(`/listing/${listingId}`)
+  }
+
+  const handleEditListing = (listingId: string) => {
+    router.push(`/edit-listing/${listingId}`)
+  }
+
+  if (authLoading || loadingListings) {
     return (
       <div className="container mx-auto py-12 px-4">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-64 bg-gray-200 rounded"></div>
-            ))}
-          </div>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       </div>
     )
   }
 
-  if (!user) {
+  if (!currentUser) {
     return null
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800 border-green-200"
       case "sold":
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800 border-gray-200"
       case "draft":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800 border-yellow-200"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800 border-gray-200"
     }
   }
 
@@ -132,36 +135,51 @@ export default function MyListingsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {listings.map((listing) => (
-            <Card key={listing.id} className="overflow-hidden">
+            <Card key={listing.id} className="overflow-hidden group">
               <div className="aspect-square bg-gray-100 relative">
                 <img
-                  src={listing.images[0] || "/placeholder.svg"}
+                  src={listing.images[0] || "/placeholder.svg?height=300&width=300"}
                   alt={listing.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <Badge className={`absolute top-2 right-2 ${getStatusColor(listing.status)}`}>
                   {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
                 </Badge>
               </div>
               <CardHeader>
-                <CardTitle className="text-lg">{listing.title}</CardTitle>
+                <CardTitle className="text-lg truncate">{listing.title}</CardTitle>
                 <div className="flex justify-between items-center">
                   <span className="text-2xl font-bold text-primary">{listing.price} Credits</span>
                   <Badge variant="outline">{listing.category}</Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">{listing.description}</p>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-2 h-10">{listing.description}</p>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-transparent"
+                    onClick={() => handleViewListing(listing.id)}
+                  >
                     <Eye className="w-4 h-4 mr-1" />
                     View
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-transparent"
+                    onClick={() => handleEditListing(listing.id)}
+                  >
                     <Edit className="w-4 h-4 mr-1" />
                     Edit
                   </Button>
-                  <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 bg-transparent">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-red-600 hover:text-red-700 bg-transparent"
+                    onClick={() => handleDeleteListing(listing.id)}
+                  >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>

@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true)
 
   const loadUser = useCallback(async () => {
+    setIsLoading(true)
     try {
       const user = await auth.getCurrentUser()
       setCurrentUser(user)
@@ -49,6 +50,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const signup = async (data: SignupData) => {
+    // After signup, we could automatically log them in or require manual login
+    // For now, we'll just create the account.
     await auth.signup(data)
   }
 

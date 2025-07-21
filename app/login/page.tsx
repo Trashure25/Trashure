@@ -3,32 +3,28 @@
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 
 import { useAuth } from "@/contexts/auth-context"
-import { type LoginData, loginSchema } from "@/lib/auth"
+// Zod removed – we’ll do plain HTML/React-Hook-Form validation
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 
 export default function LoginPage() {
   const router = useRouter()
   const { login } = useAuth()
 
   // ─── RHF & Zod setup ────────────────────────────────────────────────────────
-  const form = useForm<LoginData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+  type LoginFormValues = { email: string; password: string }
+  const form = useForm<LoginFormValues>({
+    defaultValues: { email: "", password: "" },
   })
 
   // ─── Submit handler ─────────────────────────────────────────────────────────
-  const onSubmit = async (data: LoginData) => {
+  const onSubmit = async (data: LoginFormValues) => {
     try {
       await login(data) // authenticates via the mock service in lib/auth
       toast.success("Login successful! Redirecting …")
@@ -57,9 +53,11 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="you@example.com" {...field} />
+                      <Input type="email" placeholder="you@example.com" {...field} required />
                     </FormControl>
-                    <FormMessage />
+                    {form.formState.errors.email && (
+                      <p className="text-xs text-red-600">{form.formState.errors.email.message}</p>
+                    )}
                   </FormItem>
                 )}
               />
@@ -70,9 +68,11 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input type="password" placeholder="••••••••" {...field} required minLength={1} />
                     </FormControl>
-                    <FormMessage />
+                    {form.formState.errors.password && (
+                      <p className="text-xs text-red-600">{form.formState.errors.password.message}</p>
+                    )}
                   </FormItem>
                 )}
               />

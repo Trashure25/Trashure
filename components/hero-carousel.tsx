@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Image from "next/image"
+import Link from "next/link"
 import {
   Carousel,
   CarouselContent,
@@ -10,42 +11,30 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel"
+import Autoplay from "embla-carousel-autoplay"
 
-interface CarouselSlide {
-  id: number
-  imageSrc: string
-  altText: string
-  title: string
-  subtitle: string
-  buttonText: string
-  buttonLink: string
-}
-
-const slides: CarouselSlide[] = [
+const carouselItems = [
   {
-    id: 1,
-    imageSrc: "/placeholder.svg?width=1200&height=400",
-    altText: "Trending Sustainable Fashion",
+    src: "/hero-images/hero-1.png",
+    alt: "Abstract blurry photo of a field with yellow flowers",
     title: "Trending: Eco-Threads",
-    subtitle: "Discover unique, upcycled & sustainable pieces from top creators.",
+    subtitle: "Discover unique, upcycled & sustainable pieces.",
     buttonText: "Shop Eco-Threads",
     buttonLink: "/collections/eco-threads",
   },
   {
-    id: 2,
-    imageSrc: "/placeholder.svg?width=1200&height=400",
-    altText: "Vintage Denim Collection",
+    src: "/hero-images/hero-2.png",
+    alt: "Minimalist image of a grassy hill with colored squares",
     title: "Vintage Denim Drop",
-    subtitle: "Rare finds and classic cuts. Your next favorite jeans are here.",
+    subtitle: "Rare finds and classic cuts.",
     buttonText: "Explore Denim",
     buttonLink: "/collections/vintage-denim",
   },
   {
-    id: 3,
-    imageSrc: "/placeholder.svg?width=1200&height=400",
-    altText: "Minimalist Streetwear",
+    src: "/hero-images/hero-3.png",
+    alt: "Painting of a desert landscape with a pinkish mesa",
     title: "Streetwear Essentials",
-    subtitle: "Curated streetwear for the modern minimalist. Trade for your next look.",
+    subtitle: "Curated streetwear for the modern minimalist.",
     buttonText: "View Streetwear",
     buttonLink: "/collections/streetwear",
   },
@@ -54,6 +43,7 @@ const slides: CarouselSlide[] = [
 export function HeroCarousel() {
   const [api, setApi] = React.useState<CarouselApi>()
   const [current, setCurrent] = React.useState(0)
+  const plugin = React.useRef(Autoplay({ delay: 4000, stopOnInteraction: true }))
 
   React.useEffect(() => {
     if (!api) {
@@ -67,29 +57,34 @@ export function HeroCarousel() {
 
   return (
     <div className="w-full relative">
-      <Carousel setApi={setApi} className="w-full" opts={{ loop: true }}>
+      <Carousel
+        setApi={setApi}
+        plugins={[plugin.current]}
+        className="w-full"
+        opts={{ loop: true }}
+        onMouseEnter={plugin.current.stop}
+        onMouseLeave={plugin.current.reset}
+      >
         <CarouselContent>
-          {slides.map((slide) => (
-            <CarouselItem key={slide.id}>
-              <div className="relative h-[300px] md:h-[350px] lg:h-[400px] w-full">
-                {" "}
-                {/* Reduced height */}
+          {carouselItems.map((item, index) => (
+            <CarouselItem key={index}>
+              <div className="relative h-[300px] md:h-[400px] lg:h-[500px] w-full">
                 <Image
-                  src={slide.imageSrc || "/placeholder.svg"}
-                  alt={slide.altText}
-                  layout="fill"
-                  objectFit="cover"
-                  className="brightness-75"
+                  src={item.src || "/placeholder.svg"}
+                  alt={item.alt}
+                  fill
+                  className="object-cover brightness-75"
+                  priority={index === 0}
                 />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-black/30 p-8">
-                  <p className="text-sm md:text-base font-light tracking-wider uppercase">{slide.subtitle}</p>
-                  <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold my-4">{slide.title}</h2>
-                  <a
-                    href={slide.buttonLink}
-                    className="inline-flex items-center justify-center mt-4 px-8 py-3 text-base md:text-lg border border-white text-white hover:bg-white hover:text-black rounded-md transition-colors"
+                  <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold my-4">{item.title}</h2>
+                  <p className="text-lg md:text-xl font-light tracking-wider uppercase">{item.subtitle}</p>
+                  <Link
+                    href={item.buttonLink}
+                    className="inline-block mt-6 px-8 py-3 border border-white text-white rounded-md text-base hover:bg-white hover:text-black transition-colors"
                   >
-                    {slide.buttonText}
-                  </a>
+                    {item.buttonText}
+                  </Link>
                 </div>
               </div>
             </CarouselItem>
@@ -99,7 +94,7 @@ export function HeroCarousel() {
         <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/50 hover:bg-white text-black" />
       </Carousel>
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
-        {slides.map((_, index) => (
+        {carouselItems.map((_, index) => (
           <button
             key={index}
             onClick={() => api?.scrollTo(index)}

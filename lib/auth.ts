@@ -1,19 +1,6 @@
 import { z } from "zod"
 
-// Define the schema for a user
-export const userSchema = z.object({
-  id: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string().email(),
-  username: z.string(),
-  credits: z.number().default(0),
-  avatarUrl: z.string().url().optional().nullable(),
-})
-
-export type User = z.infer<typeof userSchema>
-
-// Define schemas for auth operations
+// --- Validation Schemas ---
 export const signupSchema = z
   .object({
     firstName: z.string().min(1, "First name is required"),
@@ -24,7 +11,7 @@ export const signupSchema = z
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: "Passwords do not match",
     path: ["confirmPassword"],
   })
 
@@ -37,7 +24,7 @@ export const profileUpdateSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   username: z.string().min(3, "Username must be at least 3 characters"),
-  email: z.string().email("Invalid email address"),
+  email: z.string().email(), // Email is read-only in the form
 })
 
 export const passwordChangeSchema = z
@@ -47,7 +34,7 @@ export const passwordChangeSchema = z
     confirmNewPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: "New passwords don't match",
+    message: "New passwords do not match",
     path: ["confirmNewPassword"],
   })
 
@@ -56,22 +43,48 @@ export type LoginData = z.infer<typeof loginSchema>
 export type ProfileUpdateData = z.infer<typeof profileUpdateSchema>
 export type PasswordChangeData = z.infer<typeof passwordChangeSchema>
 
+// --- Mock User Type ---
+export interface User {
+  id: string
+  firstName: string
+  lastName: string
+  username: string
+  email: string
+  passwordHash: string
+  avatarUrl?: string
+  trustScore: number
+}
+
+// --- Mock Database using localStorage ---
+const USERS_KEY = "trashure_users"
+const SESSION_KEY = "trashure_session"
+
+const getStoredUsers = (): User[] => {
+  if (typeof window === "undefined") return []
+  try {
+    const usersJson = localStorage.getItem(USERS_KEY)
+    return usersJson ? JSON.parse(usersJson) : []
+  } catch (error) {
+    console.error("Failed to parse users from localStorage", error)
+    return []
+  }
+}
+
+const storeUsers = (users: User[]) => {
+  if (typeof window === "undefined") return
+  localStorage.setItem(USERS_KEY, JSON.stringify(users))
+}
+
 // --- Mock Authentication Service ---
-// In a real app, this would interact with your database and authentication provider.
+export const auth = {
+  async signup(data: SignupData): Promise<User> {
+    await new Promise((resolve) => setTimeout(resolve, 500)) // Simulate network delay
+    const users = getStoredUsers()
 
-const MOCK_DELAY = 1000
-const users: User[] = []
-let loggedInUser: User | null = null
-
-const authService = {
-  signup: async (data: SignupData): Promise<{ success: true }> => {
-    console.log("Attempting signup for:", data.email)
-    await new Promise((res) => setTimeout(res, MOCK_DELAY))
-
-    if (users.find((u) => u.email === data.email)) {
+    if (users.some((user) => user.email === data.email)) {
       throw new Error("An account with this email already exists.")
     }
-    if (users.find((u) => u.username === data.username)) {
+    if (users.some((user) => user.username === data.username)) {
       throw new Error("This username is already taken.")
     }
 
@@ -79,86 +92,92 @@ const authService = {
       id: `user_${Date.now()}`,
       firstName: data.firstName,
       lastName: data.lastName,
-      email: data.email,
       username: data.username,
-      credits: 10, // Start with some credits
-      avatarUrl: null,
+      email: data.email,
+      passwordHash: `hashed_${data.password}`, // In a real app, use bcrypt
+      avatarUrl: `https://api.dicebear.com/8.x/initials/svg?seed=${data.firstName} ${data.lastName}`,
+      trustScore: Math.floor(Math.random() * 30) + 70, // Assign a random score between 70-99
     }
-    users.push(newUser)
-    console.log("Signup successful:", newUser)
-    return { success: true }
+
+    storeUsers([...users, newUser])
+    return newUser
   },
 
-  login: async (data: LoginData): Promise<User> => {
-    console.log("Attempting login for:", data.email)
-    await new Promise((res) => setTimeout(res, MOCK_DELAY))
-
+  async login(data: LoginData): Promise<User> {
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    const users = getStoredUsers()
     const user = users.find((u) => u.email === data.email)
-    // In a real app, you would also check the password hash
-    if (!user) {
+
+    if (!user || user.passwordHash !== `hashed_${data.password}`) {
       throw new Error("Invalid email or password.")
     }
 
-    loggedInUser = user
-    localStorage.setItem("trashure-user-token", user.id) // Mock session
-    console.log("Login successful:", loggedInUser)
-    return loggedInUser
-  },
-
-  logout: async (): Promise<void> => {
-    console.log("Logging out.")
-    await new Promise((res) => setTimeout(res, 500))
-    loggedInUser = null
-    localStorage.removeItem("trashure-user-token")
-  },
-
-  getCurrentUser: async (): Promise<User | null> => {
-    console.log("Getting current user...")
-    await new Promise((res) => setTimeout(res, 500))
-    const token = localStorage.getItem("trashure-user-token")
-    if (token) {
-      const user = users.find((u) => u.id === token)
-      loggedInUser = user || null
-    } else {
-      loggedInUser = null
+    if (typeof window !== "undefined") {
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ userId: user.id }))
     }
-    console.log("Current user is:", loggedInUser)
-    return loggedInUser
+    return user
   },
 
-  updateProfile: async (userId: string, data: ProfileUpdateData): Promise<User> => {
-    await new Promise((res) => setTimeout(res, MOCK_DELAY))
+  async logout(): Promise<void> {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(SESSION_KEY)
+    }
+  },
+
+  async getCurrentUser(): Promise<User | null> {
+    if (typeof window === "undefined") return null
+    const sessionJson = localStorage.getItem(SESSION_KEY)
+    if (!sessionJson) return null
+
+    try {
+      const { userId } = JSON.parse(sessionJson)
+      if (!userId) return null
+
+      const users = getStoredUsers()
+      const user = users.find((u) => u.id === userId)
+      return user || null
+    } catch (error) {
+      console.error("Failed to parse session from localStorage", error)
+      return null
+    }
+  },
+
+  async updateProfile(userId: string, data: ProfileUpdateData): Promise<User> {
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    const users = getStoredUsers()
     const userIndex = users.findIndex((u) => u.id === userId)
-    if (userIndex === -1) {
-      throw new Error("User not found.")
-    }
-    users[userIndex] = { ...users[userIndex], ...data }
-    loggedInUser = users[userIndex]
-    return loggedInUser
+
+    if (userIndex === -1) throw new Error("User not found.")
+
+    const updatedUser = { ...users[userIndex], ...data }
+    users[userIndex] = updatedUser
+    storeUsers(users)
+    return updatedUser
   },
 
-  changePassword: async (userId: string, data: PasswordChangeData): Promise<{ success: true }> => {
-    await new Promise((res) => setTimeout(res, MOCK_DELAY))
-    const user = users.find((u) => u.id === userId)
-    if (!user) {
-      throw new Error("User not found.")
-    }
-    // In a real app, you'd verify the currentPassword
-    console.log("Password changed successfully for", user.email)
-    return { success: true }
-  },
-  updateAvatar: async (userId: string, avatarUrl: string): Promise<User> => {
-    await new Promise((res) => setTimeout(res, MOCK_DELAY))
+  async changePassword(userId: string, data: PasswordChangeData): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    const users = getStoredUsers()
     const userIndex = users.findIndex((u) => u.id === userId)
-    if (userIndex === -1) {
-      throw new Error("User not found.")
+
+    if (userIndex === -1) throw new Error("User not found.")
+    if (users[userIndex].passwordHash !== `hashed_${data.currentPassword}`) {
+      throw new Error("Incorrect current password.")
     }
+
+    users[userIndex].passwordHash = `hashed_${data.newPassword}`
+    storeUsers(users)
+  },
+
+  async updateAvatar(userId: string, avatarUrl: string): Promise<User> {
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    const users = getStoredUsers()
+    const userIndex = users.findIndex((u) => u.id === userId)
+
+    if (userIndex === -1) throw new Error("User not found.")
+
     users[userIndex].avatarUrl = avatarUrl
-    if (loggedInUser?.id === userId) {
-      loggedInUser = users[userIndex]
-    }
+    storeUsers(users)
     return users[userIndex]
   },
 }
-
-export const auth = authService

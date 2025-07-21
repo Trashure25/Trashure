@@ -4,22 +4,19 @@ import { useEffect, type CSSProperties } from "react"
 import { motion, useAnimation, type Variants } from "framer-motion"
 
 interface AnimatedSloganProps {
-  /** Optional callback fired as soon as the text begins animating in. */
-  onSloganAnimationStart?: () => void
+  onAnimationComplete?: () => void
 }
 
 const sloganText = "MAKE YOUR TRASH TREASURE."
 
-/* ------------------------------- Variants ------------------------------- */
-
 const containerVariants: Variants = {
-  visible: { opacity: 1, height: "auto" },
+  initial: { opacity: 1, height: "auto", paddingTop: "6rem", paddingBottom: "6rem" },
   hidden: {
     opacity: 0,
     height: 0,
     paddingTop: 0,
     paddingBottom: 0,
-    transition: { duration: 1, ease: "easeInOut" },
+    transition: { duration: 1, ease: "easeInOut", delay: 0.5 },
   },
 }
 
@@ -34,34 +31,32 @@ const textVariants: Variants = {
   fadeOut: { opacity: 0, transition: { duration: 0.5, ease: "easeInOut" } },
 }
 
-/* ------------------------------ Component ------------------------------ */
-
-export function AnimatedSlogan({ onSloganAnimationStart }: AnimatedSloganProps) {
+export function AnimatedSlogan({ onAnimationComplete }: AnimatedSloganProps) {
   const containerControls = useAnimation()
   const textControls = useAnimation()
 
   useEffect(() => {
     const sequence = async () => {
-      await new Promise((r) => setTimeout(r, 500)) // brief delay
-      onSloganAnimationStart?.()
+      await new Promise((r) => setTimeout(r, 500))
+      await textControls.start("visible")
+      await new Promise((r) => setTimeout(r, 2000))
 
-      await textControls.start("visible") // animate in
-      await new Promise((r) => setTimeout(r, 2000)) // hold
+      void textControls.start("fadeOut")
+      void containerControls.start("hidden")
 
-      await textControls.start("fadeOut") // fade text
-      await containerControls.start("hidden") // collapse container
+      await new Promise((r) => setTimeout(r, 1500))
+      onAnimationComplete?.()
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    sequence()
-  }, [containerControls, textControls, onSloganAnimationStart])
+    sequence().catch(console.error)
+  }, [containerControls, textControls, onAnimationComplete])
 
   const gradientTextStyle: CSSProperties = {
     backgroundImage: "linear-gradient(to right, #059669, #047857, #065f46, #047857, #059669)",
     WebkitBackgroundClip: "text",
     backgroundClip: "text",
     color: "transparent",
-    fontFamily: "var(--font-oswald)", // original heading font
+    fontFamily: "var(--font-oswald)",
     letterSpacing: "0.05em",
     textTransform: "uppercase",
     fontWeight: 700,
@@ -69,10 +64,10 @@ export function AnimatedSlogan({ onSloganAnimationStart }: AnimatedSloganProps) 
 
   return (
     <motion.div
-      className="py-16 text-center md:py-24"
+      className="text-center"
       style={{ overflow: "hidden" }}
       variants={containerVariants}
-      initial="visible"
+      initial="initial"
       animate={containerControls}
     >
       <motion.h1

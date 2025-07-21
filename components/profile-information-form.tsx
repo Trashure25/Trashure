@@ -1,92 +1,65 @@
 "use client"
 
-import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useAuth } from "@/contexts/auth-context"
-import { profileUpdateSchema, type ProfileUpdateData, type User } from "@/lib/auth"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { useToast } from "@/hooks/use-toast"
-import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { useAuth } from "@/contexts/auth-context"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-interface ProfileInformationFormProps {
-  user: User
-}
+const profileFormSchema = z.object({
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
+  }),
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+})
 
-export function ProfileInformationForm({ user }: ProfileInformationFormProps) {
-  const { updateProfile } = useAuth()
-  const { toast } = useToast()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+type ProfileFormValues = z.infer<typeof profileFormSchema>
 
-  const form = useForm<ProfileUpdateData>({
-    resolver: zodResolver(profileUpdateSchema),
+export function ProfileInformationForm() {
+  const { user, updateUser } = useAuth()
+
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      username: user.username,
-      email: user.email,
+      name: user?.name || "",
+      email: user?.email || "",
     },
+    mode: "onChange",
   })
 
-  const onSubmit = async (data: ProfileUpdateData) => {
-    setIsSubmitting(true)
-    try {
-      await updateProfile(data)
-      toast({
-        title: "Success",
-        description: "Your profile has been updated.",
-      })
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred."
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
+  function onSubmit(data: ProfileFormValues) {
+    if (user) {
+      updateUser({ ...user, ...data })
+      alert("Profile updated successfully!")
     }
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Personal Information</CardTitle>
-        <CardDescription>Update your personal details here.</CardDescription>
+        <CardTitle>Profile Information</CardTitle>
       </CardHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
-            <div className="grid sm:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"
@@ -94,33 +67,16 @@ export function ProfileInformationForm({ user }: ProfileInformationFormProps) {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" {...field} disabled />
+                    <Input placeholder="Your email" {...field} disabled />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-          <CardFooter>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Changes"}
-            </Button>
-          </CardFooter>
-        </form>
-      </Form>
+            <Button type="submit">Update Profile</Button>
+          </form>
+        </Form>
+      </CardContent>
     </Card>
   )
 }

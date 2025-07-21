@@ -1,36 +1,74 @@
-import React from "react"
+"use client"
+
+import { ItemCard } from "@/components/item-card"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+
+const items = [
+  {
+    id: "1",
+    name: "Floral Midi Dress",
+    price: 125,
+    imageUrl: "/placeholder.svg?height=400&width=300",
+    designer: "Reformation",
+    size: "S",
+    isNew: true,
+  },
+  {
+    id: "2",
+    name: "High-Waisted Straight Jeans",
+    price: 98,
+    imageUrl: "/placeholder.svg?height=400&width=300",
+    designer: "AGOLDE",
+    size: "27",
+  },
+  {
+    id: "3",
+    name: "Silk Camisole",
+    price: 60,
+    imageUrl: "/placeholder.svg?height=400&width=300",
+    designer: "Vince",
+    size: "M",
+  },
+  {
+    id: "4",
+    name: "Leather Ankle Boots",
+    price: 195,
+    imageUrl: "/placeholder.svg?height=400&width=300",
+    designer: "Madewell",
+    size: "8",
+  },
+]
 
 export default function WomenswearPage() {
   return (
-    <div className="container mx-auto py-10 px-4">
-      {/* Hero Copy */}
-      <div className="w-full h-32 bg-pink-100 flex items-center justify-center mb-8">
-        <span className="text-2xl font-bold">Curate your closet, sustainably.</span>
-      </div>
-      {/* Sticky Sub-Nav */}
-      <nav className="sticky top-16 bg-white z-10 flex gap-6 border-b py-2 mb-8">
-        {["Tops", "Bottoms", "Outerwear", "Dresses", "Co-ords", "Accessories"].map((cat) => (
-          <a key={cat} href="#" className="font-semibold text-sm hover:text-primary">{cat}</a>
-        ))}
-      </nav>
-      {/* Feed Tiles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1,2,3].map((i) => (
-          <div key={i} className="bg-white border rounded-lg p-4 flex flex-col">
-            <div className="aspect-[3/4] bg-gray-100 mb-4 flex items-center justify-center">
-              <span className="text-gray-400">3:4 Image</span>
-            </div>
-            <div className="mb-2 font-bold">Brand Name</div>
-            <div className="mb-1">Item Name</div>
-            <div className="mb-1 text-primary font-semibold">XX Credits</div>
-            <div className="text-xs text-gray-500">Like icon</div>
-          </div>
+    <main className="container mx-auto px-4 py-8">
+      <Breadcrumb className="mb-8">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Womenswear</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <h1 className="text-3xl font-bold mb-2">Womenswear</h1>
+      <p className="text-gray-600 mb-8">
+        Effortless style for every occasion, from everyday essentials to statement pieces.
+      </p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {items.map((item) => (
+          <ItemCard key={item.id} item={item} />
         ))}
       </div>
-      {/* Fit-Finder Widget */}
-      <div className="mt-8 p-4 bg-blue-100 text-blue-900 rounded text-center font-semibold">
-        Fit-Finder Widget: Enter height + usual size → auto-filters.
-      </div>
-    </div>
+    </main>
   )
 }

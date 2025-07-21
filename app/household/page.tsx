@@ -1,5 +1,3 @@
-import React from "react"
-
 const categories = [
   { title: "Bedding & Linens", items: ["Duvet covers", "Throw blankets"] },
   { title: "Desk & Storage", items: ["Shelving carts", "Organisers"] },
@@ -11,7 +9,7 @@ const categories = [
 export default function HouseholdPage() {
   return (
     <div className="container mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold mb-6">Household & Dorm</h1>
+      <h1 className="text-3xl font-bold mb-6">Households & Dorms</h1>
       {/* Category Tiles */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {categories.map((cat) => (

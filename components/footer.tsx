@@ -1,25 +1,117 @@
-import React from "react"
-import { FaInstagram, FaFacebook, FaYoutube, FaLinkedin } from "react-icons/fa"
+import Link from "next/link"
+import Image from "next/image"
 
 export function Footer() {
   return (
-    <footer className="w-full border-t border-gray-200 bg-white py-8 mt-12">
-      <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
-        <nav className="flex flex-wrap gap-x-8 gap-y-2 justify-center md:justify-start w-full md:w-auto mb-4 md:mb-0">
-          <a href="#" className="font-bold text-black text-sm">ABOUT</a>
-          <a href="#" className="font-bold text-black text-sm">YOUR PRIVACY CHOICES</a>
-          <a href="#" className="font-bold text-black text-sm">HELP & FAQ</a>
-          <a href="#" className="font-bold text-black text-sm">TERMS</a>
-          <a href="#" className="font-bold text-black text-sm">PRIVACY</a>
-          <a href="#" className="font-bold text-black text-sm">CONTACT</a>
-          <a href="#" className="font-bold text-black text-sm">IOS APP</a>
-        </nav>
-        <div className="flex items-center gap-4">
-          <a href="#" aria-label="Instagram"><FaInstagram className="w-5 h-5 text-black" /></a>
-          <a href="#" aria-label="Facebook"><FaFacebook className="w-5 h-5 text-black" /></a>
-          <a href="#" aria-label="YouTube"><FaYoutube className="w-5 h-5 text-black" /></a>
-          <a href="#" aria-label="LinkedIn"><FaLinkedin className="w-5 h-5 text-black" /></a>
-          <span className="ml-4 text-black text-sm font-semibold">Trashure © 2025</span>
+    <footer className="bg-gray-100 text-gray-700">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
+          <div className="col-span-2 lg:col-span-2">
+            <Image src="/trashure-wordmark.jpeg" alt="Trashure Logo" width={120} height={32} className="mb-4" />
+            <p className="text-sm max-w-xs">
+              The leading global platform for peer-to-peer luxury, streetwear, and vintage fashion and goods.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-4">Shop</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link href="/menswear" className="hover:text-primary">
+                  Menswear
+                </Link>
+              </li>
+              <li>
+                <Link href="/womenswear" className="hover:text-primary">
+                  Womenswear
+                </Link>
+              </li>
+              <li>
+                <Link href="/household" className="hover:text-primary">
+                  Households & Dorms
+                </Link>
+              </li>
+              <li>
+                <Link href="/designers" className="hover:text-primary">
+                  Designers
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-4">About</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link href="#" className="hover:text-primary">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary">
+                  Careers
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary">
+                  Press
+                </Link>
+              </li>
+              <li>
+                <Link href="/sponsorship" className="hover:text-primary">
+                  Sponsorship
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-4">Help</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link href="#" className="hover:text-primary">
+                  Help Center
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary">
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary">
+                  Shipping
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-primary">
+                  Returns
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-4">Follow Us</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link href="#" className="hover:text-primary">
+                  Instagram
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div className="mt-12 border-t border-gray-200 pt-8 flex flex-col sm:flex-row justify-between items-center text-sm">
+          <p>&copy; {new Date().getFullYear()} Trashure. All rights reserved.</p>
+          <div className="flex space-x-4 mt-4 sm:mt-0">
+            <Link href="#" className="hover:text-primary">
+              Terms of Service
+            </Link>
+            <Link href="#" className="hover:text-primary">
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

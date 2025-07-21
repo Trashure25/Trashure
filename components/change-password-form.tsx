@@ -1,60 +1,62 @@
 "use client"
 
-import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useAuth } from "@/contexts/auth-context"
-import { passwordChangeSchema, type PasswordChangeData } from "@/lib/auth"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { useToast } from "@/hooks/use-toast"
-import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { useAuth } from "@/contexts/auth-context"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+const passwordFormSchema = z
+  .object({
+    currentPassword: z.string().min(1, { message: "Current password is required." }),
+    newPassword: z.string().min(8, {
+      message: "Password must be at least 8 characters.",
+    }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  })
+
+type PasswordFormValues = z.infer<typeof passwordFormSchema>
 
 export function ChangePasswordForm() {
-  const { changePassword } = useAuth()
-  const { toast } = useToast()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { user, changePassword } = useAuth()
 
-  const form = useForm<PasswordChangeData>({
-    resolver: zodResolver(passwordChangeSchema),
+  const form = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordFormSchema),
     defaultValues: {
       currentPassword: "",
       newPassword: "",
-      confirmNewPassword: "",
+      confirmPassword: "",
     },
+    mode: "onChange",
   })
 
-  const onSubmit = async (data: PasswordChangeData) => {
-    setIsSubmitting(true)
-    try {
-      await changePassword(data)
-      toast({
-        title: "Success",
-        description: "Your password has been changed successfully.",
-      })
-      form.reset()
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred."
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
+  function onSubmit(data: PasswordFormValues) {
+    if (user) {
+      const success = changePassword(user.email, data.currentPassword, data.newPassword)
+      if (success) {
+        alert("Password changed successfully!")
+        form.reset()
+      } else {
+        alert("Incorrect current password.")
+      }
     }
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Password</CardTitle>
-        <CardDescription>Change your password here.</CardDescription>
+        <CardTitle>Change Password</CardTitle>
       </CardHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
               name="currentPassword"
@@ -83,7 +85,7 @@ export function ChangePasswordForm() {
             />
             <FormField
               control={form.control}
-              name="confirmNewPassword"
+              name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Confirm New Password</FormLabel>
@@ -94,14 +96,10 @@ export function ChangePasswordForm() {
                 </FormItem>
               )}
             />
-          </CardContent>
-          <CardFooter>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Updating..." : "Update Password"}
-            </Button>
-          </CardFooter>
-        </form>
-      </Form>
+            <Button type="submit">Change Password</Button>
+          </form>
+        </Form>
+      </CardContent>
     </Card>
   )
 }

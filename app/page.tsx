@@ -2,11 +2,10 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-
+import { AnimatedSlogan } from "@/components/animated-slogan"
 import { HeroCarousel } from "@/components/hero-carousel"
 import { ItemGridSection } from "@/components/item-grid-section"
-import { AnimatedSlogan } from "@/components/animated-slogan"
-import { PageTransition } from "@/components/page-transition"
+import { UserListingsGrid } from "@/components/user-listings-grid"
 import type { Item } from "@/components/item-card"
 
 const trendingApparelItems: Item[] = [
@@ -53,26 +52,30 @@ const trendingApparelItems: Item[] = [
 ]
 
 export default function HomePage() {
-  const [animateContent, setAnimateContent] = useState(false)
+  const [contentVisible, setContentVisible] = useState(false)
 
   return (
-    <PageTransition>
-      <div className="bg-white text-black">
-        <AnimatedSlogan onSloganAnimationStart={() => setAnimateContent(true)} />
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: animateContent ? 1 : 0 }}
-          transition={{ duration: 1.0, ease: "circOut", delay: 0.5 }}
-          className="flex-grow"
-        >
+    <main className="min-h-screen bg-white">
+      {!contentVisible && <AnimatedSlogan onAnimationComplete={() => setContentVisible(true)} />}
+
+      {contentVisible && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.0, ease: "easeIn" }}>
           <HeroCarousel />
+          <div className="py-8 md:py-12">
+            <div className="container mx-auto px-4">
+              <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-black">
+                Recently Listed by the Community
+              </h2>
+              <UserListingsGrid />
+            </div>
+          </div>
           <ItemGridSection
-            title="Trending: Sustainable Apparel"
+            title="Trending: Eco Threads"
             subtitle="VINTAGE, STREETWEAR, UPCYCLED BRANDS +MORE"
             items={trendingApparelItems}
           />
         </motion.div>
-      </div>
-    </PageTransition>
+      )}
+    </main>
   )
 }

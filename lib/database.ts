@@ -17,3 +17,18 @@ export interface Item {
   imageUrl: string
   seller: string
 }
+
+export interface Listing {
+  id: string
+  userId: string
+  title: string
+  description: string
+  price: number
+  category: string
+  condition: string
+  brand?: string
+  size?: string
+  status: "active" | "sold" | "draft"
+  images: string[]
+  createdAt: string
+}
