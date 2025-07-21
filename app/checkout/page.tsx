@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { loadStripe, type StripeElementsOptions } from "@stripe/stripe-js"
 import { Elements } from "@stripe/react-stripe-js"
-import { UpdatedAuthNavbar } from "@/components/updated-auth-navbar"
+
 import { PageTransition } from "@/components/page-transition"
 import { TrashureFooter } from "@/components/trashure-footer"
 import { CheckoutForm } from "@/components/checkout-form"
@@ -77,7 +77,6 @@ export default function CheckoutPage() {
   return (
     <PageTransition>
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <UpdatedAuthNavbar />
         <div className="flex-grow container mx-auto px-4 py-8">
           <div className="max-w-lg mx-auto">
             <motion.div

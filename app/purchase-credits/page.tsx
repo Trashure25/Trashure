@@ -1,7 +1,6 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { UpdatedAuthNavbar } from "@/components/updated-auth-navbar"
 import { TrashureFooter } from "@/components/trashure-footer"
 import { PageTransition } from "@/components/page-transition"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -47,7 +46,6 @@ export default function PurchaseCreditsPage() {
   return (
     <PageTransition>
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        <UpdatedAuthNavbar />
         <main className="flex-grow container mx-auto px-4 py-12">
           <motion.div
             initial={{ opacity: 0, y: -20 }}

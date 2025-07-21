@@ -1,11 +1,9 @@
 import { Skeleton } from "@/components/ui/skeleton"
-import { UpdatedAuthNavbar } from "@/components/updated-auth-navbar"
 import { TrashureFooter } from "@/components/trashure-footer"
 
 export default function Loading() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <UpdatedAuthNavbar />
       <main className="flex-grow container mx-auto px-4 py-12">
         <div className="text-center mb-12">
           <Skeleton className="h-10 w-1/2 mx-auto mb-4" />
