@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Save, Loader2 } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
+import Image from "next/image"
 
 export default function EditListingPage() {
   const params = useParams()
@@ -184,9 +185,11 @@ export default function EditListingPage() {
                 <div className="grid grid-cols-5 gap-2">
                   {listing.images.map((image, index) => (
                     <div key={index} className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                      <img
-                        src={image || "/placeholder.svg"}
-                        alt={`${listing.title} ${index + 1}`}
+                      <Image
+                        src={listing.images[0] || "/placeholder.svg?height=400&width=300"}
+                        alt={listing.title}
+                        width={400}
+                        height={300}
                         className="w-full h-full object-cover"
                       />
                     </div>

@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
       const result = await auth.requestPasswordReset(email)
       if (result.success) {
         setSuccess(
-          "If an account with this email exists, we've sent password reset instructions. Please check your email.",
+          "If an account with this email exists, we&apos;ve sent password reset instructions. Please check your email.",
         )
         // For demo purposes, generate a reset link
         const mockToken = `MOCK_RESET_${Date.now()}`
@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
         setError(result.error || "Failed to send reset instructions.")
       }
     } catch (err) {
-      setError("An error occurred. Please try again.")
+      setError("We&apos;re sorry, something went wrong. Please try again later.")
     } finally {
       setLoading(false)
     }
@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
           <CardHeader>
             <CardTitle className="text-2xl">Forgot Password</CardTitle>
             <CardDescription>
-              Enter your email address and we'll send you instructions to reset your password.
+              Enter your email address and we&apos;ll send you instructions to reset your password.
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>

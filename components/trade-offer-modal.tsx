@@ -15,6 +15,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import Image from "next/image"
 
 interface TradeOfferModalProps {
   isOpen: boolean
@@ -55,7 +56,7 @@ export default function TradeOfferModal({ isOpen, onOpenChange, userListings, ta
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Make a Trade Offer</DialogTitle>
-          <DialogDescription>Select one of your items to offer in trade for "{targetListing.title}".</DialogDescription>
+          <DialogDescription>Select one of your items to offer in trade for &quot;{targetListing.title}&quot;.</DialogDescription>
         </DialogHeader>
 
         {userListings.length > 0 ? (
@@ -68,7 +69,7 @@ export default function TradeOfferModal({ isOpen, onOpenChange, userListings, ta
                   className="flex items-center gap-4 p-4 border rounded-md has-[:checked]:border-primary"
                 >
                   <RadioGroupItem value={listing.id} id={listing.id} />
-                  <img
+                  <Image
                     src={listing.images[0] || "/placeholder.svg?width=64&height=64"}
                     alt={listing.title}
                     width={64}

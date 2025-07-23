@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import Image from "next/image"
 
 interface ItemCardProps {
   item: {
@@ -20,9 +21,11 @@ export function ItemCard({ item }: ItemCardProps) {
       <Card className="w-full overflow-hidden border-0 bg-transparent shadow-none rounded-none">
         <CardContent className="p-0">
           <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-100">
-            <img
+            <Image
               src={item.imageUrl || "/placeholder.svg"}
               alt={item.name}
+              width={300}
+              height={400}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
             {item.isNew && (

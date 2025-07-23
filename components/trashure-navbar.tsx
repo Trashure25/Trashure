@@ -3,7 +3,7 @@
 import { useAuth } from "@/contexts/auth-context"
 import Link from "next/link"
 import Image from "next/image"
-import { ShoppingCart, PlusCircle } from "lucide-react"
+import { ShoppingCart, PlusCircle, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
@@ -26,11 +26,16 @@ function TrashureNavbar() {
 
         {/* Search bar */}
         <div className="flex-1 mx-4 max-w-xl">
+          <div className="relative">
+            <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </span>
           <Input
             type="search"
             placeholder="Search for items, brands, and more..."
-            className="h-10 rounded-md bg-white"
+              className="h-10 rounded-md bg-white pl-10"
           />
+          </div>
         </div>
 
         {/* Actions */}

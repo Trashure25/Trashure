@@ -94,7 +94,7 @@ export default function CartPage() {
         >
           <ShoppingBag className="mx-auto h-24 w-24 text-gray-300" />
           <h2 className="mt-6 text-2xl font-semibold text-gray-800">Your cart is empty</h2>
-          <p className="mt-2 text-gray-500">Looks like you haven't added anything to your cart yet.</p>
+          <p className="mt-2 text-gray-500">Looks like you haven&apos;t added anything to your cart yet.</p>
           <Button asChild className="mt-6">
             <Link href="/">Start Shopping</Link>
           </Button>
@@ -121,7 +121,7 @@ export default function CartPage() {
                       />
                       <div className="flex-grow">
                         <h2 className="text-lg font-semibold text-gray-800">{item.name}</h2>
-                        <p className="text-sm text-gray-500 mt-1">From {item.seller}</p>
+                        <p className="text-sm text-gray-500 mt-1">Don&apos;t forget your items!</p>
                         <p className="text-lg font-bold text-gray-900 mt-4">{item.price} Credits</p>
                       </div>
                       <Button

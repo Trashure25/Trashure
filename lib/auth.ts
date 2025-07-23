@@ -43,7 +43,7 @@ export type LoginData = z.infer<typeof loginSchema>
 export type ProfileUpdateData = z.infer<typeof profileUpdateSchema>
 export type PasswordChangeData = z.infer<typeof passwordChangeSchema>
 
-// --- Mock User Type ---
+// --- User Type ---
 export interface User {
   id: string
   firstName: string
@@ -53,131 +53,154 @@ export interface User {
   passwordHash: string
   avatarUrl?: string
   trustScore: number
+  createdAt: string
+  updatedAt: string
 }
 
-// --- Mock Database using localStorage ---
-const USERS_KEY = "trashure_users"
-const SESSION_KEY = "trashure_session"
-
-const getStoredUsers = (): User[] => {
-  if (typeof window === "undefined") return []
-  try {
-    const usersJson = localStorage.getItem(USERS_KEY)
-    return usersJson ? JSON.parse(usersJson) : []
-  } catch (error) {
-    console.error("Failed to parse users from localStorage", error)
-    return []
-  }
-}
-
-const storeUsers = (users: User[]) => {
-  if (typeof window === "undefined") return
-  localStorage.setItem(USERS_KEY, JSON.stringify(users))
-}
-
-// --- Mock Authentication Service ---
+// --- Real API Authentication Service ---
 export const auth = {
   async signup(data: SignupData): Promise<User> {
-    await new Promise((resolve) => setTimeout(resolve, 500)) // Simulate network delay
-    const users = getStoredUsers()
+    const response = await fetch('/api/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        username: data.username,
+        email: data.email,
+        password: data.password, // Note: This should be hashed on the server
+      }),
+    })
 
-    if (users.some((user) => user.email === data.email)) {
-      throw new Error("An account with this email already exists.")
-    }
-    if (users.some((user) => user.username === data.username)) {
-      throw new Error("This username is already taken.")
-    }
-
-    const newUser: User = {
-      id: `user_${Date.now()}`,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      username: data.username,
-      email: data.email,
-      passwordHash: `hashed_${data.password}`, // In a real app, use bcrypt
-      avatarUrl: `https://api.dicebear.com/8.x/initials/svg?seed=${data.firstName} ${data.lastName}`,
-      trustScore: Math.floor(Math.random() * 30) + 70, // Assign a random score between 70-99
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to create account')
     }
 
-    storeUsers([...users, newUser])
-    return newUser
+    const user = await response.json()
+    return user
   },
 
   async login(data: LoginData): Promise<User> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    const users = getStoredUsers()
-    const user = users.find((u) => u.email === data.email)
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
 
-    if (!user || user.passwordHash !== `hashed_${data.password}`) {
-      throw new Error("Invalid email or password.")
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Invalid email or password')
     }
 
+    const user = await response.json()
+    
+    // Store session in localStorage for client-side persistence
     if (typeof window !== "undefined") {
-      localStorage.setItem(SESSION_KEY, JSON.stringify({ userId: user.id }))
+      localStorage.setItem('trashure_session', JSON.stringify({ userId: user.id }))
     }
+    
     return user
   },
 
   async logout(): Promise<void> {
     if (typeof window !== "undefined") {
-      localStorage.removeItem(SESSION_KEY)
+      localStorage.removeItem('trashure_session')
     }
   },
 
   async getCurrentUser(): Promise<User | null> {
     if (typeof window === "undefined") return null
-    const sessionJson = localStorage.getItem(SESSION_KEY)
+    
+    const sessionJson = localStorage.getItem('trashure_session')
     if (!sessionJson) return null
 
     try {
       const { userId } = JSON.parse(sessionJson)
       if (!userId) return null
 
-      const users = getStoredUsers()
-      const user = users.find((u) => u.id === userId)
-      return user || null
+      // Fetch current user from API
+      const response = await fetch(`/api/users/${userId}`)
+      if (!response.ok) {
+        localStorage.removeItem('trashure_session')
+        return null
+      }
+
+      return await response.json()
     } catch (error) {
-      console.error("Failed to parse session from localStorage", error)
+      console.error("Failed to get current user", error)
+      localStorage.removeItem('trashure_session')
       return null
     }
   },
 
   async updateProfile(userId: string, data: ProfileUpdateData): Promise<User> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    const users = getStoredUsers()
-    const userIndex = users.findIndex((u) => u.id === userId)
+    const response = await fetch(`/api/users/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
 
-    if (userIndex === -1) throw new Error("User not found.")
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to update profile')
+    }
 
-    const updatedUser = { ...users[userIndex], ...data }
-    users[userIndex] = updatedUser
-    storeUsers(users)
-    return updatedUser
+    return await response.json()
   },
 
   async changePassword(userId: string, data: PasswordChangeData): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    const users = getStoredUsers()
-    const userIndex = users.findIndex((u) => u.id === userId)
+    const response = await fetch(`/api/users/${userId}/password`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
 
-    if (userIndex === -1) throw new Error("User not found.")
-    if (users[userIndex].passwordHash !== `hashed_${data.currentPassword}`) {
-      throw new Error("Incorrect current password.")
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to change password')
     }
-
-    users[userIndex].passwordHash = `hashed_${data.newPassword}`
-    storeUsers(users)
   },
 
   async updateAvatar(userId: string, avatarUrl: string): Promise<User> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    const users = getStoredUsers()
-    const userIndex = users.findIndex((u) => u.id === userId)
+    const response = await fetch(`/api/users/${userId}/avatar`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ avatarUrl }),
+    })
 
-    if (userIndex === -1) throw new Error("User not found.")
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to update avatar')
+    }
 
-    users[userIndex].avatarUrl = avatarUrl
-    storeUsers(users)
-    return users[userIndex]
+    return await response.json()
+  },
+
+  async requestPasswordReset(email: string): Promise<{ success: boolean; error?: string }> {
+    const response = await fetch('/api/auth/forgot-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return { success: false, error: error.message }
+    }
+
+    return { success: true }
   },
 }

@@ -12,6 +12,7 @@ import { ArrowLeft, MessageCircle, Heart, Share2, Loader2, Calendar, Package } f
 import { useToast } from "@/components/ui/use-toast"
 import TradeOfferModal from "@/components/trade-offer-modal"
 import ContactSellerModal from "@/components/contact-seller-modal"
+import Image from "next/image"
 
 export default function ListingDetailPage() {
   const params = useParams()
@@ -142,9 +143,11 @@ export default function ListingDetailPage() {
           {/* Image Gallery */}
           <div className="space-y-4">
             <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-              <img
-                src={listing.images[currentImageIndex] || "/placeholder.svg?height=500&width=500"}
+              <Image
+                src={listing.images[0] || "/placeholder.svg?height=400&width=300"}
                 alt={listing.title}
+                width={400}
+                height={300}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -158,9 +161,11 @@ export default function ListingDetailPage() {
                       currentImageIndex === index ? "border-primary" : "border-transparent"
                     }`}
                   >
-                    <img
+                    <Image
                       src={image || "/placeholder.svg?height=100&width=100"}
                       alt={`${listing.title} ${index + 1}`}
+                      width={100}
+                      height={100}
                       className="w-full h-full object-cover"
                     />
                   </button>

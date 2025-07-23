@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
+import Image from "next/image"
 
 // ---------- helpers ----------
 const fileToBase64 = (file: File) =>
@@ -220,7 +221,13 @@ export default function ListItemPage() {
                 <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
                   {previews.map((src, i) => (
                     <div key={i} className="relative aspect-square rounded overflow-hidden">
-                      <img src={src || "/placeholder.svg"} className="w-full h-full object-cover" alt="" />
+                      <Image
+                        src={src || "/placeholder.svg"}
+                        alt={formData.title}
+                        width={300}
+                        height={400}
+                        className="w-full h-full object-cover"
+                      />
                       <Button
                         size="icon"
                         variant="destructive"

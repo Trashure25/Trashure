@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Plus, Package, Eye, Edit, Trash2, Loader2 } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
+import Image from "next/image"
 
 export default function MyListingsPage() {
   const router = useRouter()
@@ -137,9 +138,11 @@ export default function MyListingsPage() {
           {listings.map((listing) => (
             <Card key={listing.id} className="overflow-hidden group">
               <div className="aspect-square bg-gray-100 relative">
-                <img
+                <Image
                   src={listing.images[0] || "/placeholder.svg?height=300&width=300"}
                   alt={listing.title}
+                  width={300}
+                  height={300}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <Badge className={`absolute top-2 right-2 ${getStatusColor(listing.status)}`}>
