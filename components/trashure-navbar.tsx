@@ -7,11 +7,13 @@ import { ShoppingCart, PlusCircle, Search, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { useState } from "react"
+import { useRef, useState } from "react"
 
 function TrashureNavbar() {
   const { currentUser, isLoading } = useAuth()
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false)
+  const profileMenuRef = useRef<HTMLDivElement>(null)
 
   const getInitials = (firstName?: string, lastName?: string) => {
     return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase()
@@ -134,9 +136,43 @@ function TrashureNavbar() {
         </form>
         {/* Actions */}
         <div className="flex items-center gap-1">
-          <Link href="/list-item" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sell</Link>
-          <Link href="/signup" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sign Up</Link>
-          <Link href="/login" className="px-3 h-8 flex items-center justify-center font-bold uppercase bg-accent text-white border border-black hover:bg-[#04331f] text-xs">Log In</Link>
+          {currentUser ? (
+            <>
+              <Link href="/list-item" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sell</Link>
+              <Link href="/purchase-credits" className="px-3 h-8 flex items-center justify-center font-bold uppercase bg-accent text-white border border-black hover:bg-[#04331f] text-xs ml-1">Purchase Credits</Link>
+              <div className="relative ml-2" ref={profileMenuRef}>
+                <button
+                  className="h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center bg-white text-black font-bold text-xs focus:outline-none"
+                  onClick={() => setProfileMenuOpen((v) => !v)}
+                  aria-label="Open profile menu"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={currentUser.avatarUrl || undefined} alt="User avatar" />
+                    <AvatarFallback>{getInitials(currentUser.firstName, currentUser.lastName)}</AvatarFallback>
+                  </Avatar>
+                </button>
+                {profileMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-2">
+                    <Link href="/my-listings" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Listings</Link>
+                    <Link href="/account-settings" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">Account Settings</Link>
+                    <Link href="/profile" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">Profile</Link>
+                    <button
+                      onClick={() => { setProfileMenuOpen(false); if (typeof window !== 'undefined') { window.location.href = '/api/auth/logout'; } }}
+                      className="block w-full text-left px-4 py-2 text-sm bg-[#950606] text-white rounded-b-lg hover:bg-[#7a0505] mt-2"
+                    >
+                      Log Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <Link href="/list-item" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sell</Link>
+              <Link href="/signup" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sign Up</Link>
+              <Link href="/login" className="px-3 h-8 flex items-center justify-center font-bold uppercase bg-accent text-white border border-black hover:bg-[#04331f] text-xs">Log In</Link>
+            </>
+          )}
         </div>
       </div>
       {/* Second Row: Main Nav */}

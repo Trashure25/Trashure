@@ -37,13 +37,14 @@ export function UpdatedAuthNavbar() {
 
           {/* Avatar / auth */}
           {currentUser ? (
-            <button
+            <Button
               onClick={logout}
-              className="h-8 w-8 rounded-full bg-primary text-white text-xs font-bold"
+              variant="destructive"
+              className="h-8 px-4 rounded-full text-xs font-bold"
               title="Log out"
             >
-              {currentUser.initials}
-            </button>
+              Log Out
+            </Button>
           ) : (
             <Link href="/login">
               <Button size="sm" variant="secondary">

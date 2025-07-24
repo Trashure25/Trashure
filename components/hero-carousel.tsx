@@ -56,7 +56,7 @@ export function HeroCarousel() {
   }, [api])
 
   return (
-    <div className="w-full relative">
+    <div className="relative left-1/2 -translate-x-1/2 w-screen">
       <Carousel
         setApi={setApi}
         plugins={[plugin.current]}
