@@ -312,9 +312,9 @@ export default function AccountSettingsPage() {
                 </Button>
                 <Separator className="my-2" />
                 <Button
-                  variant="link"
+                  variant="destructive"
                   onClick={handleLogout}
-                  className="p-0 h-auto text-base text-red-600 hover:text-red-700 font-normal"
+                  className="px-4 py-2 rounded-md text-base font-bold"
                 >
                   Log Out
                 </Button>

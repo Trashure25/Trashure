@@ -62,80 +62,50 @@ export const auth = {
   async signup(data: SignupData): Promise<User> {
     const response = await fetch('/api/users', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         firstName: data.firstName,
         lastName: data.lastName,
         username: data.username,
         email: data.email,
-        password: data.password, // Note: This should be hashed on the server
+        password: data.password,
       }),
     })
-
     if (!response.ok) {
       const error = await response.json()
       throw new Error(error.message || 'Failed to create account')
     }
-
-    const user = await response.json()
-    return user
+    return await response.json()
   },
 
   async login(data: LoginData): Promise<User> {
     const response = await fetch('/api/auth/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
+      credentials: 'include',
     })
-
     if (!response.ok) {
       const error = await response.json()
       throw new Error(error.message || 'Invalid email or password')
     }
-
-    const user = await response.json()
-    
-    // Store session in localStorage for client-side persistence
-    if (typeof window !== "undefined") {
-      localStorage.setItem('trashure_session', JSON.stringify({ userId: user.id }))
-    }
-    
-    return user
+    return await response.json()
   },
 
   async logout(): Promise<void> {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem('trashure_session')
-    }
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+    })
   },
 
   async getCurrentUser(): Promise<User | null> {
-    if (typeof window === "undefined") return null
-    
-    const sessionJson = localStorage.getItem('trashure_session')
-    if (!sessionJson) return null
-
-    try {
-      const { userId } = JSON.parse(sessionJson)
-      if (!userId) return null
-
-      // Fetch current user from API
-      const response = await fetch(`/api/users/${userId}`)
-      if (!response.ok) {
-        localStorage.removeItem('trashure_session')
-        return null
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.error("Failed to get current user", error)
-      localStorage.removeItem('trashure_session')
-      return null
-    }
+    const response = await fetch('/api/auth/me', {
+      method: 'GET',
+      credentials: 'include',
+    })
+    if (!response.ok) return null
+    return await response.json()
   },
 
   async updateProfile(userId: string, data: ProfileUpdateData): Promise<User> {

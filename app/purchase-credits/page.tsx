@@ -72,7 +72,7 @@ export default function PurchaseCreditsPage() {
                   )}
                 >
                   {pkg.popular && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 text-sm font-bold rounded-full shadow-lg">
+                    <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-[#06402B] text-white px-4 py-1 text-xs font-bold rounded-full shadow-lg z-10">
                       POPULAR
                     </div>
                   )}

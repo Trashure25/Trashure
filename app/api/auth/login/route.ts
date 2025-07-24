@@ -1,78 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Client } from 'pg';
+import jwt from 'jsonwebtoken';
 
 export async function POST(req: NextRequest) {
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+  });
+
   try {
+    await client.connect();
     const { email, password } = await req.json();
-
     if (!email || !password) {
-      return NextResponse.json(
-        { message: 'Email and password are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: 'Email and password are required' }, { status: 400 });
     }
-
-    console.log('Attempting login for email:', email);
-
-    // Create a direct PostgreSQL connection
-    const client = new Client({
-      connectionString: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: false
-      }
+    const result = await client.query(
+      'SELECT id, email, username, password, "firstName", "lastName", "avatarUrl", "trustScore", "createdAt", "updatedAt" FROM "User" WHERE email = $1 LIMIT 1',
+      [email]
+    );
+    const user = result.rows[0];
+    if (!user || user.password !== password) {
+      return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
+    }
+    // Remove password from user object
+    delete user.password;
+    // Create JWT
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '30d' });
+    // Set cookie
+    const response = NextResponse.json(user);
+    response.cookies.set('trashure_jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 30 // 30 days
     });
-
-    try {
-      await client.connect();
-      
-      // Use direct SQL query to bypass Prisma issues
-      const result = await client.query(
-        'SELECT id, email, username, password, "firstName", "lastName", "avatarUrl", "trustScore", "createdAt", "updatedAt" FROM "User" WHERE email = $1 LIMIT 1',
-        [email]
-      );
-
-      const user = result.rows[0];
-      console.log('User found:', user ? 'Yes' : 'No');
-
-      if (!user) {
-        return NextResponse.json(
-          { message: 'Invalid email or password' },
-          { status: 401 }
-        );
-      }
-
-      // TODO: Add proper password hashing and comparison
-      // For now, we'll do a simple comparison (NOT secure for production!)
-      if (user.password !== password) {
-        console.log('Password mismatch for user:', email);
-        return NextResponse.json(
-          { message: 'Invalid email or password' },
-          { status: 401 }
-        );
-      }
-
-      console.log('Login successful for user:', email);
-
-      // Return user data (without password)
-      const { password: _, ...userWithoutPassword } = user;
-      return NextResponse.json(userWithoutPassword);
-
-    } finally {
-      await client.end();
-    }
-
+    return response;
   } catch (error) {
     console.error('Login error:', error);
-    
-    // More specific error handling
-    if (error instanceof Error) {
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-    }
-    
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+  } finally {
+    await client.end();
   }
 } 

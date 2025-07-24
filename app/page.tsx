@@ -6,7 +6,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-white via-[#f5f5f5] to-[#e5e5e5] flex flex-col items-center justify-start pt-0 pb-12">
       {/* Hero Carousel */}
-      <section className="w-full max-w-5xl mx-auto mb-16 animate-fade-in">
+      <section className="w-full max-w-5xl mx-auto mb-16 animate-fade-in mt-8">
         <HeroCarousel />
       </section>
 

@@ -7,7 +7,7 @@ import { ShoppingCart, PlusCircle, Search, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 
 function TrashureNavbar() {
   const { currentUser, isLoading } = useAuth()
@@ -109,6 +109,18 @@ function TrashureNavbar() {
     },
   ]
 
+  // Add effect to close profile menu on outside click
+  useEffect(() => {
+    if (!profileMenuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [profileMenuOpen]);
+
   return (
     <header className="w-full border-b border-gray-200 bg-white">
       {/* Top Row */}
@@ -138,7 +150,7 @@ function TrashureNavbar() {
         <div className="flex items-center gap-1">
           {currentUser ? (
             <>
-              <Link href="/list-item" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sell</Link>
+              <Link href="/list-item" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">List Item</Link>
               <Link href="/purchase-credits" className="px-3 h-8 flex items-center justify-center font-bold uppercase bg-accent text-white border border-black hover:bg-[#04331f] text-xs ml-1">Purchase Credits</Link>
               <div className="relative ml-2" ref={profileMenuRef}>
                 <button
@@ -158,7 +170,7 @@ function TrashureNavbar() {
                     <Link href="/profile" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">Profile</Link>
                     <button
                       onClick={() => { setProfileMenuOpen(false); if (typeof window !== 'undefined') { window.location.href = '/api/auth/logout'; } }}
-                      className="block w-full text-left px-4 py-2 text-sm bg-[#950606] text-white rounded-b-lg hover:bg-[#7a0505] mt-2"
+                      className="mx-auto mt-3 px-4 py-2 bg-[#950606] text-white rounded-md font-bold text-sm hover:bg-[#7a0505] block"
                     >
                       Log Out
                     </button>
@@ -168,7 +180,7 @@ function TrashureNavbar() {
             </>
           ) : (
             <>
-              <Link href="/list-item" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sell</Link>
+              <Link href="/list-item" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">List Item</Link>
               <Link href="/signup" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sign Up</Link>
               <Link href="/login" className="px-3 h-8 flex items-center justify-center font-bold uppercase bg-accent text-white border border-black hover:bg-[#04331f] text-xs">Log In</Link>
             </>
@@ -182,6 +194,7 @@ function TrashureNavbar() {
             <Link
               href={item.href}
               className="uppercase font-bold tracking-widest text-xs text-black px-1 py-0.5 hover:underline hover:decoration-2 hover:underline-offset-4 transition-colors"
+              onClick={() => setProfileMenuOpen(false)}
             >
               {item.name}
             </Link>
