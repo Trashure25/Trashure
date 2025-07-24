@@ -8,12 +8,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { useRef, useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
 
 function TrashureNavbar() {
   const { currentUser, isLoading } = useAuth()
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const profileMenuRef = useRef<HTMLDivElement>(null)
+  const pathname = usePathname();
 
   const getInitials = (firstName?: string, lastName?: string) => {
     return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase()
@@ -131,21 +133,23 @@ function TrashureNavbar() {
           <Image src="/trashure-wordmark.png" alt="Trashure logo" width={80} height={20} priority style={{ background: 'transparent' }} />
         </Link>
         {/* Search Bar */}
-        <form className="flex-1 flex justify-center" onSubmit={e => { e.preventDefault(); const q = e.currentTarget.query.value.trim(); if(q) window.location.href = `/search?q=${encodeURIComponent(q)}`; }}>
-          <div className="flex w-full max-w-sm border border-black rounded-md overflow-hidden h-9 relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-[#06402B]" />
-            </span>
-            <input
-              name="query"
-              type="search"
-              placeholder="Search for anything"
-              className="flex-1 pl-10 pr-2 py-0.5 text-sm bg-white focus:outline-none focus:ring-0 border-none rounded-none"
-              style={{ boxShadow: 'none' }}
-            />
-            <button type="submit" className="px-4 font-bold uppercase border-l border-black bg-white hover:bg-gray-100 text-xs">Search</button>
-          </div>
-        </form>
+        {pathname !== "/list-item" && (
+          <form className="flex-1 flex justify-center" onSubmit={e => { e.preventDefault(); const q = e.currentTarget.query.value.trim(); if(q) window.location.href = `/search?q=${encodeURIComponent(q)}`; }}>
+            <div className="flex w-full max-w-sm border border-black rounded-md overflow-hidden h-9 relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-[#06402B]" />
+              </span>
+              <input
+                name="query"
+                type="search"
+                placeholder="Search for anything"
+                className="flex-1 pl-10 pr-2 py-0.5 text-sm bg-white focus:outline-none focus:ring-0 border-none rounded-none"
+                style={{ boxShadow: 'none' }}
+              />
+              <button type="submit" className="px-4 font-bold uppercase border-l border-black bg-white hover:bg-gray-100 text-xs">Search</button>
+            </div>
+          </form>
+        )}
         {/* Actions */}
         <div className="flex items-center gap-1">
           {currentUser ? (
