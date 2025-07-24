@@ -110,37 +110,37 @@ function TrashureNavbar() {
   return (
     <header className="w-full border-b border-gray-200 bg-white">
       {/* Top Row */}
-      <div className="flex items-center justify-between px-6 py-2 gap-2">
+      <div className="flex items-center justify-between px-4 py-1 gap-1 min-h-12">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <Image src="/trashure-icon.jpeg" alt="Trashure icon" width={32} height={32} priority style={{ background: 'transparent' }} />
-          <Image src="/trashure-wordmark.png" alt="Trashure logo" width={110} height={28} priority style={{ background: 'transparent' }} />
+        <Link href="/" className="flex items-center gap-1 shrink-0">
+          <Image src="/trashure-icon.jpeg" alt="Trashure icon" width={24} height={24} priority style={{ background: 'transparent' }} />
+          <Image src="/trashure-wordmark.png" alt="Trashure logo" width={80} height={20} priority style={{ background: 'transparent' }} />
         </Link>
         {/* Search Bar */}
         <form className="flex-1 flex justify-center">
-          <div className="flex w-full max-w-md border border-black h-9">
+          <div className="flex w-full max-w-sm border border-black h-9">
             <input
               type="search"
               placeholder="Search for anything"
-              className="flex-1 px-3 py-1 text-base bg-white focus:outline-none"
+              className="flex-1 px-2 py-0.5 text-sm bg-white focus:outline-none"
             />
             <button type="submit" className="px-4 font-bold uppercase border-l border-black bg-white hover:bg-gray-100 text-xs">Search</button>
           </div>
         </form>
         {/* Actions */}
-        <div className="flex items-center gap-2">
-          <Link href="/list-item" className="px-4 h-9 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sell</Link>
-          <Link href="/signup" className="px-4 h-9 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sign Up</Link>
-          <Link href="/login" className="px-4 h-9 flex items-center justify-center font-bold uppercase bg-black text-white border border-black hover:bg-gray-900 text-xs">Log In</Link>
+        <div className="flex items-center gap-1">
+          <Link href="/list-item" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sell</Link>
+          <Link href="/signup" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sign Up</Link>
+          <Link href="/login" className="px-3 h-8 flex items-center justify-center font-bold uppercase bg-black text-white border border-black hover:bg-gray-900 text-xs">Log In</Link>
         </div>
       </div>
       {/* Second Row: Main Nav */}
-      <nav className="flex items-center justify-center gap-8 py-1 border-t border-gray-200">
+      <nav className="flex items-center justify-center gap-6 py-1 border-t border-gray-200 text-xs">
         {navigationItems.map((item) => (
           <div key={item.name} className="relative group">
             <Link
               href={item.href}
-              className="uppercase font-bold tracking-widest text-sm text-black px-1 py-0.5 hover:underline hover:decoration-2 hover:underline-offset-4 transition-colors"
+              className="uppercase font-bold tracking-widest text-xs text-black px-1 py-0.5 hover:underline hover:decoration-2 hover:underline-offset-4 transition-colors"
             >
               {item.name}
             </Link>

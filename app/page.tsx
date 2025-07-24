@@ -15,31 +15,54 @@ export default function HomePage() {
         <HeroCarousel />
       </section>
 
-      {/* Featured Categories */}
-      <section className="w-full max-w-5xl mx-auto mb-10">
-        <h2 className="text-2xl font-bold mb-6 text-gray-900 text-center tracking-tight uppercase">Featured Categories</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { name: 'Menswear', href: '/menswear', img: '/placeholder.jpg' },
-            { name: 'Womenswear', href: '/womenswear', img: '/placeholder.jpg' },
-            { name: 'Sneakers', href: '/sneakers', img: '/placeholder.jpg' },
-            { name: 'Designers', href: '/designers', img: '/placeholder.jpg' },
-          ].map(cat => (
-            <a
-              key={cat.name}
-              href={cat.href}
-              className="relative group block w-full h-[120px] md:h-[160px] overflow-hidden"
-            >
-              <img
-                src={cat.img}
-                alt={cat.name}
-                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-              />
-              <span className="absolute left-0 bottom-0 m-3 text-base md:text-lg font-semibold text-white uppercase drop-shadow bg-black/50 px-3 py-1 rounded-none tracking-wide">
-                {cat.name}
-              </span>
-            </a>
-          ))}
+      {/* Featured Sections (Grailed style) */}
+      <section className="w-full max-w-6xl mx-auto mb-10 px-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Trending: Apparel */}
+          <div>
+            <div className="text-xs uppercase text-gray-400 mb-1">Vintage, Streetwear, Supreme +more</div>
+            <div className="text-lg font-bold mb-2 text-black">Trending: Apparel</div>
+            <div className="grid grid-cols-2 gap-2">
+              {[1,2,3,4].map((i, idx) => (
+                <div key={i} className="relative w-full aspect-square bg-gray-100 overflow-hidden">
+                  <img src="/placeholder.jpg" alt="Apparel" className="object-cover w-full h-full" />
+                  {idx === 3 && (
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs font-mono uppercase tracking-wider">+ View More</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Trending: Footwear */}
+          <div>
+            <div className="text-xs uppercase text-gray-400 mb-1">Jordan Brand, Nike, Maison Margiela +more</div>
+            <div className="text-lg font-bold mb-2 text-black">Trending: Footwear</div>
+            <div className="grid grid-cols-2 gap-2">
+              {[1,2,3,4].map((i, idx) => (
+                <div key={i} className="relative w-full aspect-square bg-gray-100 overflow-hidden">
+                  <img src="/placeholder.jpg" alt="Footwear" className="object-cover w-full h-full" />
+                  {idx === 3 && (
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs font-mono uppercase tracking-wider">+ View More</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Trending: Accessories */}
+          <div>
+            <div className="text-xs uppercase text-gray-400 mb-1">Supreme, Vintage, Chrome Hearts +more</div>
+            <div className="text-lg font-bold mb-2 text-black">Trending: Accessories</div>
+            <div className="grid grid-cols-2 gap-2">
+              {[1,2,3,4].map((i, idx) => (
+                <div key={i} className="relative w-full aspect-square bg-gray-100 overflow-hidden">
+                  <img src="/placeholder.jpg" alt="Accessories" className="object-cover w-full h-full" />
+                  {idx === 3 && (
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs font-mono uppercase tracking-wider">+ View More</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     </main>

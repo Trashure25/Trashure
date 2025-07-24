@@ -7,7 +7,8 @@ export function Footer() {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
           <div className="col-span-2 lg:col-span-2">
-            <Image src="/trashure-wordmark.jpeg" alt="Trashure logo" width={200} height={48} className="mb-4" />
+            <Image src="/trashure-icon.jpeg" alt="Trashure icon" width={24} height={24} className="inline-block align-middle mr-2" />
+            <Image src="/trashure-wordmark.png" alt="Trashure logo" width={80} height={20} className="inline-block align-middle" />
             <p className="text-sm max-w-xs">
               The leading global platform for peer-to-peer luxury, streetwear, and vintage fashion and goods.
             </p>
