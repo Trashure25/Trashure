@@ -110,36 +110,37 @@ function TrashureNavbar() {
   return (
     <header className="w-full border-b border-gray-200 bg-white">
       {/* Top Row */}
-      <div className="flex items-center justify-between px-8 py-4 gap-4">
+      <div className="flex items-center justify-between px-6 py-2 gap-2">
         {/* Logo */}
-        <Link href="/" className="flex items-center shrink-0">
-          <Image src="/trashure-wordmark.jpeg" alt="Trashure logo" width={160} height={40} priority />
+        <Link href="/" className="flex items-center gap-2 shrink-0">
+          <Image src="/trashure-icon.jpeg" alt="Trashure icon" width={32} height={32} priority style={{ background: 'transparent' }} />
+          <Image src="/trashure-wordmark.png" alt="Trashure logo" width={110} height={28} priority style={{ background: 'transparent' }} />
         </Link>
         {/* Search Bar */}
         <form className="flex-1 flex justify-center">
-          <div className="flex w-full max-w-xl border border-black h-12">
+          <div className="flex w-full max-w-md border border-black h-9">
             <input
               type="search"
               placeholder="Search for anything"
-              className="flex-1 px-5 py-2 text-lg bg-white focus:outline-none"
+              className="flex-1 px-3 py-1 text-base bg-white focus:outline-none"
             />
-            <button type="submit" className="px-6 font-bold uppercase border-l border-black bg-white hover:bg-gray-100">Search</button>
+            <button type="submit" className="px-4 font-bold uppercase border-l border-black bg-white hover:bg-gray-100 text-xs">Search</button>
           </div>
         </form>
         {/* Actions */}
-        <div className="flex items-center gap-4">
-          <Link href="/list-item" className="px-6 h-12 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100">Sell</Link>
-          <Link href="/signup" className="px-6 h-12 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100">Sign Up</Link>
-          <Link href="/login" className="px-6 h-12 flex items-center justify-center font-bold uppercase bg-black text-white border border-black hover:bg-gray-900">Log In</Link>
+        <div className="flex items-center gap-2">
+          <Link href="/list-item" className="px-4 h-9 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sell</Link>
+          <Link href="/signup" className="px-4 h-9 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sign Up</Link>
+          <Link href="/login" className="px-4 h-9 flex items-center justify-center font-bold uppercase bg-black text-white border border-black hover:bg-gray-900 text-xs">Log In</Link>
         </div>
       </div>
       {/* Second Row: Main Nav */}
-      <nav className="flex items-center justify-center gap-12 py-2 border-t border-gray-200">
+      <nav className="flex items-center justify-center gap-8 py-1 border-t border-gray-200">
         {navigationItems.map((item) => (
           <div key={item.name} className="relative group">
             <Link
               href={item.href}
-              className="uppercase font-bold tracking-widest text-base text-black px-2 py-1 hover:underline hover:decoration-2 hover:underline-offset-4 transition-colors"
+              className="uppercase font-bold tracking-widest text-sm text-black px-1 py-0.5 hover:underline hover:decoration-2 hover:underline-offset-4 transition-colors"
             >
               {item.name}
             </Link>
@@ -154,7 +155,7 @@ function TrashureNavbar() {
                       <Link
                         key={subcategory.name}
                         href={subcategory.href}
-                        className="block px-6 py-2 text-black text-sm uppercase tracking-wider hover:bg-gray-100 hover:underline hover:decoration-2 hover:underline-offset-4 transition-colors"
+                        className="block px-6 py-2 text-black text-xs uppercase tracking-wider hover:bg-gray-100 hover:underline hover:decoration-2 hover:underline-offset-4 transition-colors"
                       >
                         {subcategory.name}
                       </Link>
