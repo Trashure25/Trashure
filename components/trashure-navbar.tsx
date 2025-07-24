@@ -108,84 +108,45 @@ function TrashureNavbar() {
   ]
 
   return (
-    <header className="navbar sticky-nav flex flex-col bg-white/85 shadow-lg backdrop-blur-md border-b border-gray-200">
-      <div className="flex items-center justify-between px-6 py-3 lg:px-12">
+    <header className="w-full border-b border-gray-200 bg-white">
+      {/* Top Row */}
+      <div className="flex items-center justify-between px-8 py-4 gap-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 shrink-0">
-          <Image src="/trashure-icon.jpeg" alt="Trashure icon" width={36} height={36} priority />
-          <Image src="/trashure-wordmark-final.jpeg" alt="Trashure wordmark" width={160} height={32} />
+        <Link href="/" className="flex items-center shrink-0">
+          <Image src="/trashure-wordmark.jpeg" alt="Trashure logo" width={160} height={40} priority />
         </Link>
-
-        {/* Search bar */}
-        <div className="flex-1 mx-6 max-w-2xl hidden md:block">
-          <div className="relative">
-            <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
-            </span>
-            <Input
+        {/* Search Bar */}
+        <form className="flex-1 flex justify-center">
+          <div className="flex w-full max-w-xl border border-black h-12">
+            <input
               type="search"
-              placeholder="Search for items, brands, and more..."
-              className="h-12 rounded-full bg-white pl-12 shadow-sm border border-gray-200 focus:border-accent"
+              placeholder="Search for anything"
+              className="flex-1 px-5 py-2 text-lg bg-white focus:outline-none"
             />
+            <button type="submit" className="px-6 font-bold uppercase border-l border-black bg-white hover:bg-gray-100">Search</button>
           </div>
-        </div>
-
+        </form>
         {/* Actions */}
-        <div className="flex items-center gap-2 sm:gap-4">
-          <Button asChild variant="ghost" className="hidden sm:inline-flex items-center gap-1 rounded-full px-4 py-2 text-base font-semibold hover:bg-accent/10 hover:text-accent transition-colors">
-            <Link href="/list-item">
-              <PlusCircle className="h-5 w-5" />
-              List Item
-            </Link>
-          </Button>
-          <Button asChild variant="ghost" size="icon" aria-label="Cart" className="rounded-full hover:bg-accent/10 hover:text-accent transition-colors">
-            <Link href="/cart">
-              <ShoppingCart className="h-6 w-6 text-black" />
-            </Link>
-          </Button>
-
-          {isLoading ? (
-            <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200" />
-          ) : currentUser ? (
-            <Button asChild variant="ghost" className="relative h-10 w-10 rounded-full">
-              <Link href="/account-settings">
-                <Avatar className="h-10 w-10 border">
-                  <AvatarImage src={currentUser.avatarUrl || "/placeholder.svg"} alt="User avatar" />
-                  <AvatarFallback>{getInitials(currentUser.firstName, currentUser.lastName)}</AvatarFallback>
-                </Avatar>
-              </Link>
-            </Button>
-          ) : (
-            <div className="hidden items-center gap-2 md:flex">
-              <Button asChild variant="outline" className="rounded-full px-4 py-2 text-base font-semibold text-black border-gray-300 bg-white hover:bg-accent/10 hover:text-accent">
-                <Link href="/login">Log In</Link>
-              </Button>
-              <Button asChild className="rounded-full px-4 py-2 text-base font-semibold text-white bg-accent hover:bg-[#009e7a]">
-                <Link href="/signup">Sign Up</Link>
-              </Button>
-            </div>
-          )}
+        <div className="flex items-center gap-4">
+          <Link href="/list-item" className="px-6 h-12 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100">Sell</Link>
+          <Link href="/signup" className="px-6 h-12 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100">Sign Up</Link>
+          <Link href="/login" className="px-6 h-12 flex items-center justify-center font-bold uppercase bg-black text-white border border-black hover:bg-gray-900">Log In</Link>
         </div>
       </div>
-      {/* Secondary Nav */}
-      <nav className="flex items-center justify-center gap-8 overflow-x-auto px-6 py-2 text-base font-semibold text-black border-t border-gray-100">
+      {/* Second Row: Main Nav */}
+      <nav className="flex items-center justify-center gap-12 py-2 border-t border-gray-200">
         {navigationItems.map((item) => (
-          <div 
-            key={item.name} 
-            className="relative group"
-            onMouseEnter={() => setHoveredItem(item.name)}
-            onMouseLeave={() => setHoveredItem(null)}
-          >
-            <div className="flex items-center gap-1 hover:text-accent cursor-pointer transition-colors">
-              <Link href={item.href} className="hover:text-accent transition-colors">
-                {item.name}
-              </Link>
-              <ChevronDown className="h-3 w-3" />
-            </div>
-            {/* Hover Dropdown */}
-            {hoveredItem === item.name && (
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-56 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] min-w-max animate-fade-in">
-                <div className="py-2">
+          <div key={item.name} className="relative group">
+            <Link
+              href={item.href}
+              className="uppercase font-bold tracking-widest text-base text-black px-2 py-1 hover:underline hover:decoration-2 hover:underline-offset-4 transition-colors"
+            >
+              {item.name}
+            </Link>
+            {/* Dropdown on hover */}
+            {item.subcategories && item.subcategories.length > 0 && hoveredItem === item.name && (
+              <div className="absolute left-1/2 top-full -translate-x-1/2 mt-2 min-w-max bg-white border border-gray-200 z-50 shadow-xl">
+                <div className="flex flex-col py-2">
                   {item.subcategories.map((subcategory) => (
                     subcategory.name === "---" ? (
                       <div key="separator" className="h-px bg-gray-200 my-1" />
@@ -193,7 +154,7 @@ function TrashureNavbar() {
                       <Link
                         key={subcategory.name}
                         href={subcategory.href}
-                        className="block px-5 py-2 text-base text-gray-700 hover:bg-accent/10 hover:text-accent transition-colors whitespace-nowrap rounded-lg"
+                        className="block px-6 py-2 text-black text-sm uppercase tracking-wider hover:bg-gray-100 hover:underline hover:decoration-2 hover:underline-offset-4 transition-colors"
                       >
                         {subcategory.name}
                       </Link>
