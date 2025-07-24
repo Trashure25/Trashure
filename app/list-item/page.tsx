@@ -137,6 +137,12 @@ export default function ListItemPage() {
     }
   }
 
+  // 2. For the brand autocomplete, provide a static fallback if brandOptions is empty:
+  const staticBrandOptions = [
+    "Nike", "Adidas", "New Balance", "Jordan", "Maison Margiela", "Converse", "Vans", "Asics", "Salomon", "Yeezy", "Reebok", "Puma", "Saucony", "Hoka", "Louis Vuitton", "Dior", "Gucci", "Prada", "Saint Laurent", "Balenciaga", "Off-White", "Stussy", "Essentials", "Fear of God", "Supreme", "Palace", "A Bathing Ape", "Comme des Garçons", "Vintage", "Chanel", "Miu Miu", "Fendi", "Celine", "Aime Leon Dore"
+  ];
+  const effectiveBrandOptions = brandOptions.length > 0 ? brandOptions : staticBrandOptions;
+
   // ---------- guards ----------
   useEffect(() => {
     if (!authLoading && !currentUser) {
@@ -269,16 +275,6 @@ export default function ListItemPage() {
   return (
     <div className="container mx-auto py-12 px-4">
       <div className="max-w-2xl mx-auto">
-        {/* --- Search/type bar at the top --- */}
-        <div className="mb-6">
-          <Input
-            type="search"
-            placeholder="Search categories or brands..."
-            value={brandSearch}
-            onChange={e => setBrandSearch(e.target.value)}
-            className="mb-2"
-          />
-        </div>
         {step === "upload" && (
           <Card>
             <CardHeader>
@@ -357,20 +353,20 @@ export default function ListItemPage() {
                   <div className="space-y-2">
                     <Label>Category *</Label>
                     <AdvancedAutocomplete
-                      options={categories.filter(c => !brandSearch || c.toLowerCase().includes(brandSearch.toLowerCase()))}
+                      options={categories}
                       value={formData.category}
                       onChange={v => onSelect("category", v)}
-                      placeholder="Select or type a category"
-                      allowCustom={false}
+                      placeholder="Category"
+                      allowCustom={true}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label>Brand</Label>
                     <AdvancedAutocomplete
-                      options={brandOptions.filter(b => !brandSearch || b.toLowerCase().includes(brandSearch.toLowerCase()))}
+                      options={effectiveBrandOptions}
                       value={formData.brand}
                       onChange={v => setFormData(s => ({ ...s, brand: v }))}
-                      placeholder="Type or select a brand"
+                      placeholder="Brand"
                       allowCustom={true}
                     />
                   </div>
