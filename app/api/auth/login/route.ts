@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { Client } from 'pg';
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,35 +14,52 @@ export async function POST(req: NextRequest) {
 
     console.log('Attempting login for email:', email);
 
-    // Find user by email
-    const user = await prisma.user.findUnique({
-      where: { email }
+    // Create a direct PostgreSQL connection
+    const client = new Client({
+      connectionString: process.env.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false
+      }
     });
 
-    console.log('User found:', user ? 'Yes' : 'No');
-
-    if (!user) {
-      return NextResponse.json(
-        { message: 'Invalid email or password' },
-        { status: 401 }
+    try {
+      await client.connect();
+      
+      // Use direct SQL query to bypass Prisma issues
+      const result = await client.query(
+        'SELECT id, email, username, password, "firstName", "lastName", "avatarUrl", "trustScore", "createdAt", "updatedAt" FROM "User" WHERE email = $1 LIMIT 1',
+        [email]
       );
+
+      const user = result.rows[0];
+      console.log('User found:', user ? 'Yes' : 'No');
+
+      if (!user) {
+        return NextResponse.json(
+          { message: 'Invalid email or password' },
+          { status: 401 }
+        );
+      }
+
+      // TODO: Add proper password hashing and comparison
+      // For now, we'll do a simple comparison (NOT secure for production!)
+      if (user.password !== password) {
+        console.log('Password mismatch for user:', email);
+        return NextResponse.json(
+          { message: 'Invalid email or password' },
+          { status: 401 }
+        );
+      }
+
+      console.log('Login successful for user:', email);
+
+      // Return user data (without password)
+      const { password: _, ...userWithoutPassword } = user;
+      return NextResponse.json(userWithoutPassword);
+
+    } finally {
+      await client.end();
     }
-
-    // TODO: Add proper password hashing and comparison
-    // For now, we'll do a simple comparison (NOT secure for production!)
-    if (user.password !== password) {
-      console.log('Password mismatch for user:', email);
-      return NextResponse.json(
-        { message: 'Invalid email or password' },
-        { status: 401 }
-      );
-    }
-
-    console.log('Login successful for user:', email);
-
-    // Return user data (without password)
-    const { password: _, ...userWithoutPassword } = user;
-    return NextResponse.json(userWithoutPassword);
 
   } catch (error) {
     console.error('Login error:', error);
