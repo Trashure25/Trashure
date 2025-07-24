@@ -16,6 +16,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import Image from "next/image"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useRef } from "react"
+import { AdvancedAutocomplete } from "@/components/ui/advanced-autocomplete"
 
 // ---------- helpers ----------
 const fileToBase64 = (file: File) =>
@@ -53,38 +56,36 @@ export default function ListItemPage() {
     size: "",
   })
 
+  // --- New: Brand autocomplete state ---
+  const [brandOptions, setBrandOptions] = useState<string[]>([])
+  const [brandSearch, setBrandSearch] = useState("")
+  const [brandDropdownOpen, setBrandDropdownOpen] = useState(false)
+  const [brandActiveIndex, setBrandActiveIndex] = useState(-1)
+  const brandInputRef = useRef<HTMLInputElement>(null)
+
+  // --- Fetch unique brands from listings on mount ---
+  useEffect(() => {
+    async function fetchBrands() {
+      try {
+        const res = await fetch("/api/listings")
+        const data = await res.json()
+        const brands = Array.from(new Set(data.map((item: any) => item.brand).filter(Boolean)))
+        setBrandOptions(brands)
+      } catch (e) {
+        setBrandOptions([])
+      }
+    }
+    fetchBrands()
+  }, [])
+
+  // --- Only categories, no brands/designers ---
   const categories = [
-    // Designer Categories
-    "Louis Vuitton",
-    "Dior", 
-    "Bottega Veneta",
-    "Gucci",
-    "Prada",
-    "Saint Laurent",
-    "Balenciaga",
-    "Chanel",
-    "Miu Miu",
-    "Fendi",
-    "Celine",
-    "Off-White",
-    "Stussy",
-    "Essentials",
-    "Fear of God",
-    "Aime Leon Dore",
-    "Supreme",
-    "Palace",
-    "A Bathing Ape",
-    "Comme des Garçons",
-    "Vintage & Archive",
-    
-    // Main Categories
     "Menswear - T-Shirts & Tops",
     "Menswear - Pants & Jeans", 
     "Menswear - Outerwear",
     "Menswear - Shoes & Boots",
     "Menswear - Accessories",
     "Menswear - Formal Wear",
-    
     "Womenswear - Dresses",
     "Womenswear - Tops & Blouses",
     "Womenswear - Pants & Jeans",
@@ -92,14 +93,12 @@ export default function ListItemPage() {
     "Womenswear - Outerwear", 
     "Womenswear - Shoes & Heels",
     "Womenswear - Accessories",
-    
     "Sneakers - Running",
     "Sneakers - Basketball",
     "Sneakers - Lifestyle",
     "Sneakers - Skateboarding",
     "Sneakers - Limited Edition",
     "Sneakers - Vintage",
-    
     "Household - Furniture",
     "Household - Kitchen & Dining",
     "Household - Bedding & Bath",
@@ -108,6 +107,35 @@ export default function ListItemPage() {
     "Household - Storage & Organization",
   ]
   const conditions = ["New with tags", "Like new", "Good", "Fair", "Poor"]
+
+  // Filtered brands for dropdown
+  const filteredBrands = brandOptions.filter(b =>
+    !brandSearch || b.toLowerCase().includes(brandSearch.toLowerCase())
+  )
+
+  // Handle keyboard navigation for brand autocomplete
+  function handleBrandKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!brandDropdownOpen && ["ArrowDown", "ArrowUp"].includes(e.key)) {
+      setBrandDropdownOpen(true)
+      setBrandActiveIndex(0)
+      return
+    }
+    if (e.key === "ArrowDown") {
+      setBrandActiveIndex(i => Math.min(i + 1, filteredBrands.length - 1))
+    } else if (e.key === "ArrowUp") {
+      setBrandActiveIndex(i => Math.max(i - 1, 0))
+    } else if (e.key === "Enter") {
+      if (brandDropdownOpen && brandActiveIndex >= 0 && filteredBrands[brandActiveIndex]) {
+        setFormData(s => ({ ...s, brand: filteredBrands[brandActiveIndex] }))
+        setBrandDropdownOpen(false)
+        setBrandActiveIndex(-1)
+        e.preventDefault()
+      }
+    } else if (e.key === "Escape") {
+      setBrandDropdownOpen(false)
+      setBrandActiveIndex(-1)
+    }
+  }
 
   // ---------- guards ----------
   useEffect(() => {
@@ -241,6 +269,16 @@ export default function ListItemPage() {
   return (
     <div className="container mx-auto py-12 px-4">
       <div className="max-w-2xl mx-auto">
+        {/* --- Search/type bar at the top --- */}
+        <div className="mb-6">
+          <Input
+            type="search"
+            placeholder="Search categories or brands..."
+            value={brandSearch}
+            onChange={e => setBrandSearch(e.target.value)}
+            className="mb-2"
+          />
+        </div>
         {step === "upload" && (
           <Card>
             <CardHeader>
@@ -318,40 +356,26 @@ export default function ListItemPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Category *</Label>
-                    <Select value={formData.category} onValueChange={(v) => onSelect("category", v)} required>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((c) => (
-                          <SelectItem key={c} value={c}>
-                            {c}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <AdvancedAutocomplete
+                      options={categories.filter(c => !brandSearch || c.toLowerCase().includes(brandSearch.toLowerCase()))}
+                      value={formData.category}
+                      onChange={v => onSelect("category", v)}
+                      placeholder="Select or type a category"
+                      allowCustom={false}
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label>Condition *</Label>
-                    <Select value={formData.condition} onValueChange={(v) => onSelect("condition", v)} required>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select condition" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {conditions.map((c) => (
-                          <SelectItem key={c} value={c}>
-                            {c}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Label>Brand</Label>
+                    <AdvancedAutocomplete
+                      options={brandOptions.filter(b => !brandSearch || b.toLowerCase().includes(brandSearch.toLowerCase()))}
+                      value={formData.brand}
+                      onChange={v => setFormData(s => ({ ...s, brand: v }))}
+                      placeholder="Type or select a brand"
+                      allowCustom={true}
+                    />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="brand">Brand</Label>
-                    <Input id="brand" name="brand" value={formData.brand} onChange={onFieldChange} />
-                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="size">Size</Label>
                     <Input id="size" name="size" value={formData.size} onChange={onFieldChange} />

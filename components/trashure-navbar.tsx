@@ -108,37 +108,37 @@ function TrashureNavbar() {
   ]
 
   return (
-    <header className="sticky top-0 z-40 flex flex-col bg-gray-50/95 shadow-sm backdrop-blur-sm">
-      <div className="flex items-center justify-between px-4 py-2 lg:px-8">
+    <header className="navbar sticky-nav flex flex-col bg-white/85 shadow-lg backdrop-blur-md border-b border-gray-200">
+      <div className="flex items-center justify-between px-6 py-3 lg:px-12">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <Image src="/trashure-icon.jpeg" alt="Trashure icon" width={24} height={24} priority />
-          <Image src="/trashure-wordmark-final.jpeg" alt="Trashure wordmark" width={120} height={24} />
+        <Link href="/" className="flex items-center gap-3 shrink-0">
+          <Image src="/trashure-icon.jpeg" alt="Trashure icon" width={36} height={36} priority />
+          <Image src="/trashure-wordmark-final.jpeg" alt="Trashure wordmark" width={160} height={32} />
         </Link>
 
         {/* Search bar */}
-        <div className="flex-1 mx-4 max-w-xl">
+        <div className="flex-1 mx-6 max-w-2xl hidden md:block">
           <div className="relative">
             <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
             </span>
-          <Input
-            type="search"
-            placeholder="Search for items, brands, and more..."
-              className="h-10 rounded-md bg-white pl-10"
-          />
+            <Input
+              type="search"
+              placeholder="Search for items, brands, and more..."
+              className="h-12 rounded-full bg-white pl-12 shadow-sm border border-gray-200 focus:border-accent"
+            />
           </div>
         </div>
 
         {/* Actions */}
         <div className="flex items-center gap-2 sm:gap-4">
-          <Button asChild variant="ghost" className="hidden sm:inline-flex items-center gap-1">
+          <Button asChild variant="ghost" className="hidden sm:inline-flex items-center gap-1 rounded-full px-4 py-2 text-base font-semibold hover:bg-accent/10 hover:text-accent transition-colors">
             <Link href="/list-item">
               <PlusCircle className="h-5 w-5" />
               List Item
             </Link>
           </Button>
-          <Button asChild variant="ghost" size="icon" aria-label="Cart">
+          <Button asChild variant="ghost" size="icon" aria-label="Cart" className="rounded-full hover:bg-accent/10 hover:text-accent transition-colors">
             <Link href="/cart">
               <ShoppingCart className="h-6 w-6 text-black" />
             </Link>
@@ -157,10 +157,10 @@ function TrashureNavbar() {
             </Button>
           ) : (
             <div className="hidden items-center gap-2 md:flex">
-              <Button asChild variant="outline">
+              <Button asChild variant="outline" className="rounded-full px-4 py-2 text-base font-semibold">
                 <Link href="/login">Log In</Link>
               </Button>
-              <Button asChild>
+              <Button asChild className="rounded-full px-4 py-2 text-base font-semibold">
                 <Link href="/signup">Sign Up</Link>
               </Button>
             </div>
@@ -168,7 +168,7 @@ function TrashureNavbar() {
         </div>
       </div>
       {/* Secondary Nav */}
-      <nav className="flex items-center justify-center gap-6 overflow-x-auto px-4 py-1 text-sm font-medium text-black lg:gap-8 border-t border-gray-200">
+      <nav className="flex items-center justify-center gap-8 overflow-x-auto px-6 py-2 text-base font-semibold text-black border-t border-gray-100">
         {navigationItems.map((item) => (
           <div 
             key={item.name} 
@@ -176,16 +176,15 @@ function TrashureNavbar() {
             onMouseEnter={() => setHoveredItem(item.name)}
             onMouseLeave={() => setHoveredItem(null)}
           >
-            <div className="flex items-center gap-1 hover:text-primary cursor-pointer">
-              <Link href={item.href} className="hover:text-primary">
+            <div className="flex items-center gap-1 hover:text-accent cursor-pointer transition-colors">
+              <Link href={item.href} className="hover:text-accent transition-colors">
                 {item.name}
               </Link>
               <ChevronDown className="h-3 w-3" />
             </div>
-            
             {/* Hover Dropdown */}
             {hoveredItem === item.name && (
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-56 bg-white border border-gray-200 rounded-xl shadow-2xl z-[100] min-w-max animate-fade-in">
                 <div className="py-2">
                   {item.subcategories.map((subcategory) => (
                     subcategory.name === "---" ? (
@@ -194,7 +193,7 @@ function TrashureNavbar() {
                       <Link
                         key={subcategory.name}
                         href={subcategory.href}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary transition-colors"
+                        className="block px-5 py-2 text-base text-gray-700 hover:bg-accent/10 hover:text-accent transition-colors whitespace-nowrap rounded-lg"
                       >
                         {subcategory.name}
                       </Link>
