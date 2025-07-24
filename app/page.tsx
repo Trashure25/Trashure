@@ -1,14 +1,13 @@
 "use client"
 
 import { HeroCarousel } from "@/components/hero-carousel"
-import { AnimatedSlogan } from "@/components/animated-slogan"
 
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-white via-[#f5f5f5] to-[#e5e5e5] flex flex-col items-center justify-start pt-0 pb-12">
-      {/* Animated Slogan */}
-      <div className="w-full flex flex-col items-center mt-8 mb-2">
-        <AnimatedSlogan />
+      {/* Slogan Bar */}
+      <div className="w-full flex justify-center mb-4">
+        <span className="text-xs md:text-sm font-bold uppercase tracking-widest text-[#06402B]">We make your trash treasure</span>
       </div>
       {/* Hero Carousel */}
       <section className="w-full max-w-5xl mx-auto mb-16 animate-fade-in">

@@ -72,9 +72,9 @@ button:hover, .btn:hover {
 }
 
 input:focus, select:focus, textarea:focus, button:focus {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid #06402B;
   outline-offset: 2px;
-  border-color: var(--color-accent);
+  border-color: #06402B;
 }
 
 .navbar, .sticky-nav {

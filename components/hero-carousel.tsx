@@ -68,7 +68,7 @@ export function HeroCarousel() {
         <CarouselContent>
           {carouselItems.map((item, index) => (
             <CarouselItem key={index}>
-              <div className="relative h-[300px] md:h-[400px] lg:h-[500px] w-full">
+              <div className="relative w-full h-[220px] md:h-[320px]">
                 <Image
                   src={item.src || "/placeholder.svg"}
                   alt={item.alt}
