@@ -1,5 +1,5 @@
 // lib/listings.ts
-// Mock listings service using localStorage
+// Database-backed listings service
 
 export interface Listing {
   id: string
@@ -15,6 +15,11 @@ export interface Listing {
   status: "active" | "sold" | "draft"
   createdAt: string
   updatedAt: string
+  user?: {
+    firstName: string
+    lastName: string
+    username: string
+  }
 }
 
 export interface CreateListingData {
@@ -29,94 +34,87 @@ export interface CreateListingData {
   images: string[]
 }
 
-const LISTINGS_KEY = "trashure_listings"
-
-// Helper to get listings from localStorage
-const getListings = (): Listing[] => {
-  if (typeof window === "undefined") return []
-  try {
-    const listings = localStorage.getItem(LISTINGS_KEY)
-    return listings ? JSON.parse(listings) : []
-  } catch (e) {
-    return []
-  }
-}
-
-// Helper to save listings to localStorage
-const saveListings = (listings: Listing[]) => {
-  if (typeof window === "undefined") return
-  localStorage.setItem(LISTINGS_KEY, JSON.stringify(listings))
-}
-
 export const listingsService = {
   async createListing(data: CreateListingData): Promise<Listing> {
-    await new Promise((resolve) => setTimeout(resolve, 500)) // Simulate network delay
+    const response = await fetch('/api/listings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
 
-    const newListing: Listing = {
-      id: `listing_${Date.now()}`,
-      userId: data.userId,
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      condition: data.condition,
-      price: data.price,
-      brand: data.brand,
-      size: data.size,
-      images: data.images,
-      status: "active",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    if (!response.ok) {
+      throw new Error('Failed to create listing');
     }
 
-    const listings = getListings()
-    listings.push(newListing)
-    saveListings(listings)
-
-    return newListing
+    return response.json();
   },
 
   async getListingsForUser(userId: string): Promise<Listing[]> {
-    await new Promise((resolve) => setTimeout(resolve, 100))
-    const listings = getListings()
-    return listings.filter((listing) => listing.userId === userId)
+    const response = await fetch(`/api/listings?userId=${userId}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch user listings');
+    }
+
+    return response.json();
   },
 
   async getAllListings(): Promise<Listing[]> {
-    await new Promise((resolve) => setTimeout(resolve, 100))
-    return getListings()
+    const response = await fetch('/api/listings');
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch listings');
+    }
+
+    return response.json();
   },
 
   async getListingById(id: string): Promise<Listing | null> {
-    await new Promise((resolve) => setTimeout(resolve, 100))
-    const listings = getListings()
-    return listings.find((listing) => listing.id === id) || null
+    const response = await fetch(`/api/listings/${id}`);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      throw new Error('Failed to fetch listing');
+    }
+
+    return response.json();
   },
 
   async updateListing(id: string, updates: Partial<Listing>): Promise<Listing | null> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    const listings = getListings()
-    const index = listings.findIndex((listing) => listing.id === id)
+    const response = await fetch(`/api/listings/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updates),
+    });
 
-    if (index === -1) return null
-
-    listings[index] = {
-      ...listings[index],
-      ...updates,
-      updatedAt: new Date().toISOString(),
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      throw new Error('Failed to update listing');
     }
 
-    saveListings(listings)
-    return listings[index]
+    return response.json();
   },
 
   async deleteListing(id: string): Promise<boolean> {
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    const listings = getListings()
-    const filteredListings = listings.filter((listing) => listing.id !== id)
+    const response = await fetch(`/api/listings/${id}`, {
+      method: 'DELETE',
+    });
 
-    if (filteredListings.length === listings.length) return false
+    if (!response.ok) {
+      if (response.status === 404) {
+        return false;
+      }
+      throw new Error('Failed to delete listing');
+    }
 
-    saveListings(filteredListings)
-    return true
+    return true;
   },
 }
