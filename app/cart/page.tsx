@@ -5,7 +5,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
-// import { useCart } from "@/components/cart-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -13,38 +12,86 @@ import { X, ShoppingBag, AlertTriangle } from "lucide-react"
 import { motion } from "framer-motion"
 import Loading from "@/components/loading"
 
+interface CartItem {
+  id: string
+  name: string
+  seller: string
+  price: number
+  image: string
+}
+
 export default function CartPage() {
   const { currentUser } = useAuth()
-  // const { cart, removeFromCart, clearCart } = useCart()
   const router = useRouter()
   const [isClient, setIsClient] = useState(false)
-  const [items, setItems] = useState([
-    {
-      id: "1",
-      name: "AI-Powered Toaster",
-      seller: "Tech Gadgets Inc.",
-      price: 79,
-      image: "/placeholder.svg",
-    },
-    {
-      id: "2",
-      name: "Self-Stirring Mug",
-      seller: "Novelty Goods Co.",
-      price: 29,
-      image: "/placeholder.svg",
-    },
-  ])
+  const [items, setItems] = useState<CartItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     setIsClient(true)
-  }, [])
+    loadCartItems()
+  }, [currentUser])
 
-  if (!isClient) {
+  const loadCartItems = () => {
+    if (!currentUser) {
+      setItems([])
+      setIsLoading(false)
+      return
+    }
+
+    try {
+      const cartKey = `trashure_cart_${currentUser.id}`
+      const cartData = localStorage.getItem(cartKey)
+      const cartItems = cartData ? JSON.parse(cartData) : []
+      setItems(cartItems)
+    } catch (error) {
+      console.error('Error loading cart:', error)
+      setItems([])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleRemoveItem = (id: string) => {
+    if (!currentUser) return
+
+    const updatedItems = items.filter((item) => item.id !== id)
+    setItems(updatedItems)
+    
+    // Update localStorage
+    const cartKey = `trashure_cart_${currentUser.id}`
+    localStorage.setItem(cartKey, JSON.stringify(updatedItems))
+  }
+
+  const handleClearCart = () => {
+    if (!currentUser) return
+
+    setItems([])
+    const cartKey = `trashure_cart_${currentUser.id}`
+    localStorage.removeItem(cartKey)
+  }
+
+  if (!isClient || isLoading) {
     return <Loading />
   }
 
+  if (!currentUser) {
+    return (
+      <div className="container mx-auto max-w-6xl px-4 py-8 sm:py-12">
+        <div className="text-center py-20">
+          <ShoppingBag className="mx-auto h-24 w-24 text-gray-300" />
+          <h2 className="mt-6 text-2xl font-semibold text-gray-800">Please log in</h2>
+          <p className="mt-2 text-gray-500">You need to be logged in to view your cart.</p>
+          <Button asChild className="mt-6">
+            <Link href="/login">Log In</Link>
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   const totalCost = items.reduce((acc, item) => acc + item.price, 0)
-  const userCredits = currentUser?.credits ?? 0
+  const userCredits = currentUser?.trustScore ?? 0 // Using trustScore as credits for now
   const hasSufficientCredits = userCredits >= totalCost
   const creditsNeeded = totalCost - userCredits
 
@@ -64,14 +111,10 @@ export default function CartPage() {
       y: 0,
       opacity: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 100,
       },
     },
-  }
-
-  const handleRemoveItem = (id: string) => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id))
   }
 
   return (
@@ -107,6 +150,17 @@ export default function CartPage() {
           className="grid grid-cols-1 gap-x-12 gap-y-8 lg:grid-cols-3"
         >
           <div className="lg:col-span-2">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold text-gray-800">Cart Items ({items.length})</h2>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleClearCart}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                Clear Cart
+              </Button>
+            </div>
             <ul className="space-y-6">
               {items.map((item) => (
                 <motion.li key={item.id} variants={itemVariants}>
@@ -121,7 +175,7 @@ export default function CartPage() {
                       />
                       <div className="flex-grow">
                         <h2 className="text-lg font-semibold text-gray-800">{item.name}</h2>
-                        <p className="text-sm text-gray-500 mt-1">Don&apos;t forget your items!</p>
+                        <p className="text-sm text-gray-500 mt-1">Seller: {item.seller}</p>
                         <p className="text-lg font-bold text-gray-900 mt-4">{item.price} Credits</p>
                       </div>
                       <Button
@@ -160,13 +214,18 @@ export default function CartPage() {
                   <span>{totalCost} Credits</span>
                 </div>
                 <Separator />
+                <div className="p-3 bg-blue-50 text-blue-700 rounded-lg">
+                  <p className="text-sm">
+                    <span className="font-semibold">Your Balance:</span> {userCredits} Credits
+                  </p>
+                </div>
                 {!hasSufficientCredits && (
                   <div className="p-4 bg-red-50 text-red-700 rounded-lg flex items-start gap-3">
                     <AlertTriangle className="h-5 w-5 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-semibold">Insufficient Credits</p>
                       <p className="text-sm">
-                        Your balance is {userCredits} Credits. You need {creditsNeeded} more.
+                        You need {creditsNeeded} more credits to complete this purchase.
                       </p>
                     </div>
                   </div>
@@ -174,11 +233,19 @@ export default function CartPage() {
               </CardContent>
               <CardFooter className="flex flex-col gap-3 pt-4">
                 {hasSufficientCredits ? (
-                  <Button size="lg" className="w-full" onClick={() => alert("Proceeding to checkout!")}>
+                  <Button 
+                    size="lg" 
+                    className="w-full" 
+                    onClick={() => router.push('/checkout')}
+                  >
                     Complete Exchange
                   </Button>
                 ) : (
-                  <Button size="lg" className="w-full" onClick={() => router.push("/purchase-credits")}>
+                  <Button 
+                    size="lg" 
+                    className="w-full" 
+                    onClick={() => router.push("/purchase-credits")}
+                  >
                     Purchase Credits
                   </Button>
                 )}
