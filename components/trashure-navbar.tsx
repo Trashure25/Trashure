@@ -7,21 +7,27 @@ import { ShoppingCart, PlusCircle, Search, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { useState } from "react"
 
 function TrashureNavbar() {
   const { currentUser, isLoading } = useAuth()
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null)
 
   const getInitials = (firstName?: string, lastName?: string) => {
     return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase()
   }
 
-  const navigationItems = [
+  interface NavigationItem {
+    name: string
+    href: string
+    subcategories: Array<{
+      name: string
+      href: string
+      disabled?: boolean
+    }>
+  }
+
+  const navigationItems: NavigationItem[] = [
     {
       name: "Designers",
       href: "/designers",
@@ -46,6 +52,7 @@ function TrashureNavbar() {
         { name: "Palace", href: "/designers/palace" },
         { name: "A Bathing Ape", href: "/designers/bape" },
         { name: "Comme des Garçons", href: "/designers/comme-des-garcons" },
+        { name: "---", href: "#", disabled: true },
         { name: "Vintage & Archive", href: "/designers/vintage" },
       ]
     },
@@ -163,35 +170,40 @@ function TrashureNavbar() {
       {/* Secondary Nav */}
       <nav className="flex items-center justify-center gap-6 overflow-x-auto px-4 py-1 text-sm font-medium text-black lg:gap-8 border-t border-gray-200">
         {navigationItems.map((item) => (
-          <DropdownMenu key={item.name}>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className="flex items-center gap-1 hover:text-primary hover:bg-transparent p-0 h-auto font-medium text-sm"
-              >
-                <Link href={item.href} className="hover:text-primary">
-                  {item.name}
-                </Link>
-                <ChevronDown className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="center" 
-              className="w-48 mt-2"
-              sideOffset={8}
-            >
-              {item.subcategories.map((subcategory) => (
-                <DropdownMenuItem key={subcategory.name} asChild>
-                  <Link 
-                    href={subcategory.href}
-                    className="cursor-pointer"
-                  >
-                    {subcategory.name}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div 
+            key={item.name} 
+            className="relative group"
+            onMouseEnter={() => setHoveredItem(item.name)}
+            onMouseLeave={() => setHoveredItem(null)}
+          >
+            <div className="flex items-center gap-1 hover:text-primary cursor-pointer">
+              <Link href={item.href} className="hover:text-primary">
+                {item.name}
+              </Link>
+              <ChevronDown className="h-3 w-3" />
+            </div>
+            
+            {/* Hover Dropdown */}
+            {hoveredItem === item.name && (
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                <div className="py-2">
+                  {item.subcategories.map((subcategory) => (
+                    subcategory.name === "---" ? (
+                      <div key="separator" className="h-px bg-gray-200 my-1" />
+                    ) : (
+                      <Link
+                        key={subcategory.name}
+                        href={subcategory.href}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-primary transition-colors"
+                      >
+                        {subcategory.name}
+                      </Link>
+                    )
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         ))}
       </nav>
     </header>

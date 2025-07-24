@@ -54,15 +54,58 @@ export default function ListItemPage() {
   })
 
   const categories = [
-    "Menswear",
-    "Womenswear",
-    "Sneakers",
-    "Accessories",
-    "Denim",
-    "Streetwear",
-    "Vintage",
-    "Designer",
-    "Household & Dorm",
+    // Designer Categories
+    "Louis Vuitton",
+    "Dior", 
+    "Bottega Veneta",
+    "Gucci",
+    "Prada",
+    "Saint Laurent",
+    "Balenciaga",
+    "Chanel",
+    "Miu Miu",
+    "Fendi",
+    "Celine",
+    "Off-White",
+    "Stussy",
+    "Essentials",
+    "Fear of God",
+    "Aime Leon Dore",
+    "Supreme",
+    "Palace",
+    "A Bathing Ape",
+    "Comme des Garçons",
+    "Vintage & Archive",
+    
+    // Main Categories
+    "Menswear - T-Shirts & Tops",
+    "Menswear - Pants & Jeans", 
+    "Menswear - Outerwear",
+    "Menswear - Shoes & Boots",
+    "Menswear - Accessories",
+    "Menswear - Formal Wear",
+    
+    "Womenswear - Dresses",
+    "Womenswear - Tops & Blouses",
+    "Womenswear - Pants & Jeans",
+    "Womenswear - Skirts",
+    "Womenswear - Outerwear", 
+    "Womenswear - Shoes & Heels",
+    "Womenswear - Accessories",
+    
+    "Sneakers - Running",
+    "Sneakers - Basketball",
+    "Sneakers - Lifestyle",
+    "Sneakers - Skateboarding",
+    "Sneakers - Limited Edition",
+    "Sneakers - Vintage",
+    
+    "Household - Furniture",
+    "Household - Kitchen & Dining",
+    "Household - Bedding & Bath",
+    "Household - Decor & Art",
+    "Household - Electronics",
+    "Household - Storage & Organization",
   ]
   const conditions = ["New with tags", "Like new", "Good", "Fair", "Poor"]
 
