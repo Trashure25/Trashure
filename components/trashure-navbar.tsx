@@ -157,10 +157,10 @@ function TrashureNavbar() {
             </Button>
           ) : (
             <div className="hidden items-center gap-2 md:flex">
-              <Button asChild variant="outline" className="rounded-full px-4 py-2 text-base font-semibold">
+              <Button asChild variant="outline" className="rounded-full px-4 py-2 text-base font-semibold text-black border-gray-300 bg-white hover:bg-accent/10 hover:text-accent">
                 <Link href="/login">Log In</Link>
               </Button>
-              <Button asChild className="rounded-full px-4 py-2 text-base font-semibold">
+              <Button asChild className="rounded-full px-4 py-2 text-base font-semibold text-white bg-accent hover:bg-[#009e7a]">
                 <Link href="/signup">Sign Up</Link>
               </Button>
             </div>
