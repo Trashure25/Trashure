@@ -117,12 +117,14 @@ function TrashureNavbar() {
           <Image src="/trashure-wordmark.png" alt="Trashure logo" width={80} height={20} priority style={{ background: 'transparent' }} />
         </Link>
         {/* Search Bar */}
-        <form className="flex-1 flex justify-center">
-          <div className="flex w-full max-w-sm border border-black h-9">
+        <form className="flex-1 flex justify-center" onSubmit={e => { e.preventDefault(); const q = e.currentTarget.query.value.trim(); if(q) window.location.href = `/search?q=${encodeURIComponent(q)}`; }}>
+          <div className="flex w-full max-w-sm border border-black rounded-md overflow-hidden h-9">
             <input
+              name="query"
               type="search"
               placeholder="Search for anything"
-              className="flex-1 px-2 py-0.5 text-sm bg-white focus:outline-none"
+              className="flex-1 px-2 py-0.5 text-sm bg-white focus:outline-none focus:ring-0 border-none rounded-none"
+              style={{ boxShadow: 'none' }}
             />
             <button type="submit" className="px-4 font-bold uppercase border-l border-black bg-white hover:bg-gray-100 text-xs">Search</button>
           </div>
@@ -131,7 +133,7 @@ function TrashureNavbar() {
         <div className="flex items-center gap-1">
           <Link href="/list-item" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sell</Link>
           <Link href="/signup" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">Sign Up</Link>
-          <Link href="/login" className="px-3 h-8 flex items-center justify-center font-bold uppercase bg-black text-white border border-black hover:bg-gray-900 text-xs">Log In</Link>
+          <Link href="/login" className="px-3 h-8 flex items-center justify-center font-bold uppercase bg-accent text-white border border-black hover:bg-[#04331f] text-xs">Log In</Link>
         </div>
       </div>
       {/* Second Row: Main Nav */}
