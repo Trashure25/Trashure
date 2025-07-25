@@ -86,9 +86,11 @@ export async function GET(req: NextRequest) {
     console.log('Database URL exists:', !!process.env.DATABASE_URL)
     console.log('Prisma client initialized:', !!prisma)
 
-    // Test database connection first
+    // Test database connection first (but be lenient in development)
     const isConnected = await testDatabaseConnection();
-    if (!isConnected) {
+    console.log('Database connection test result:', isConnected);
+    
+    if (!isConnected && process.env.NODE_ENV === 'production') {
       console.error('Database connection failed, returning error')
       return NextResponse.json(
         { error: 'Database connection failed' },
@@ -103,6 +105,8 @@ export async function GET(req: NextRequest) {
       ...(category && { category }),
       ...(brand && { brand }),
     };
+
+    console.log('Query where clause:', where);
 
     // Validate sort parameters
     const validSortFields = ['createdAt', 'updatedAt', 'price', 'title'];
@@ -125,8 +129,11 @@ export async function GET(req: NextRequest) {
     // Calculate pagination
     const skip = (page - 1) * limit;
 
+    console.log('Attempting to fetch listings...');
+
     // Fetch listings with pagination using Prisma with retry logic
     const [listings, totalCount] = await withRetry(async () => {
+      console.log('Executing database query...');
       const [listingsResult, countResult] = await Promise.all([
         prisma.listing.findMany({
           where,
@@ -147,6 +154,10 @@ export async function GET(req: NextRequest) {
         }),
         prisma.listing.count({ where })
       ]);
+      
+      console.log('Database query successful');
+      console.log('Listings found:', listingsResult.length);
+      console.log('Total count:', countResult);
       
       return [listingsResult, countResult];
     });
