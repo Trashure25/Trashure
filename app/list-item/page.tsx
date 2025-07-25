@@ -69,7 +69,7 @@ export default function ListItemPage() {
       try {
         const res = await fetch("/api/listings")
         const data = await res.json()
-        const brands = Array.from(new Set(data.map((item: any) => item.brand).filter(Boolean)))
+        const brands = Array.from(new Set(data.map((item: any) => String(item.brand)).filter(Boolean))) as string[];
         setBrandOptions(brands)
       } catch (e) {
         setBrandOptions([])
@@ -198,7 +198,7 @@ export default function ListItemPage() {
     })
 
     if (res.success) {
-      setEvaluatedPrice(res.price)
+      setEvaluatedPrice(res.price ?? null)
       setPricingStatus("evaluated")
       toast({
         title: "Price Evaluated!",
@@ -379,26 +379,19 @@ export default function ListItemPage() {
                   <div className="space-y-2">
                     <Label htmlFor="condition">Condition *</Label>
                     <Select
-                      id="condition"
-                      name="condition"
                       value={formData.condition}
                       onValueChange={v => onSelect("condition", v)}
                       required
                     >
-                      <SelectTrigger
-                        className={
-                          `h-12 w-full rounded-full border border-gray-300 bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all placeholder:text-gray-400
-                          hover:bg-[#06402B] hover:border-[#06402B] hover:text-white data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B] data-[state=open]:text-white`
-                        }
-                      >
+                      <SelectTrigger id="condition" name="condition" className="h-12 w-full rounded-full border border-gray-300 bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all placeholder:text-gray-400 hover:bg-[#06402B] hover:border-[#06402B] hover:text-white data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B] data-[state=open]:text-white">
                         <SelectValue placeholder="Condition" className="text-gray-400" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border border-gray-300 bg-white data-[state=open]:bg-[#06402B] data-[state=open]:text-white">
-                        <SelectItem value="New with tags" className="hover:bg-[#06402B] hover:text-white">New with tags</SelectItem>
-                        <SelectItem value="Like new" className="hover:bg-[#06402B] hover:text-white">Like new</SelectItem>
-                        <SelectItem value="Good" className="hover:bg-[#06402B] hover:text-white">Good</SelectItem>
-                        <SelectItem value="Fair" className="hover:bg-[#06402B] hover:text-white">Fair</SelectItem>
-                        <SelectItem value="Poor" className="hover:bg-[#06402B] hover:text-white">Poor</SelectItem>
+                        <SelectItem value="New with tags" className="hover:bg-[#198154] hover:text-white">New with tags</SelectItem>
+                        <SelectItem value="Like new" className="hover:bg-[#198154] hover:text-white">Like new</SelectItem>
+                        <SelectItem value="Good" className="hover:bg-[#198154] hover:text-white">Good</SelectItem>
+                        <SelectItem value="Fair" className="hover:bg-[#198154] hover:text-white">Fair</SelectItem>
+                        <SelectItem value="Poor" className="hover:bg-[#198154] hover:text-white">Poor</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
