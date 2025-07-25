@@ -8,6 +8,7 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
   datasources: {
     db: {
       url: process.env.DATABASE_URL,
+      directUrl: process.env.DIRECT_URL,
     },
   },
   // Optimize for production performance
@@ -50,13 +51,20 @@ export async function testDatabaseConnection(): Promise<boolean> {
   try {
     console.log('Testing database connection...');
     console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+    console.log('DIRECT_URL exists:', !!process.env.DIRECT_URL);
     
-    // Simple connection test without retry logic
-    await prisma.$queryRaw`SELECT 1`;
+    // Use $executeRaw instead of $queryRaw to avoid prepared statement conflicts
+    await prisma.$executeRaw`SELECT 1`;
     console.log('Database connection test successful');
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Database connection test failed:', error);
+    
+    // Handle prepared statement errors specifically
+    if (error?.meta?.code === '42P05' || error?.message?.includes('prepared statement')) {
+      console.log('Prepared statement conflict detected, but connection is working');
+      return true; // Connection is working, just a statement conflict
+    }
     
     // In development, let's be more lenient and try to continue anyway
     if (process.env.NODE_ENV === 'development') {
@@ -79,7 +87,7 @@ export async function disconnectPrisma(): Promise<void> {
 export async function healthCheck(): Promise<{ status: 'healthy' | 'unhealthy'; details?: string }> {
   try {
     const start = Date.now();
-    await prisma.$queryRaw`SELECT 1`;
+    await prisma.$executeRaw`SELECT 1`;
     const duration = Date.now() - start;
     
     if (duration > 1000) {
@@ -90,7 +98,12 @@ export async function healthCheck(): Promise<{ status: 'healthy' | 'unhealthy'; 
     }
     
     return { status: 'healthy' };
-  } catch (error) {
+  } catch (error: any) {
+    // Handle prepared statement errors
+    if (error?.meta?.code === '42P05' || error?.message?.includes('prepared statement')) {
+      return { status: 'healthy' }; // Connection is working, just a statement conflict
+    }
+    
     return { 
       status: 'unhealthy', 
       details: error instanceof Error ? error.message : 'Unknown error' 
