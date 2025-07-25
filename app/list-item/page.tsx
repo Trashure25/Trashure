@@ -354,7 +354,7 @@ export default function ListItemPage() {
                         className="h-12 w-full rounded-full bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]"
                         style={{ border: '1px solid #d1d5db' }}
                       >
-                        <SelectValue placeholder="Condition" />
+                        <SelectValue placeholder="Condition" className="text-gray-400 data-[placeholder]:text-gray-400" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border border-gray-300 bg-white">
                         <SelectItem value="New with tags" className="hover:bg-[#198154] hover:text-white">New with tags</SelectItem>

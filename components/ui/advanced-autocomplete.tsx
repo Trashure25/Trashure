@@ -80,8 +80,9 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
     setSearch(newValue)
     setOpen(true)
     setActiveIndex(-1)
-    onChange?.(newValue)
-  }, [onChange])
+    // Don't call onChange during typing - only call onSelect when selection is made
+    // This prevents parent re-renders that cause focus loss
+  }, [])
 
   const handleOptionClick = React.useCallback((optionValue: string) => {
     setSearch(optionValue)
