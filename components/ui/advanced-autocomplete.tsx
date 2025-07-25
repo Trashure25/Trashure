@@ -83,7 +83,6 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
             setSearch(e.target.value)
             setOpen(true)
             setActiveIndex(-1)
-            onChange(e.target.value)
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}

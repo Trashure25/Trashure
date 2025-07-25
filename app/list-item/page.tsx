@@ -398,7 +398,7 @@ export default function ListItemPage() {
                       onValueChange={v => onSelect("condition", v)}
                       required
                     >
-                      <SelectTrigger className="h-12 w-full rounded-full border border-gray-300 bg-white px-5 py-3 text-base font-normal text-black focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]">
+                      <SelectTrigger className="h-12 w-full rounded-full border border-gray-300 bg-white px-5 py-3 text-base font-normal text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]">
                         <SelectValue placeholder="Condition" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border border-gray-300 bg-white data-[state=open]:bg-[#06402B] data-[state=open]:text-white">
