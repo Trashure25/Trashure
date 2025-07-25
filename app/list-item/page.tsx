@@ -1,30 +1,104 @@
 "use client"
 
-import React from "react"
-import { useEffect, useState, useMemo } from "react"
+import React, { useEffect, useState, useMemo, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, ArrowRight, Loader2, Plus, Sparkles, Upload, X } from "lucide-react"
-
-import { useAuth } from "@/contexts/auth-context"
-import { evaluateItemPrice } from "@/app/actions/listing-actions"
-import { listingsService } from "@/lib/listings"
-import { Button } from "@/components/ui/button"
+import Image from "next/image"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { toast } from "@/components/ui/use-toast"
-import Image from "next/image"
 import { AdvancedAutocomplete } from "@/components/ui/advanced-autocomplete"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useAuth } from "@/contexts/auth-context"
+import { listingsService } from "@/lib/listings"
+import { evaluateItemPrice } from "@/app/actions/listing-actions"
+import { toast } from "@/hooks/use-toast"
+import { ArrowLeft, ArrowRight, Upload, X, Loader2, Sparkles, Plus, GripVertical } from "lucide-react"
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import {
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 // ---------- helpers ----------
 const fileToBase64 = (file: File) =>
   new Promise<string>((res, rej) => {
     const reader = new FileReader()
-    reader.onload = () => res(reader.result as string)
-    reader.onerror = (e) => rej(e)
     reader.readAsDataURL(file)
+    reader.onload = () => res(reader.result as string)
+    reader.onerror = (error) => rej(error)
   })
+
+// ---------- Sortable Image Component ----------
+interface SortableImageProps {
+  id: number
+  src: string
+  alt: string
+  onRemove: (index: number) => void
+}
+
+function SortableImage({ id, src, alt, onRemove }: SortableImageProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="relative aspect-square rounded overflow-hidden cursor-move"
+      {...attributes}
+      {...listeners}
+    >
+      <Image
+        src={src || "/placeholder.svg"}
+        alt={alt}
+        width={300}
+        height={400}
+        className="w-full h-full object-cover"
+      />
+      <div className="absolute top-1 left-1 bg-black bg-opacity-50 rounded p-1">
+        <GripVertical className="h-4 w-4 text-white" />
+      </div>
+      <Button
+        size="icon"
+        variant="destructive"
+        className="absolute top-1 right-1 h-6 w-6"
+        onClick={(e) => {
+          e.stopPropagation()
+          onRemove(id)
+        }}
+      >
+        <X className="h-4 w-4" />
+      </Button>
+    </div>
+  )
+}
 
 type PricingStatus = "idle" | "evaluating" | "evaluated" | "manual_fallback"
 
@@ -234,6 +308,22 @@ export default function ListItemPage() {
     }
   }
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (active.id !== over?.id) {
+      const oldIndex = previews.findIndex((_, index) => index === Number(active.id))
+      const newIndex = previews.findIndex((_, index) => index === Number(over?.id))
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newPreviews = arrayMove(previews, oldIndex, newIndex)
+        const newImages = arrayMove(images, oldIndex, newIndex)
+        setPreviews(newPreviews)
+        setImages(newImages)
+      }
+    }
+  }
+
   // ---------- UI ----------
   if (authLoading || !currentUser) {
     return (
@@ -252,7 +342,7 @@ export default function ListItemPage() {
           <Card>
             <CardHeader>
               <CardTitle>Step 1: Upload Photos</CardTitle>
-              <CardDescription>Add up to 5 photos. Good photos increase your chances of a trade.</CardDescription>
+              <CardDescription>Add up to 5 photos. Good photos increase your chances of a trade. Drag and drop to reorder images.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <label className="relative block w-full h-64 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 transition-colors">
@@ -269,25 +359,28 @@ export default function ListItemPage() {
               </label>
               {previews.length > 0 && (
                 <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
-                  {previews.map((src, i) => (
-                    <div key={i} className="relative aspect-square rounded overflow-hidden">
-                      <Image
-                        src={src || "/placeholder.svg"}
-                        alt={formData.title}
-                        width={300}
-                        height={400}
-                        className="w-full h-full object-cover"
-                      />
-                      <Button
-                        size="icon"
-                        variant="destructive"
-                        className="absolute top-1 right-1 h-6 w-6"
-                        onClick={() => removeImage(i)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
+                  <DndContext
+                    sensors={useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, {
+                      coordinateGetter: sortableKeyboardCoordinates,
+                    }))}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={previews.map((_, index) => index)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {previews.map((src, i) => (
+                        <SortableImage
+                          key={i}
+                          id={i}
+                          src={src || "/placeholder.svg"}
+                          alt={formData.title}
+                          onRemove={removeImage}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
                 </div>
               )}
               <div className="flex justify-end">

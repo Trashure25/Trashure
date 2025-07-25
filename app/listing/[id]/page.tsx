@@ -144,10 +144,10 @@ export default function ListingDetailPage() {
           <div className="space-y-4">
             <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
               <Image
-                src={listing.images[0] || "/placeholder.svg?height=400&width=300"}
+                src={listing.images[currentImageIndex] || "/placeholder.svg"}
                 alt={listing.title}
                 width={400}
-                height={300}
+                height={400}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -158,11 +158,11 @@ export default function ListingDetailPage() {
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
                     className={`aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition-colors ${
-                      currentImageIndex === index ? "border-primary" : "border-transparent"
+                      currentImageIndex === index ? "border-accent" : "border-transparent hover:border-gray-300"
                     }`}
                   >
                     <Image
-                      src={image || "/placeholder.svg?height=100&width=100"}
+                      src={image || "/placeholder.svg"}
                       alt={`${listing.title} ${index + 1}`}
                       width={100}
                       height={100}
