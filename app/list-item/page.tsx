@@ -45,32 +45,21 @@ export default function ListItemPage() {
   const [manualPrice, setManualPrice] = useState("")
 
   // --- Form data
-  const [images, setImages] = useState<File[]>([])
-  const [previews, setPreviews] = useState<string[]>([])
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
-    condition: "",
     brand: "",
+    condition: "",
     size: "",
+    price: ""
   })
-  // Local state for category/brand input
-  const [categoryInput, setCategoryInput] = useState("");
-  const [brandInput, setBrandInput] = useState("");
-
-  // Handler for when a category or brand is selected (not on every keystroke)
-  const handleCategorySelect = (v: string) => {
-    setCategoryInput(v);
-    setFormData(s => ({ ...s, category: v }));
-  };
-  const handleBrandSelect = (v: string) => {
-    setBrandInput(v);
-    setFormData(s => ({ ...s, brand: v }));
-  };
+  const [images, setImages] = useState<File[]>([])
+  const [previews, setPreviews] = useState<string[]>([])
+  const [isEvaluating, setIsEvaluating] = useState(false)
+  const [brandOptions, setBrandOptions] = useState<string[]>([])
 
   // --- New: Brand autocomplete state ---
-  const [brandOptions, setBrandOptions] = useState<string[]>([])
   const [brandSearch, setBrandSearch] = useState("")
   const [brandDropdownOpen, setBrandDropdownOpen] = useState(false)
   const [brandActiveIndex, setBrandActiveIndex] = useState(-1)
@@ -356,13 +345,15 @@ export default function ListItemPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="description">Description *</Label>
-                  <Textarea
+                  <textarea
                     id="description"
                     name="description"
-                    rows={4}
                     value={formData.description}
                     onChange={onFieldChange}
+                    placeholder="Describe your item..."
                     required
+                    rows={4}
+                    className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base placeholder:text-gray-400 focus:border-accent focus:outline-none focus:ring-0 transition-colors"
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -372,7 +363,8 @@ export default function ListItemPage() {
                       id="category"
                       name="category"
                       options={categories}
-                      onSelect={handleCategorySelect}
+                      value={formData.category}
+                      onSelect={v => setFormData(s => ({ ...s, category: v }))}
                       placeholder="Category"
                       allowCustom={true}
                       autoComplete="off"
@@ -384,7 +376,8 @@ export default function ListItemPage() {
                       id="brand"
                       name="brand"
                       options={effectiveBrandOptions}
-                      onSelect={handleBrandSelect}
+                      value={formData.brand}
+                      onSelect={v => setFormData(s => ({ ...s, brand: v }))}
                       placeholder="Brand"
                       allowCustom={true}
                       autoComplete="off"
@@ -399,9 +392,9 @@ export default function ListItemPage() {
                     >
                       <SelectTrigger 
                         className="h-12 w-full rounded-full bg-white px-5 py-3 text-base font-normal text-black focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]"
-                        style={{ border: '2px solid #d1d5db' }}
+                        style={{ border: '1px solid #d1d5db' }}
                       >
-                        <SelectValue placeholder="Condition" />
+                        <SelectValue placeholder="Condition" className="text-gray-400" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border border-gray-300 bg-white">
                         <SelectItem value="New with tags" className="hover:bg-[#198154] hover:text-white">New with tags</SelectItem>

@@ -1,12 +1,27 @@
 import * as React from "react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Check, ChevronsUpDown } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
 
 interface AdvancedAutocompleteProps {
   options: string[]
   value?: string
-  onChange?: (value: string) => void // called on every keystroke
-  onSelect?: (value: string) => void // called only on selection/Enter
+  onChange?: (value: string) => void
+  onSelect?: (value: string) => void
   placeholder?: string
   allowCustom?: boolean
   className?: string
@@ -31,33 +46,46 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
   const [activeIndex, setActiveIndex] = React.useState(-1)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const [search, setSearch] = React.useState(value)
-  // If value prop changes (from parent), update local search
-  React.useEffect(() => {
-    setSearch(value)
-  }, [value])
+  const [internalValue, setInternalValue] = React.useState(value)
 
-  const filtered = options.filter(
-    (opt) => !search || opt.toLowerCase().includes(search.toLowerCase())
-  )
+  // Only update internal state when value prop changes from external selection
+  React.useEffect(() => {
+    if (value !== internalValue) {
+      setInternalValue(value)
+      setSearch(value)
+    }
+  }, [value, internalValue])
+
+  const filtered = React.useMemo(() => {
+    if (!search) return options
+    return options.filter(opt => 
+      opt.toLowerCase().includes(search.toLowerCase())
+    )
+  }, [options, search])
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!open && ["ArrowDown", "ArrowUp"].includes(e.key)) {
-      setOpen(true)
-      setActiveIndex(0)
-      return
-    }
     if (e.key === "ArrowDown") {
-      setActiveIndex((i) => Math.min(i + 1, filtered.length - 1))
+      e.preventDefault()
+      setActiveIndex(prev => 
+        prev < filtered.length - 1 ? prev + 1 : prev
+      )
     } else if (e.key === "ArrowUp") {
-      setActiveIndex((i) => Math.max(i - 1, 0))
+      e.preventDefault()
+      setActiveIndex(prev => prev > 0 ? prev - 1 : -1)
     } else if (e.key === "Enter") {
       if (open && activeIndex >= 0 && filtered[activeIndex]) {
-        onSelect?.(filtered[activeIndex])
+        const selectedValue = filtered[activeIndex]
+        setInternalValue(selectedValue)
+        setSearch(selectedValue)
+        onSelect?.(selectedValue)
         setOpen(false)
         setActiveIndex(-1)
         e.preventDefault()
       } else if (allowCustom && search.trim()) {
-        onSelect?.(search.trim())
+        const customValue = search.trim()
+        setInternalValue(customValue)
+        setSearch(customValue)
+        onSelect?.(customValue)
         setOpen(false)
         setActiveIndex(-1)
         e.preventDefault()
@@ -67,6 +95,27 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
       setActiveIndex(-1)
     }
   }
+
+  const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value
+    setSearch(newValue)
+    setInternalValue(newValue)
+    setOpen(true)
+    setActiveIndex(-1)
+    onChange?.(newValue)
+  }, [onChange])
+
+  const handleOptionClick = React.useCallback((optionValue: string) => {
+    setInternalValue(optionValue)
+    setSearch(optionValue)
+    onSelect?.(optionValue)
+    setOpen(false)
+    setActiveIndex(-1)
+    // Maintain focus on input
+    setTimeout(() => {
+      inputRef.current?.focus()
+    }, 0)
+  }, [onSelect])
 
   return (
     <Popover open={open && (filtered.length > 0 || allowCustom)} onOpenChange={setOpen}>
@@ -79,12 +128,7 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
           autoComplete={autoComplete}
           placeholder={placeholder}
           value={search}
-          onChange={e => {
-            setSearch(e.target.value)
-            setOpen(true)
-            setActiveIndex(-1)
-            onChange?.(e.target.value)
-          }}
+          onChange={handleInputChange}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
           className={className}
@@ -94,11 +138,7 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
         {filtered.length === 0 && allowCustom && search.trim() ? (
           <div
             className="px-4 py-2 text-gray-500 text-sm cursor-pointer hover:bg-accent"
-            onClick={() => {
-              onSelect?.(search.trim())
-              setOpen(false)
-              setActiveIndex(-1)
-            }}
+            onClick={() => handleOptionClick(search.trim())}
           >
             Add "{search.trim()}"
           </div>
@@ -108,11 +148,7 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
               <div
                 key={opt}
                 className={`px-4 py-2 cursor-pointer text-sm hover:bg-accent ${i === activeIndex ? "bg-accent text-accent-foreground" : ""}`}
-                onClick={() => {
-                  onSelect?.(opt)
-                  setOpen(false)
-                  setActiveIndex(-1)
-                }}
+                onClick={() => handleOptionClick(opt)}
                 onMouseEnter={() => setActiveIndex(i)}
               >
                 {opt}
@@ -121,11 +157,7 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
             {allowCustom && search.trim() && !filtered.includes(search.trim()) && (
               <div
                 className="px-4 py-2 text-gray-500 text-sm cursor-pointer hover:bg-accent border-t"
-                onClick={() => {
-                  onSelect?.(search.trim())
-                  setOpen(false)
-                  setActiveIndex(-1)
-                }}
+                onClick={() => handleOptionClick(search.trim())}
               >
                 Add "{search.trim()}"
               </div>
