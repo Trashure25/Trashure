@@ -349,7 +349,7 @@ export default function ListItemPage() {
                     required
                   />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="category">Category *</Label>
                     <AdvancedAutocomplete
@@ -375,6 +375,27 @@ export default function ListItemPage() {
                       allowCustom={true}
                       autoComplete="off"
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="condition">Condition *</Label>
+                    <Select
+                      id="condition"
+                      name="condition"
+                      value={formData.condition}
+                      onValueChange={v => onSelect("condition", v)}
+                      required
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select condition" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="New with tags">New with tags</SelectItem>
+                        <SelectItem value="Like new">Like new</SelectItem>
+                        <SelectItem value="Good">Good</SelectItem>
+                        <SelectItem value="Fair">Fair</SelectItem>
+                        <SelectItem value="Poor">Poor</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

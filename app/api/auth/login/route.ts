@@ -28,13 +28,24 @@ export async function POST(req: NextRequest) {
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '30d' });
     // Set cookie
     const response = NextResponse.json(user);
+    const secureFlag = process.env.NODE_ENV === 'production';
     response.cookies.set('trashure_jwt', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: secureFlag,
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 30 // 30 days
     });
+    console.log('[LOGIN DEBUG] NODE_ENV:', process.env.NODE_ENV);
+    console.log('[LOGIN DEBUG] Setting cookie trashure_jwt:', token.slice(0, 10) + '...');
+    console.log('[LOGIN DEBUG] Cookie options:', {
+      httpOnly: true,
+      secure: secureFlag,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 30
+    });
+    console.log('[LOGIN DEBUG] Response cookies:', response.cookies);
     return response;
   } catch (error) {
     console.error('Login error:', error);
