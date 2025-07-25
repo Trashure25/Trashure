@@ -65,6 +65,7 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
       <PopoverTrigger asChild>
         <Input
           ref={inputRef}
+          type="text"
           placeholder={placeholder}
           value={search}
           onChange={e => {
@@ -74,21 +75,13 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
             if (!e.target.value && allowCustom) onChange("")
           }}
           onFocus={() => setOpen(true)}
-          onBlur={e => {
-            // Only close if the next focused element is not inside the popover
-            const next = e.relatedTarget as HTMLElement | null
-            if (!next || !next.closest('[data-autocomplete-popover]')) {
-              setOpen(false)
-              setActiveIndex(-1)
-            }
-          }}
           onKeyDown={handleKeyDown}
           autoComplete="off"
           className={className}
         />
       </PopoverTrigger>
-      <PopoverContent data-autocomplete-popover className="p-0 w-full min-w-[200px] max-h-60 overflow-y-auto">
-        {filtered.length === 0 && allowCustom ? (
+      <PopoverContent data-autocomplete-popover className="p-0 w-full min-w-[200px] max-h-60 overflow-y-auto bg-white shadow-lg rounded-xl border z-50">
+        {filtered.length === 0 && allowCustom && search.trim() ? (
           <div
             className="px-4 py-2 text-gray-500 text-sm cursor-pointer hover:bg-accent"
             onMouseDown={() => {
@@ -100,20 +93,34 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
             Add "{search.trim()}"
           </div>
         ) : (
-          filtered.map((opt, i) => (
-            <div
-              key={opt}
-              className={`px-4 py-2 cursor-pointer text-sm hover:bg-accent ${i === activeIndex ? "bg-accent text-accent-foreground" : ""}`}
-              onMouseDown={() => {
-                onChange(opt)
-                setOpen(false)
-                setActiveIndex(-1)
-              }}
-              onMouseEnter={() => setActiveIndex(i)}
-            >
-              {opt}
-            </div>
-          ))
+          <>
+            {filtered.map((opt, i) => (
+              <div
+                key={opt}
+                className={`px-4 py-2 cursor-pointer text-sm hover:bg-accent ${i === activeIndex ? "bg-accent text-accent-foreground" : ""}`}
+                onMouseDown={() => {
+                  onChange(opt)
+                  setOpen(false)
+                  setActiveIndex(-1)
+                }}
+                onMouseEnter={() => setActiveIndex(i)}
+              >
+                {opt}
+              </div>
+            ))}
+            {allowCustom && search.trim() && !filtered.includes(search.trim()) && (
+              <div
+                className="px-4 py-2 text-gray-500 text-sm cursor-pointer hover:bg-accent border-t"
+                onMouseDown={() => {
+                  onChange(search.trim())
+                  setOpen(false)
+                  setActiveIndex(-1)
+                }}
+              >
+                Add "{search.trim()}"
+              </div>
+            )}
+          </>
         )}
       </PopoverContent>
     </Popover>

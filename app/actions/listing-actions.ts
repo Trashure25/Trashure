@@ -47,7 +47,7 @@ export async function evaluateItemPrice(details: {
       `,
     })
 
-    return { success: true, price: object.priceInCredits }
+    return { success: true, price: Math.ceil(object.priceInCredits * 1.05) }
   } catch (error) {
     console.error("AI price evaluation failed:", error)
     return {
