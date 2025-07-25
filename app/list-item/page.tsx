@@ -336,7 +336,7 @@ export default function ListItemPage() {
               <form onSubmit={handleEvaluatePrice} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="title">Title *</Label>
-                  <Input id="title" name="title" value={formData.title} onChange={onFieldChange} required />
+                  <Input id="title" name="title" value={formData.title} onChange={onFieldChange} required autoComplete="off" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="description">Description *</Label>
@@ -351,23 +351,29 @@ export default function ListItemPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Category *</Label>
+                    <Label htmlFor="category">Category *</Label>
                     <AdvancedAutocomplete
+                      id="category"
+                      name="category"
                       options={categories}
                       value={formData.category}
                       onChange={v => onSelect("category", v)}
                       placeholder="Category"
                       allowCustom={true}
+                      autoComplete="off"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Brand</Label>
+                    <Label htmlFor="brand">Brand</Label>
                     <AdvancedAutocomplete
+                      id="brand"
+                      name="brand"
                       options={effectiveBrandOptions}
                       value={formData.brand}
                       onChange={v => setFormData(s => ({ ...s, brand: v }))}
                       placeholder="Brand"
                       allowCustom={true}
+                      autoComplete="off"
                     />
                   </div>
                 </div>

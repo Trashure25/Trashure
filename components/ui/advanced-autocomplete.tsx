@@ -9,6 +9,9 @@ interface AdvancedAutocompleteProps {
   placeholder?: string
   allowCustom?: boolean
   className?: string
+  id?: string
+  name?: string
+  autoComplete?: string
 }
 
 export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
@@ -17,7 +20,10 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
   onChange,
   placeholder = "",
   allowCustom = true,
-  className = ""
+  className = "",
+  id,
+  name,
+  autoComplete = "off"
 }) => {
   const [open, setOpen] = React.useState(false)
   const [activeIndex, setActiveIndex] = React.useState(-1)
@@ -66,6 +72,9 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
         <Input
           ref={inputRef}
           type="text"
+          id={id}
+          name={name}
+          autoComplete={autoComplete}
           placeholder={placeholder}
           value={search}
           onChange={e => {
@@ -76,7 +85,6 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
-          autoComplete="off"
           className={className}
         />
       </PopoverTrigger>
