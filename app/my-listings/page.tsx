@@ -139,14 +139,14 @@ export default function MyListingsPage() {
             <Card key={listing.id} className="overflow-hidden group">
               <div className="aspect-square bg-gray-100 relative">
                 <Image
-                  src={listing.images[0] || "/placeholder.svg?height=300&width=300"}
+                  src={listing.images?.[0] || "/placeholder.svg?height=300&width=300"}
                   alt={listing.title}
                   width={300}
                   height={300}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <Badge className={`absolute top-2 right-2 ${getStatusColor(listing.status)}`}>
-                  {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
+                  {listing.status?.charAt(0).toUpperCase() + listing.status?.slice(1) || 'Active'}
                 </Badge>
               </div>
               <CardHeader>

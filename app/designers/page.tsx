@@ -52,7 +52,7 @@ export default function DesignersPage() {
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 15000) // Increased timeout to 15 seconds
 
-        const response = await fetch('/api/listings?category=Designer&limit=100', {
+        const response = await fetch('/api/listings?limit=100', {
           signal: controller.signal
         })
 
@@ -77,8 +77,11 @@ export default function DesignersPage() {
           throw new Error('Invalid response format')
         }
 
+        // Filter for designer brands instead of category
         const designerListings = listings.filter((listing: Listing) => 
-          listing.category.startsWith('Designer') || listing.category === 'Designer'
+          listing.brand && designerBrands.some(designerBrand => 
+            listing.brand.toLowerCase().includes(designerBrand.toLowerCase())
+          )
         )
         console.log('Filtered designer listings:', designerListings)
 

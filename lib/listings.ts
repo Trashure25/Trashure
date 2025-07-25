@@ -58,7 +58,9 @@ export const listingsService = {
       throw new Error('Failed to fetch user listings');
     }
 
-    return response.json();
+    const data = await response.json();
+    // Handle new paginated response format
+    return data.listings || data; // Fallback for old format
   },
 
   async getAllListings(): Promise<Listing[]> {
@@ -68,7 +70,9 @@ export const listingsService = {
       throw new Error('Failed to fetch listings');
     }
 
-    return response.json();
+    const data = await response.json();
+    // Handle new paginated response format
+    return data.listings || data; // Fallback for old format
   },
 
   async getListingById(id: string): Promise<Listing | null> {
