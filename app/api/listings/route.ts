@@ -43,8 +43,12 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    console.log('GET /api/listings - Starting request')
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
+
+    console.log('Database URL exists:', !!process.env.DATABASE_URL)
+    console.log('Prisma client initialized:', !!prisma)
 
     // Fetch listings using Prisma
     const listings = await prisma.listing.findMany({
@@ -66,12 +70,13 @@ export async function GET(req: NextRequest) {
       }
     });
 
+    console.log(`Found ${listings.length} listings`)
     return NextResponse.json(listings);
 
   } catch (error) {
     console.error('Error fetching listings:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch listings' },
+      { error: 'Failed to fetch listings', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

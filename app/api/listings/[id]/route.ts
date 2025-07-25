@@ -1,46 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Client } from 'pg';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const client = new Client({
-      connectionString: process.env.DATABASE_URL,
-      ssl: {
-        rejectUnauthorized: false
+    console.log('GET /api/listings/[id] - Starting request for ID:', params.id)
+    console.log('Database URL exists:', !!process.env.DATABASE_URL)
+    console.log('Prisma client initialized:', !!prisma)
+
+    const listing = await prisma.listing.findUnique({
+      where: { id: params.id },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            username: true,
+          }
+        }
       }
     });
 
-    try {
-      await client.connect();
-      
-      const result = await client.query(
-        `SELECT l.*, u."firstName", u."lastName", u.username 
-         FROM "Listing" l 
-         JOIN "User" u ON l."userId" = u.id 
-         WHERE l.id = $1`,
-        [params.id]
+    if (!listing) {
+      console.log('Listing not found for ID:', params.id)
+      return NextResponse.json(
+        { error: 'Listing not found' },
+        { status: 404 }
       );
-
-      if (result.rows.length === 0) {
-        return NextResponse.json(
-          { error: 'Listing not found' },
-          { status: 404 }
-        );
-      }
-
-      const listing = result.rows[0];
-      listing.images = JSON.parse(listing.images || '[]');
-      
-      return NextResponse.json(listing);
-
-    } finally {
-      await client.end();
     }
+
+    console.log('Found listing:', listing.id)
+    return NextResponse.json(listing);
 
   } catch (error) {
     console.error('Error fetching listing:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch listing' },
+      { error: 'Failed to fetch listing', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
