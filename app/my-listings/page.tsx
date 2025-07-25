@@ -31,10 +31,14 @@ export default function MyListingsPage() {
     }
 
     if (currentUser) {
+      console.log('Current user object:', currentUser)
+      console.log('Current user ID:', currentUser.id)
       const fetchListings = async () => {
         try {
           setLoadingListings(true)
+          console.log('Fetching listings for user ID:', currentUser.id)
           const userListings = await listingsService.getListingsForUser(currentUser.id)
+          console.log('User listings response:', userListings)
           setListings(userListings)
         } catch (error) {
           console.error("Failed to fetch listings", error)
@@ -125,6 +129,31 @@ export default function MyListingsPage() {
             <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
             <h3 className="text-xl font-semibold mb-2">No listings yet</h3>
             <p className="text-gray-600 mb-6">Start by listing your first item for trade</p>
+            
+            {/* Temporary debug section */}
+            <div className="mt-4 p-4 bg-gray-100 rounded text-left text-sm">
+              <p><strong>Debug Info:</strong></p>
+              <p>Current User ID: {currentUser?.id}</p>
+              <p>Listings found: {listings.length}</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={async () => {
+                  try {
+                    const allListings = await listingsService.getAllListings()
+                    console.log('All listings in database:', allListings)
+                    alert(`Found ${allListings.length} total listings. Check console for details.`)
+                  } catch (error) {
+                    console.error('Error fetching all listings:', error)
+                    alert('Error fetching all listings. Check console.')
+                  }
+                }}
+                className="mt-2"
+              >
+                Debug: Show All Listings
+              </Button>
+            </div>
+            
             <Link href="/list-item">
               <Button>
                 <Plus className="w-4 h-4 mr-2" />

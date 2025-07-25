@@ -52,15 +52,23 @@ export const listingsService = {
   },
 
   async getListingsForUser(userId: string): Promise<Listing[]> {
+    console.log('listingsService.getListingsForUser called with userId:', userId)
     const response = await fetch(`/api/listings?userId=${userId}`);
     
+    console.log('API response status:', response.status)
+    
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error('API error response:', errorText)
       throw new Error('Failed to fetch user listings');
     }
 
     const data = await response.json();
+    console.log('API response data:', data)
     // Handle new paginated response format
-    return data.listings || data; // Fallback for old format
+    const listings = data.listings || data; // Fallback for old format
+    console.log('Processed listings:', listings)
+    return listings;
   },
 
   async getAllListings(): Promise<Listing[]> {
