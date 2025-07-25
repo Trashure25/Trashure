@@ -81,7 +81,6 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
             setSearch(e.target.value)
             setOpen(true)
             setActiveIndex(-1)
-            if (!e.target.value && allowCustom) onChange("")
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
@@ -92,7 +91,7 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
         {filtered.length === 0 && allowCustom && search.trim() ? (
           <div
             className="px-4 py-2 text-gray-500 text-sm cursor-pointer hover:bg-accent"
-            onMouseDown={() => {
+            onClick={() => {
               onChange(search.trim())
               setOpen(false)
               setActiveIndex(-1)
@@ -106,7 +105,7 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
               <div
                 key={opt}
                 className={`px-4 py-2 cursor-pointer text-sm hover:bg-accent ${i === activeIndex ? "bg-accent text-accent-foreground" : ""}`}
-                onMouseDown={() => {
+                onClick={() => {
                   onChange(opt)
                   setOpen(false)
                   setActiveIndex(-1)
@@ -119,7 +118,7 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
             {allowCustom && search.trim() && !filtered.includes(search.trim()) && (
               <div
                 className="px-4 py-2 text-gray-500 text-sm cursor-pointer hover:bg-accent border-t"
-                onMouseDown={() => {
+                onClick={() => {
                   onChange(search.trim())
                   setOpen(false)
                   setActiveIndex(-1)

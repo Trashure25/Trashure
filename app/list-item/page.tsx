@@ -387,13 +387,13 @@ export default function ListItemPage() {
                     >
                       <SelectTrigger
                         className={
-                          `h-12 w-full rounded-full border border-black bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all placeholder:text-gray-400
-                          data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B] data-[state=open]:text-white`
+                          `h-12 w-full rounded-full border border-gray-300 bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all placeholder:text-gray-400
+                          hover:bg-[#06402B] hover:border-[#06402B] hover:text-white data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B] data-[state=open]:text-white`
                         }
                       >
                         <SelectValue placeholder="Condition" className="text-gray-400" />
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl border border-black bg-white data-[state=open]:bg-[#06402B] data-[state=open]:text-white">
+                      <SelectContent className="rounded-xl border border-gray-300 bg-white data-[state=open]:bg-[#06402B] data-[state=open]:text-white">
                         <SelectItem value="New with tags" className="hover:bg-[#06402B] hover:text-white">New with tags</SelectItem>
                         <SelectItem value="Like new" className="hover:bg-[#06402B] hover:text-white">Like new</SelectItem>
                         <SelectItem value="Good" className="hover:bg-[#06402B] hover:text-white">Good</SelectItem>
