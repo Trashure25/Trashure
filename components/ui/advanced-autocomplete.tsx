@@ -31,14 +31,11 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
   const [activeIndex, setActiveIndex] = React.useState(-1)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const [search, setSearch] = React.useState(value)
-  const [isTyping, setIsTyping] = React.useState(false)
 
-  // Only update search when value prop changes from external selection (not from typing)
+  // Update search when value prop changes
   React.useEffect(() => {
-    if (!isTyping) {
-      setSearch(value)
-    }
-  }, [value, isTyping])
+    setSearch(value)
+  }, [value])
 
   const filtered = React.useMemo(() => {
     if (!search) return options
@@ -60,7 +57,6 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
       if (open && activeIndex >= 0 && filtered[activeIndex]) {
         const selectedValue = filtered[activeIndex]
         setSearch(selectedValue)
-        setIsTyping(false)
         onSelect?.(selectedValue)
         setOpen(false)
         setActiveIndex(-1)
@@ -68,7 +64,6 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
       } else if (allowCustom && search.trim()) {
         const customValue = search.trim()
         setSearch(customValue)
-        setIsTyping(false)
         onSelect?.(customValue)
         setOpen(false)
         setActiveIndex(-1)
@@ -83,16 +78,13 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
   const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value
     setSearch(newValue)
-    setIsTyping(true)
     setOpen(true)
     setActiveIndex(-1)
-    // Don't call onChange during typing - only call onSelect when selection is made
-    // This prevents parent re-renders that cause focus loss
-  }, [])
+    onChange?.(newValue)
+  }, [onChange])
 
   const handleOptionClick = React.useCallback((optionValue: string) => {
     setSearch(optionValue)
-    setIsTyping(false)
     onSelect?.(optionValue)
     setOpen(false)
     setActiveIndex(-1)
@@ -100,19 +92,6 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
 
   const handleFocus = React.useCallback(() => {
     setOpen(true)
-  }, [])
-
-  const handleBlur = React.useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-    // Check if the focus is moving to the popover content
-    const relatedTarget = e.relatedTarget as HTMLElement
-    const isMovingToPopover = relatedTarget?.closest('[data-autocomplete-popover]')
-    
-    // Only reset typing state if we're not moving to the popover
-    if (!isMovingToPopover) {
-      setTimeout(() => {
-        setIsTyping(false)
-      }, 100)
-    }
   }, [])
 
   return (
@@ -128,7 +107,6 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
           value={search}
           onChange={handleInputChange}
           onFocus={handleFocus}
-          onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           className={className}
         />
