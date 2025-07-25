@@ -59,6 +59,16 @@ export default function ListItemPage() {
   const [categoryInput, setCategoryInput] = useState("");
   const [brandInput, setBrandInput] = useState("");
 
+  // Handler for when a category or brand is selected (not on every keystroke)
+  const handleCategorySelect = (v: string) => {
+    setCategoryInput(v);
+    setFormData(s => ({ ...s, category: v }));
+  };
+  const handleBrandSelect = (v: string) => {
+    setBrandInput(v);
+    setFormData(s => ({ ...s, brand: v }));
+  };
+
   // --- New: Brand autocomplete state ---
   const [brandOptions, setBrandOptions] = useState<string[]>([])
   const [brandSearch, setBrandSearch] = useState("")
@@ -360,10 +370,8 @@ export default function ListItemPage() {
                       name="category"
                       options={categories}
                       value={categoryInput}
-                      onChange={v => {
-                        setCategoryInput(v);
-                        setFormData(s => ({ ...s, category: v }));
-                      }}
+                      onChange={setCategoryInput}
+                      onSelect={handleCategorySelect}
                       placeholder="Category"
                       allowCustom={true}
                       autoComplete="off"
@@ -376,10 +384,8 @@ export default function ListItemPage() {
                       name="brand"
                       options={effectiveBrandOptions}
                       value={brandInput}
-                      onChange={v => {
-                        setBrandInput(v);
-                        setFormData(s => ({ ...s, brand: v }));
-                      }}
+                      onChange={setBrandInput}
+                      onSelect={handleBrandSelect}
                       placeholder="Brand"
                       allowCustom={true}
                       autoComplete="off"
@@ -388,11 +394,11 @@ export default function ListItemPage() {
                   <div className="space-y-2">
                     <Label htmlFor="condition">Condition *</Label>
                     <Select
-                      value={formData.condition}
+                      value={formData.condition || ""}
                       onValueChange={v => onSelect("condition", v)}
                       required
                     >
-                      <SelectTrigger className="h-12 w-full rounded-full border border-gray-300 bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] hover:text-white data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B] data-[state=open]:text-white">
+                      <SelectTrigger className="h-12 w-full rounded-full border border-gray-300 bg-white px-5 py-3 text-base font-normal text-black focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]">
                         <SelectValue placeholder="Condition" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border border-gray-300 bg-white data-[state=open]:bg-[#06402B] data-[state=open]:text-white">

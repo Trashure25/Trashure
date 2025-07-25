@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input"
 interface AdvancedAutocompleteProps {
   options: string[]
   value: string
-  onChange: (value: string) => void
+  onChange: (value: string) => void // called on every keystroke
+  onSelect?: (value: string) => void // called only on selection/Enter
   placeholder?: string
   allowCustom?: boolean
   className?: string
@@ -18,6 +19,7 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
   options,
   value,
   onChange,
+  onSelect,
   placeholder = "",
   allowCustom = true,
   className = "",
@@ -50,12 +52,12 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
       setActiveIndex((i) => Math.max(i - 1, 0))
     } else if (e.key === "Enter") {
       if (open && activeIndex >= 0 && filtered[activeIndex]) {
-        onChange(filtered[activeIndex])
+        onSelect?.(filtered[activeIndex])
         setOpen(false)
         setActiveIndex(-1)
         e.preventDefault()
       } else if (allowCustom && search.trim()) {
-        onChange(search.trim())
+        onSelect?.(search.trim())
         setOpen(false)
         setActiveIndex(-1)
         e.preventDefault()
@@ -81,7 +83,7 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
             setSearch(e.target.value)
             setOpen(true)
             setActiveIndex(-1)
-            // Do NOT call onChange here, only update local search
+            onChange(e.target.value)
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
@@ -93,7 +95,7 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
           <div
             className="px-4 py-2 text-gray-500 text-sm cursor-pointer hover:bg-accent"
             onClick={() => {
-              onChange(search.trim())
+              onSelect?.(search.trim())
               setOpen(false)
               setActiveIndex(-1)
             }}
@@ -107,7 +109,7 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
                 key={opt}
                 className={`px-4 py-2 cursor-pointer text-sm hover:bg-accent ${i === activeIndex ? "bg-accent text-accent-foreground" : ""}`}
                 onClick={() => {
-                  onChange(opt)
+                  onSelect?.(opt)
                   setOpen(false)
                   setActiveIndex(-1)
                 }}
@@ -120,7 +122,7 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
               <div
                 className="px-4 py-2 text-gray-500 text-sm cursor-pointer hover:bg-accent border-t"
                 onClick={() => {
-                  onChange(search.trim())
+                  onSelect?.(search.trim())
                   setOpen(false)
                   setActiveIndex(-1)
                 }}
