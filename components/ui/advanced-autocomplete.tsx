@@ -1,5 +1,4 @@
 import * as React from "react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
 
 interface AdvancedAutocompleteProps {
@@ -30,12 +29,28 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
   const [open, setOpen] = React.useState(false)
   const [activeIndex, setActiveIndex] = React.useState(-1)
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const containerRef = React.useRef<HTMLDivElement>(null)
   const [search, setSearch] = React.useState(value)
 
   // Update search when value prop changes
   React.useEffect(() => {
     setSearch(value)
   }, [value])
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false)
+        setActiveIndex(-1)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const filtered = React.useMemo(() => {
     if (!search) return options
@@ -95,53 +110,53 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
   }, [])
 
   return (
-    <Popover open={open && (filtered.length > 0 || allowCustom)} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Input
-          ref={inputRef}
-          type="text"
-          id={id}
-          name={name}
-          autoComplete={autoComplete}
-          placeholder={placeholder}
-          value={search}
-          onChange={handleInputChange}
-          onFocus={handleFocus}
-          onKeyDown={handleKeyDown}
-          className={className}
-        />
-      </PopoverTrigger>
-      <PopoverContent data-autocomplete-popover className="p-0 w-full min-w-[200px] max-h-60 overflow-y-auto bg-white shadow-lg rounded-xl border z-50">
-        {filtered.length === 0 && allowCustom && search.trim() ? (
-          <div
-            className="px-4 py-2 text-gray-500 text-sm cursor-pointer hover:bg-accent"
-            onClick={() => handleOptionClick(search.trim())}
-          >
-            Add "{search.trim()}"
-          </div>
-        ) : (
-          <>
-            {filtered.map((opt, i) => (
-              <div
-                key={opt}
-                className={`px-4 py-2 cursor-pointer text-sm hover:bg-accent ${i === activeIndex ? "bg-accent text-accent-foreground" : ""}`}
-                onClick={() => handleOptionClick(opt)}
-                onMouseEnter={() => setActiveIndex(i)}
-              >
-                {opt}
-              </div>
-            ))}
-            {allowCustom && search.trim() && !filtered.includes(search.trim()) && (
-              <div
-                className="px-4 py-2 text-gray-500 text-sm cursor-pointer hover:bg-accent border-t"
-                onClick={() => handleOptionClick(search.trim())}
-              >
-                Add "{search.trim()}"
-              </div>
-            )}
-          </>
-        )}
-      </PopoverContent>
-    </Popover>
+    <div ref={containerRef} className="relative">
+      <Input
+        ref={inputRef}
+        type="text"
+        id={id}
+        name={name}
+        autoComplete={autoComplete}
+        placeholder={placeholder}
+        value={search}
+        onChange={handleInputChange}
+        onFocus={handleFocus}
+        onKeyDown={handleKeyDown}
+        className={className}
+      />
+      {open && (filtered.length > 0 || allowCustom) && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-gray-300 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+          {filtered.length === 0 && allowCustom && search.trim() ? (
+            <div
+              className="px-4 py-2 text-gray-500 text-sm cursor-pointer hover:bg-accent"
+              onClick={() => handleOptionClick(search.trim())}
+            >
+              Add "{search.trim()}"
+            </div>
+          ) : (
+            <>
+              {filtered.map((opt, i) => (
+                <div
+                  key={opt}
+                  className={`px-4 py-2 cursor-pointer text-sm hover:bg-accent ${i === activeIndex ? "bg-accent text-accent-foreground" : ""}`}
+                  onClick={() => handleOptionClick(opt)}
+                  onMouseEnter={() => setActiveIndex(i)}
+                >
+                  {opt}
+                </div>
+              ))}
+              {allowCustom && search.trim() && !filtered.includes(search.trim()) && (
+                <div
+                  className="px-4 py-2 text-gray-500 text-sm cursor-pointer hover:bg-accent border-t"
+                  onClick={() => handleOptionClick(search.trim())}
+                >
+                  Add "{search.trim()}"
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
   )
 }) 
