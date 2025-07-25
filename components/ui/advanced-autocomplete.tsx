@@ -1,20 +1,5 @@
 import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
 
 interface AdvancedAutocompleteProps {
@@ -46,15 +31,11 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
   const [activeIndex, setActiveIndex] = React.useState(-1)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const [search, setSearch] = React.useState(value)
-  const [internalValue, setInternalValue] = React.useState(value)
 
-  // Only update internal state when value prop changes from external selection
+  // Only update search when value prop changes from external selection (not from typing)
   React.useEffect(() => {
-    if (value !== internalValue) {
-      setInternalValue(value)
-      setSearch(value)
-    }
-  }, [value, internalValue])
+    setSearch(value)
+  }, [value])
 
   const filtered = React.useMemo(() => {
     if (!search) return options
@@ -75,7 +56,6 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
     } else if (e.key === "Enter") {
       if (open && activeIndex >= 0 && filtered[activeIndex]) {
         const selectedValue = filtered[activeIndex]
-        setInternalValue(selectedValue)
         setSearch(selectedValue)
         onSelect?.(selectedValue)
         setOpen(false)
@@ -83,7 +63,6 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
         e.preventDefault()
       } else if (allowCustom && search.trim()) {
         const customValue = search.trim()
-        setInternalValue(customValue)
         setSearch(customValue)
         onSelect?.(customValue)
         setOpen(false)
@@ -99,22 +78,16 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
   const handleInputChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value
     setSearch(newValue)
-    setInternalValue(newValue)
     setOpen(true)
     setActiveIndex(-1)
     onChange?.(newValue)
   }, [onChange])
 
   const handleOptionClick = React.useCallback((optionValue: string) => {
-    setInternalValue(optionValue)
     setSearch(optionValue)
     onSelect?.(optionValue)
     setOpen(false)
     setActiveIndex(-1)
-    // Maintain focus on input
-    setTimeout(() => {
-      inputRef.current?.focus()
-    }, 0)
   }, [onSelect])
 
   return (

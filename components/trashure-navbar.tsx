@@ -3,9 +3,7 @@
 import { useAuth } from "@/contexts/auth-context"
 import Link from "next/link"
 import Image from "next/image"
-import { ShoppingCart, PlusCircle, Search, ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { useRef, useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
@@ -134,7 +132,7 @@ function TrashureNavbar() {
         </Link>
         {/* Search Bar */}
         <form className="flex-1 flex justify-center" onSubmit={e => { e.preventDefault(); const q = e.currentTarget.query.value.trim(); if(q) window.location.href = `/search?q=${encodeURIComponent(q)}`; }}>
-          <div className="flex w-full max-w-sm border border-black rounded-md overflow-hidden h-9 relative">
+          <div className="flex w-full max-w-sm border border-gray-300 rounded-full overflow-hidden h-9 relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-[#06402B]" />
             </span>
@@ -142,10 +140,9 @@ function TrashureNavbar() {
               name="query"
               type="search"
               placeholder="Search for anything"
-              className="flex-1 pl-10 pr-2 py-0.5 text-sm bg-white focus:outline-none focus:ring-0 border-none rounded-none"
-              style={{ boxShadow: 'none' }}
+              className="flex-1 pl-10 pr-4 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 border-none rounded-none placeholder:text-gray-400"
             />
-            <button type="submit" className="px-4 font-bold uppercase border-l border-black bg-white hover:bg-gray-100 text-xs">Search</button>
+            <button type="submit" className="px-4 font-bold uppercase border-l border-gray-300 bg-white hover:bg-gray-100 text-xs text-black">Search</button>
           </div>
         </form>
         {/* Actions */}
@@ -197,12 +194,18 @@ function TrashureNavbar() {
               href={item.href}
               className="uppercase font-bold tracking-widest text-xs text-black px-1 py-0.5 hover:underline hover:decoration-2 hover:underline-offset-4 transition-colors"
               onClick={() => setProfileMenuOpen(false)}
+              onMouseEnter={() => setHoveredItem(item.name)}
+              onMouseLeave={() => setHoveredItem(null)}
             >
               {item.name}
             </Link>
             {/* Dropdown on hover */}
             {item.subcategories && item.subcategories.length > 0 && hoveredItem === item.name && (
-              <div className="absolute left-1/2 top-full -translate-x-1/2 mt-2 min-w-max bg-white border border-gray-200 z-50 shadow-xl">
+              <div 
+                className="absolute left-1/2 top-full -translate-x-1/2 mt-2 min-w-max bg-white border border-gray-200 z-50 shadow-xl"
+                onMouseEnter={() => setHoveredItem(item.name)}
+                onMouseLeave={() => setHoveredItem(null)}
+              >
                 <div className="flex flex-col py-2">
                   {item.subcategories.map((subcategory) => (
                     subcategory.name === "---" ? (

@@ -13,11 +13,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import Image from "next/image"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { useRef } from "react"
 import { AdvancedAutocomplete } from "@/components/ui/advanced-autocomplete"
 
 // ---------- helpers ----------
@@ -56,14 +53,7 @@ export default function ListItemPage() {
   })
   const [images, setImages] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
-  const [isEvaluating, setIsEvaluating] = useState(false)
   const [brandOptions, setBrandOptions] = useState<string[]>([])
-
-  // --- New: Brand autocomplete state ---
-  const [brandSearch, setBrandSearch] = useState("")
-  const [brandDropdownOpen, setBrandDropdownOpen] = useState(false)
-  const [brandActiveIndex, setBrandActiveIndex] = useState(-1)
-  const brandInputRef = useRef<HTMLInputElement>(null)
 
   // --- Fetch unique brands from listings on mount ---
   useEffect(() => {
@@ -80,7 +70,7 @@ export default function ListItemPage() {
     fetchBrands()
   }, [])
 
-  // --- Only categories, no brands/designers ---
+  // --- Categories ---
   const categories = useMemo(() => [
     "Menswear - T-Shirts & Tops",
     "Menswear - Pants & Jeans", 
@@ -108,38 +98,8 @@ export default function ListItemPage() {
     "Household - Electronics",
     "Household - Storage & Organization",
   ], [])
-  const conditions = ["New with tags", "Like new", "Good", "Fair", "Poor"]
 
-  // Filtered brands for dropdown
-  const filteredBrands = brandOptions.filter(b =>
-    !brandSearch || b.toLowerCase().includes(brandSearch.toLowerCase())
-  )
-
-  // Handle keyboard navigation for brand autocomplete
-  function handleBrandKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!brandDropdownOpen && ["ArrowDown", "ArrowUp"].includes(e.key)) {
-      setBrandDropdownOpen(true)
-      setBrandActiveIndex(0)
-      return
-    }
-    if (e.key === "ArrowDown") {
-      setBrandActiveIndex(i => Math.min(i + 1, filteredBrands.length - 1))
-    } else if (e.key === "ArrowUp") {
-      setBrandActiveIndex(i => Math.max(i - 1, 0))
-    } else if (e.key === "Enter") {
-      if (brandDropdownOpen && brandActiveIndex >= 0 && filteredBrands[brandActiveIndex]) {
-        setFormData(s => ({ ...s, brand: filteredBrands[brandActiveIndex] }))
-        setBrandDropdownOpen(false)
-        setBrandActiveIndex(-1)
-        e.preventDefault()
-      }
-    } else if (e.key === "Escape") {
-      setBrandDropdownOpen(false)
-      setBrandActiveIndex(-1)
-    }
-  }
-
-  // 2. For the brand autocomplete, provide a static fallback if brandOptions is empty:
+  // --- Static brand options fallback ---
   const staticBrandOptions = [
     "Nike", "Adidas", "New Balance", "Jordan", "Maison Margiela", "Converse", "Vans", "Asics", "Salomon", "Yeezy", "Reebok", "Puma", "Saucony", "Hoka", "Louis Vuitton", "Dior", "Gucci", "Prada", "Saint Laurent", "Balenciaga", "Off-White", "Stussy", "Essentials", "Fear of God", "Supreme", "Palace", "A Bathing Ape", "Comme des Garçons", "Vintage", "Chanel", "Miu Miu", "Fendi", "Celine", "Aime Leon Dore"
   ];
@@ -391,10 +351,10 @@ export default function ListItemPage() {
                       required
                     >
                       <SelectTrigger 
-                        className="h-12 w-full rounded-full bg-white px-5 py-3 text-base font-normal text-black focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]"
+                        className="h-12 w-full rounded-full bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]"
                         style={{ border: '1px solid #d1d5db' }}
                       >
-                        <SelectValue placeholder="Condition" className="text-gray-400" />
+                        <SelectValue placeholder="Condition" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border border-gray-300 bg-white">
                         <SelectItem value="New with tags" className="hover:bg-[#198154] hover:text-white">New with tags</SelectItem>
