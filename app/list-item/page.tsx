@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, ArrowRight, Loader2, Plus, Sparkles, Upload, X } from "lucide-react"
 
@@ -92,7 +92,7 @@ export default function ListItemPage() {
   }, [])
 
   // --- Only categories, no brands/designers ---
-  const categories = [
+  const categories = useMemo(() => [
     "Menswear - T-Shirts & Tops",
     "Menswear - Pants & Jeans", 
     "Menswear - Outerwear",
@@ -118,7 +118,7 @@ export default function ListItemPage() {
     "Household - Decor & Art",
     "Household - Electronics",
     "Household - Storage & Organization",
-  ]
+  ], [])
   const conditions = ["New with tags", "Like new", "Good", "Fair", "Poor"]
 
   // Filtered brands for dropdown
@@ -154,7 +154,10 @@ export default function ListItemPage() {
   const staticBrandOptions = [
     "Nike", "Adidas", "New Balance", "Jordan", "Maison Margiela", "Converse", "Vans", "Asics", "Salomon", "Yeezy", "Reebok", "Puma", "Saucony", "Hoka", "Louis Vuitton", "Dior", "Gucci", "Prada", "Saint Laurent", "Balenciaga", "Off-White", "Stussy", "Essentials", "Fear of God", "Supreme", "Palace", "A Bathing Ape", "Comme des Garçons", "Vintage", "Chanel", "Miu Miu", "Fendi", "Celine", "Aime Leon Dore"
   ];
-  const effectiveBrandOptions = brandOptions.length > 0 ? brandOptions : staticBrandOptions;
+  const effectiveBrandOptions = useMemo(() => 
+    brandOptions.length > 0 ? brandOptions : staticBrandOptions, 
+    [brandOptions]
+  );
 
   // ---------- guards ----------
   useEffect(() => {
@@ -398,7 +401,7 @@ export default function ListItemPage() {
                       onValueChange={v => onSelect("condition", v)}
                       required
                     >
-                      <SelectTrigger className="h-12 w-full rounded-full border border-gray-300 bg-white px-5 py-3 text-base font-normal text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]">
+                      <SelectTrigger className="h-12 w-full rounded-full border border-gray-300 bg-gray-50 px-5 py-3 text-base font-normal text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]">
                         <SelectValue placeholder="Condition" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border border-gray-300 bg-white data-[state=open]:bg-[#06402B] data-[state=open]:text-white">
