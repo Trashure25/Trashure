@@ -324,6 +324,14 @@ export default function ListItemPage() {
     }
   }
 
+  // Set up drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
   // ---------- UI ----------
   if (authLoading || !currentUser) {
     return (
@@ -360,9 +368,7 @@ export default function ListItemPage() {
               {previews.length > 0 && (
                 <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
                   <DndContext
-                    sensors={useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, {
-                      coordinateGetter: sortableKeyboardCoordinates,
-                    }))}
+                    sensors={sensors}
                     collisionDetection={closestCenter}
                     onDragEnd={handleDragEnd}
                   >
