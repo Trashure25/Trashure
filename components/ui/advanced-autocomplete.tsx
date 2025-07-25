@@ -29,11 +29,9 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
   const [activeIndex, setActiveIndex] = React.useState(-1)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const [search, setSearch] = React.useState(value)
-
-  // Only update local search if parent value changes due to selection, not on every keystroke
+  // If value prop changes (from parent), update local search
   React.useEffect(() => {
-    // Only update if value is different from search (i.e., selection happened)
-    if (value !== search) setSearch(value)
+    setSearch(value)
   }, [value])
 
   const filtered = options.filter(

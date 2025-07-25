@@ -55,6 +55,9 @@ export default function ListItemPage() {
     brand: "",
     size: "",
   })
+  // Local state for category/brand input
+  const [categoryInput, setCategoryInput] = useState("");
+  const [brandInput, setBrandInput] = useState("");
 
   // --- New: Brand autocomplete state ---
   const [brandOptions, setBrandOptions] = useState<string[]>([])
@@ -356,8 +359,11 @@ export default function ListItemPage() {
                       id="category"
                       name="category"
                       options={categories}
-                      value={formData.category}
-                      onChange={v => onSelect("category", v)}
+                      value={categoryInput}
+                      onChange={v => {
+                        setCategoryInput(v);
+                        setFormData(s => ({ ...s, category: v }));
+                      }}
                       placeholder="Category"
                       allowCustom={true}
                       autoComplete="off"
@@ -369,8 +375,11 @@ export default function ListItemPage() {
                       id="brand"
                       name="brand"
                       options={effectiveBrandOptions}
-                      value={formData.brand}
-                      onChange={v => setFormData(s => ({ ...s, brand: v }))}
+                      value={brandInput}
+                      onChange={v => {
+                        setBrandInput(v);
+                        setFormData(s => ({ ...s, brand: v }));
+                      }}
                       placeholder="Brand"
                       allowCustom={true}
                       autoComplete="off"
@@ -383,8 +392,8 @@ export default function ListItemPage() {
                       onValueChange={v => onSelect("condition", v)}
                       required
                     >
-                      <SelectTrigger id="condition" name="condition" className="h-12 w-full rounded-full border border-gray-300 bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all placeholder:text-gray-400 hover:bg-[#06402B] hover:border-[#06402B] hover:text-white data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B] data-[state=open]:text-white">
-                        <SelectValue placeholder="Condition" className="text-gray-400" />
+                      <SelectTrigger className="h-12 w-full rounded-full border border-gray-300 bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] hover:text-white data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B] data-[state=open]:text-white">
+                        <SelectValue placeholder="Condition" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border border-gray-300 bg-white data-[state=open]:bg-[#06402B] data-[state=open]:text-white">
                         <SelectItem value="New with tags" className="hover:bg-[#198154] hover:text-white">New with tags</SelectItem>
