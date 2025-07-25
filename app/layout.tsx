@@ -4,6 +4,7 @@ import { CartProvider } from "@/components/cart-provider"
 import { TrashureNavbar } from "@/components/trashure-navbar"
 import { Footer } from "@/components/footer"
 import { Toaster } from "@/components/ui/sonner"
+import { ErrorBoundary } from "@/components/error-boundary"
 import { GeistSans } from "geist/font/sans"
 import "./globals.css"
 
@@ -21,14 +22,16 @@ export default function RootLayout({
   return (
     <html lang="en" className={GeistSans.className}>
       <body>
-        <AuthProvider>
-          <CartProvider>
-            <TrashureNavbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <Toaster />
-          </CartProvider>
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <CartProvider>
+              <TrashureNavbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <Toaster />
+            </CartProvider>
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )

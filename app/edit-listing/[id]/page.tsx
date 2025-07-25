@@ -10,10 +10,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { AdvancedAutocomplete } from "@/components/ui/advanced-autocomplete"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Save, Loader2 } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/hooks/use-toast"
 import Image from "next/image"
 
 export default function EditListingPage() {
@@ -34,16 +34,19 @@ export default function EditListingPage() {
   })
 
   const categories = [
-    "Menswear",
-    "Womenswear",
-    "Sneakers",
-    "Accessories",
-    "Denim",
-    "Streetwear",
-    "Vintage",
-    "Designer",
-    "Household & Dorm",
+    "Menswear - Tops",
+    "Menswear - Bottoms", 
+    "Menswear - Footwear",
+    "Menswear - Formal Wear",
+    "Womenswear - Tops",
+    "Womenswear - Bottoms",
+    "Womenswear - Footwear",
+    "Womenswear - Accessories",
+    "Household - Furniture",
+    "Household - Appliances",
+    "Household - Decor",
   ]
+
   const conditions = ["New with tags", "Like new", "Good", "Fair", "Poor"]
 
   useEffect(() => {
@@ -114,8 +117,16 @@ export default function EditListingPage() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
+  const handleCategorySelect = (value: string) => {
+    setFormData((prev) => ({ ...prev, category: value }))
+  }
+
+  const handleBrandSelect = (value: string) => {
+    setFormData((prev) => ({ ...prev, brand: value }))
+  }
+
+  const handleConditionSelect = (value: string) => {
+    setFormData((prev) => ({ ...prev, condition: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -138,7 +149,6 @@ export default function EditListingPage() {
       toast({
         title: "Success!",
         description: "Your listing has been updated.",
-        className: "bg-green-100 text-green-800",
       })
       router.push("/my-listings")
     } catch (error) {
@@ -186,7 +196,7 @@ export default function EditListingPage() {
                   {listing.images.map((image, index) => (
                     <div key={index} className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                       <Image
-                        src={listing.images[0] || "/placeholder.svg?height=400&width=300"}
+                        src={image || "/placeholder.svg"}
                         alt={listing.title}
                         width={400}
                         height={300}
@@ -206,74 +216,76 @@ export default function EditListingPage() {
                   onChange={handleInputChange}
                   placeholder="e.g., Vintage Levi's 501 Jeans"
                   required
+                  autoComplete="off"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="description">Description *</Label>
-                <Textarea
+                <textarea
                   id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="Describe your item's condition, fit, and any other details..."
+                  placeholder="Describe your item..."
                   rows={4}
                   required
+                  className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base placeholder:text-gray-400 focus:border-accent focus:outline-none focus:ring-0 transition-colors"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label>Category *</Label>
-                  <Select
-                    onValueChange={(value) => handleSelectChange("category", value)}
-                    required
+                  <Label htmlFor="category">Category *</Label>
+                  <AdvancedAutocomplete
+                    id="category"
+                    name="category"
+                    options={categories}
                     value={formData.category}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onSelect={handleCategorySelect}
+                    placeholder="Category"
+                    allowCustom={true}
+                    autoComplete="off"
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label>Condition *</Label>
+                  <Label htmlFor="brand">Brand</Label>
+                  <AdvancedAutocomplete
+                    id="brand"
+                    name="brand"
+                    options={[formData.brand].filter(Boolean)}
+                    value={formData.brand}
+                    onSelect={handleBrandSelect}
+                    placeholder="Brand"
+                    allowCustom={true}
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="condition">Condition *</Label>
                   <Select
-                    onValueChange={(value) => handleSelectChange("condition", value)}
+                    value={formData.condition || ""}
+                    onValueChange={handleConditionSelect}
                     required
-                    value={formData.condition}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select condition" />
+                    <SelectTrigger 
+                      className="h-12 w-full rounded-full bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] hover:text-white data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B] data-[state=open]:text-white [&[data-placeholder]]:text-gray-400 text-black"
+                      style={{ border: '1px solid #d1d5db' }}
+                    >
+                      <SelectValue placeholder="Condition" />
                     </SelectTrigger>
-                    <SelectContent>
-                      {conditions.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
+                    <SelectContent className="rounded-xl border border-gray-300 bg-white">
+                      <SelectItem value="New with tags" className="hover:bg-[#198154] hover:text-white">New with tags</SelectItem>
+                      <SelectItem value="Like new" className="hover:bg-[#198154] hover:text-white">Like new</SelectItem>
+                      <SelectItem value="Good" className="hover:bg-[#198154] hover:text-white">Good</SelectItem>
+                      <SelectItem value="Fair" className="hover:bg-[#198154] hover:text-white">Fair</SelectItem>
+                      <SelectItem value="Poor" className="hover:bg-[#198154] hover:text-white">Poor</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="brand">Brand</Label>
-                  <Input
-                    id="brand"
-                    name="brand"
-                    value={formData.brand}
-                    onChange={handleInputChange}
-                    placeholder="e.g., Nike, Adidas, Supreme"
-                  />
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="size">Size</Label>
                   <Input
@@ -284,20 +296,19 @@ export default function EditListingPage() {
                     placeholder="e.g., M, 32, 9.5"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="price">Price (Credits) *</Label>
-                <Input
-                  id="price"
-                  name="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={handleInputChange}
-                  placeholder="0"
-                  min="0"
-                  required
-                />
+                <div className="space-y-2">
+                  <Label htmlFor="price">Price (Credits) *</Label>
+                  <Input
+                    id="price"
+                    name="price"
+                    type="number"
+                    value={formData.price}
+                    onChange={handleInputChange}
+                    placeholder="0"
+                    min="0"
+                    required
+                  />
+                </div>
               </div>
 
               <div className="flex justify-end">

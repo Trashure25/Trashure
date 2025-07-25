@@ -41,7 +41,7 @@ export default function MenswearPage() {
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 15000) // Increased timeout to 15 seconds
 
-        const response = await fetch('/api/listings', {
+        const response = await fetch('/api/listings?limit=100', {
           signal: controller.signal
         })
 
@@ -60,12 +60,13 @@ export default function MenswearPage() {
         const data = await response.json()
         console.log('Fetched data:', data)
 
-        // Validate response
-        if (!Array.isArray(data)) {
+        // Handle new paginated response format
+        const listings = data.listings || data // Fallback for old format
+        if (!Array.isArray(listings)) {
           throw new Error('Invalid response format')
         }
 
-        const menswearListings = data.filter((listing: Listing) => 
+        const menswearListings = listings.filter((listing: Listing) => 
           listing.category.startsWith('Menswear')
         )
         console.log('Filtered menswear listings:', menswearListings)
@@ -98,11 +99,24 @@ export default function MenswearPage() {
           const fallbackData = [
             {
               id: 'menswear-1',
+              title: 'Supreme Box Logo Hoodie',
+              price: 2800,
+              brand: 'Supreme',
+              size: 'L',
+              condition: 'Like new',
+              category: 'Menswear - Tops',
+              description: 'Classic Supreme box logo hoodie in excellent condition',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            },
+            {
+              id: 'menswear-2',
               title: 'Nike Air Jordan 1 Retro High OG',
               price: 4500,
               brand: 'Nike',
               size: 'US 10',
-              condition: 'Like new',
+              condition: 'New with tags',
               category: 'Menswear - Footwear',
               description: 'Classic Air Jordan 1 in Chicago colorway',
               images: ['/placeholder.svg'],
@@ -110,27 +124,14 @@ export default function MenswearPage() {
               status: 'active'
             },
             {
-              id: 'menswear-2',
-              title: 'Supreme Box Logo Hoodie',
-              price: 3200,
-              brand: 'Supreme',
-              size: 'LARGE',
-              condition: 'Good',
-              category: 'Menswear - Tops',
-              description: 'Rare Supreme box logo hoodie in excellent condition',
-              images: ['/placeholder.svg'],
-              createdAt: new Date().toISOString(),
-              status: 'active'
-            },
-            {
               id: 'menswear-3',
-              title: 'Levi\'s 501 Original Jeans',
+              title: 'Levi\'s 501 Vintage Jeans',
               price: 850,
               brand: 'Levi\'s',
-              size: '32x32',
-              condition: 'New with tags',
+              size: '32/32',
+              condition: 'Good',
               category: 'Menswear - Bottoms',
-              description: 'Classic 501 jeans in perfect condition',
+              description: 'Vintage Levi\'s 501 jeans in great condition',
               images: ['/placeholder.svg'],
               createdAt: new Date().toISOString(),
               status: 'active'

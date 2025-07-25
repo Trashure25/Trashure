@@ -21,6 +21,10 @@ model User {
   updatedAt  DateTime @updatedAt
   listings   Listing[]
   favorites  Favorite[]
+
+  @@index([email])
+  @@index([username])
+  @@index([createdAt])
 }
 
 model Listing {
@@ -39,6 +43,16 @@ model Listing {
   updatedAt   DateTime @updatedAt
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   favorites   Favorite[]
+
+  @@index([userId])
+  @@index([category])
+  @@index([brand])
+  @@index([status])
+  @@index([createdAt])
+  @@index([price])
+  @@index([category, status])
+  @@index([userId, status])
+  @@index([category, brand])
 }
 
 model Favorite {
@@ -50,4 +64,7 @@ model Favorite {
   listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   @@unique([userId, listingId])
+  @@index([userId])
+  @@index([listingId])
+  @@index([createdAt])
 }

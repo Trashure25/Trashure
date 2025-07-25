@@ -14,18 +14,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Validate required fields
+    if (!data.userId || !data.title || !data.description || !data.category || !data.condition || !data.price) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Validate price
+    if (data.price <= 0) {
+      return NextResponse.json(
+        { error: 'Price must be greater than 0' },
+        { status: 400 }
+      );
+    }
+
     // Create listing using Prisma with retry logic
     const listing = await withRetry(async () => {
       return await prisma.listing.create({
         data: {
           userId: data.userId,
-          title: data.title,
-          description: data.description,
+          title: data.title.trim(),
+          description: data.description.trim(),
           category: data.category,
           condition: data.condition,
           price: data.price,
-          brand: data.brand || null,
-          size: data.size || null,
+          brand: data.brand?.trim() || null,
+          size: data.size?.trim() || null,
           images: data.images || [],
           status: data.status || 'active',
         },
@@ -56,7 +72,16 @@ export async function GET(req: NextRequest) {
   try {
     console.log('GET /api/listings - Starting request')
     const { searchParams } = new URL(req.url);
+    
+    // Parse query parameters
     const userId = searchParams.get('userId');
+    const category = searchParams.get('category');
+    const brand = searchParams.get('brand');
+    const status = searchParams.get('status') || 'active';
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100); // Max 100 items per page
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     console.log('Database URL exists:', !!process.env.DATABASE_URL)
     console.log('Prisma client initialized:', !!prisma)
@@ -71,29 +96,62 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Fetch listings using Prisma with retry logic
-    const listings = await withRetry(async () => {
-      return await prisma.listing.findMany({
-        where: {
-          status: 'active',
-          ...(userId && { userId })
-        },
-        include: {
-          user: {
-            select: {
-              firstName: true,
-              lastName: true,
-              username: true,
+    // Build where clause
+    const where: any = {
+      status: status,
+      ...(userId && { userId }),
+      ...(category && { category }),
+      ...(brand && { brand }),
+    };
+
+    // Validate sort parameters
+    const validSortFields = ['createdAt', 'updatedAt', 'price', 'title'];
+    const validSortOrders = ['asc', 'desc'];
+    
+    if (!validSortFields.includes(sortBy)) {
+      return NextResponse.json(
+        { error: 'Invalid sort field' },
+        { status: 400 }
+      );
+    }
+    
+    if (!validSortOrders.includes(sortOrder)) {
+      return NextResponse.json(
+        { error: 'Invalid sort order' },
+        { status: 400 }
+      );
+    }
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+
+    // Fetch listings with pagination using Prisma with retry logic
+    const [listings, totalCount] = await withRetry(async () => {
+      const [listingsResult, countResult] = await Promise.all([
+        prisma.listing.findMany({
+          where,
+          include: {
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                username: true,
+              }
             }
-          }
-        },
-        orderBy: {
-          createdAt: 'desc'
-        }
-      });
+          },
+          orderBy: {
+            [sortBy]: sortOrder as 'asc' | 'desc'
+          },
+          skip,
+          take: limit,
+        }),
+        prisma.listing.count({ where })
+      ]);
+      
+      return [listingsResult, countResult];
     });
 
-    console.log(`Successfully fetched ${listings.length} listings`)
+    console.log(`Successfully fetched ${listings.length} listings (page ${page} of ${Math.ceil(totalCount / limit)})`)
     
     // Validate that we got a proper response
     if (!Array.isArray(listings)) {
@@ -104,7 +162,18 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    return NextResponse.json(listings);
+    // Return paginated response
+    return NextResponse.json({
+      listings,
+      pagination: {
+        page,
+        limit,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        hasNext: page < Math.ceil(totalCount / limit),
+        hasPrev: page > 1,
+      }
+    });
 
   } catch (error) {
     console.error('Error fetching listings:', error);

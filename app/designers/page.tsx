@@ -47,47 +47,47 @@ export default function DesignersPage() {
   useEffect(() => {
     const fetchListings = async (retryCount = 0) => {
       try {
-        console.log('Fetching listings from /api/listings...')
-        
+        console.log('Fetching designer listings...')
         // Add timeout to prevent infinite loading
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 15000) // Increased timeout to 15 seconds
-        
-        const response = await fetch('/api/listings', {
+
+        const response = await fetch('/api/listings?category=Designer&limit=100', {
           signal: controller.signal
         })
-        
+
         clearTimeout(timeoutId)
         console.log('Response status:', response.status)
-        
+
         if (response.status === 503) {
           // Database connection error
           throw new Error('Database connection failed')
         }
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
-        
+
         const data = await response.json()
         console.log('Fetched data:', data)
-        
-        // Validate response
-        if (!Array.isArray(data)) {
+
+        // Handle new paginated response format
+        const listings = data.listings || data // Fallback for old format
+        if (!Array.isArray(listings)) {
           throw new Error('Invalid response format')
         }
-        
-        const designerListings = data.filter((listing: Listing) => 
-          designerBrands.some(brand => listing.brand === brand)
+
+        const designerListings = listings.filter((listing: Listing) => 
+          listing.category.startsWith('Designer') || listing.category === 'Designer'
         )
         console.log('Filtered designer listings:', designerListings)
-        
+
         // Always set the real data, even if it's empty
         setListings(designerListings)
         setFilteredListings(designerListings)
       } catch (error) {
         console.error('Failed to fetch listings:', error)
-        
+
         // Retry logic for connection errors
         const isConnectionError = error instanceof Error && (
           error.message.includes('Failed to fetch') ||
@@ -109,33 +109,46 @@ export default function DesignersPage() {
           // Add fallback data for demo purposes when database is unavailable
           const fallbackData = [
             {
-              id: 'demo-1',
-              title: 'Louis Vuitton SS25 T-shirt',
-              price: 8925,
+              id: 'designer-1',
+              title: 'Louis Vuitton Monogram Keepall',
+              price: 8500,
               brand: 'Louis Vuitton',
-              size: 'MEDIUM',
-              condition: 'New with tags',
-              category: 'Menswear - Tops',
-              description: 'Exclusive Louis Vuitton Spring/Summer 2025 collection t-shirt',
+              size: '50cm',
+              condition: 'Like new',
+              category: 'Designer',
+              description: 'Classic LV monogram keepall in excellent condition',
               images: ['/placeholder.svg'],
               createdAt: new Date().toISOString(),
               status: 'active'
             },
             {
-              id: 'demo-2',
-              title: 'Dior Homme Classic Blazer',
+              id: 'designer-2',
+              title: 'Chanel Classic Flap Bag',
               price: 12500,
-              brand: 'Dior',
-              size: 'LARGE',
-              condition: 'Like new',
-              category: 'Menswear - Formal Wear',
-              description: 'Timeless Dior Homme blazer in pristine condition',
+              brand: 'Chanel',
+              size: 'Medium',
+              condition: 'New with tags',
+              category: 'Designer',
+              description: 'Timeless Chanel classic flap in black caviar leather',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            },
+            {
+              id: 'designer-3',
+              title: 'Hermès Birkin 30',
+              price: 45000,
+              brand: 'Hermès',
+              size: '30cm',
+              condition: 'Good',
+              category: 'Designer',
+              description: 'Rare Hermès Birkin in excellent condition',
               images: ['/placeholder.svg'],
               createdAt: new Date().toISOString(),
               status: 'active'
             }
           ] as Listing[]
-          
+
           setListings(fallbackData)
           setFilteredListings(fallbackData)
         } else {

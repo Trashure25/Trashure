@@ -34,19 +34,24 @@ export default function WomenswearPage() {
 
   // Fetch womenswear listings
   useEffect(() => {
-    const fetchListings = async () => {
+    const fetchListings = async (retryCount = 0) => {
       try {
         console.log('Fetching womenswear listings...')
         // Add timeout to prevent infinite loading
         const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 15000) // Increased timeout to 15 seconds
 
-        const response = await fetch('/api/listings', {
+        const response = await fetch('/api/listings?limit=100', {
           signal: controller.signal
         })
 
         clearTimeout(timeoutId)
         console.log('Response status:', response.status)
+
+        if (response.status === 503) {
+          // Database connection error
+          throw new Error('Database connection failed')
+        }
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
@@ -55,7 +60,13 @@ export default function WomenswearPage() {
         const data = await response.json()
         console.log('Fetched data:', data)
 
-        const womenswearListings = data.filter((listing: Listing) => 
+        // Handle new paginated response format
+        const listings = data.listings || data // Fallback for old format
+        if (!Array.isArray(listings)) {
+          throw new Error('Invalid response format')
+        }
+
+        const womenswearListings = listings.filter((listing: Listing) => 
           listing.category.startsWith('Womenswear')
         )
         console.log('Filtered womenswear listings:', womenswearListings)
@@ -66,18 +77,24 @@ export default function WomenswearPage() {
       } catch (error) {
         console.error('Failed to fetch listings:', error)
 
-        // Only show fallback data for genuine database connection errors
-        // Check if it's a network error or database connection issue
+        // Retry logic for connection errors
         const isConnectionError = error instanceof Error && (
           error.message.includes('Failed to fetch') ||
           error.message.includes('NetworkError') ||
           error.message.includes('AbortError') ||
           error.message.includes('timeout') ||
-          error.message.includes('Can\'t reach database server')
+          error.message.includes('Can\'t reach database server') ||
+          error.message.includes('Database connection failed')
         )
         
+        if (isConnectionError && retryCount < 2) {
+          console.log(`Connection error, retrying... (attempt ${retryCount + 1}/3)`)
+          setTimeout(() => fetchListings(retryCount + 1), 2000 * (retryCount + 1))
+          return
+        }
+        
         if (isConnectionError) {
-          console.log('Database connection error detected, showing fallback data')
+          console.log('Database connection error detected after retries, showing fallback data')
           // Add fallback data for demo purposes when database is unavailable
           const fallbackData = [
             {
