@@ -359,7 +359,7 @@ export default function ListItemPage() {
                       required
                     >
                       <SelectTrigger 
-                        className="h-12 w-full rounded-full bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B] [&[data-placeholder]]:text-gray-400"
+                        className="h-12 w-full rounded-full bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] hover:text-white data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B] data-[state=open]:text-white [&[data-placeholder]]:text-gray-400 text-black"
                         style={{ border: '1px solid #d1d5db' }}
                       >
                         <SelectValue placeholder="Condition" />

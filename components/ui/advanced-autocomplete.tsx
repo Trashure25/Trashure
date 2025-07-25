@@ -102,11 +102,17 @@ export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
     setOpen(true)
   }, [])
 
-  const handleBlur = React.useCallback(() => {
-    // Reset typing state when focus is lost
-    setTimeout(() => {
-      setIsTyping(false)
-    }, 100)
+  const handleBlur = React.useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    // Check if the focus is moving to the popover content
+    const relatedTarget = e.relatedTarget as HTMLElement
+    const isMovingToPopover = relatedTarget?.closest('[data-autocomplete-popover]')
+    
+    // Only reset typing state if we're not moving to the popover
+    if (!isMovingToPopover) {
+      setTimeout(() => {
+        setIsTyping(false)
+      }, 100)
+    }
   }, [])
 
   return (
