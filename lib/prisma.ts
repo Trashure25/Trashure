@@ -8,7 +8,6 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
   datasources: {
     db: {
       url: process.env.DATABASE_URL,
-      directUrl: process.env.DIRECT_URL,
     },
   },
   // Optimize for production performance
