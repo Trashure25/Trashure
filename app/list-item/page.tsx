@@ -385,15 +385,20 @@ export default function ListItemPage() {
                       onValueChange={v => onSelect("condition", v)}
                       required
                     >
-                      <SelectTrigger className="h-12 w-full rounded-full border border-gray-300 bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all placeholder:text-gray-400">
-                        <SelectValue placeholder="Select condition" />
+                      <SelectTrigger
+                        className={
+                          `h-12 w-full rounded-full border border-black bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all placeholder:text-gray-400
+                          data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B] data-[state=open]:text-white`
+                        }
+                      >
+                        <SelectValue placeholder="Condition" className="text-gray-400" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="New with tags">New with tags</SelectItem>
-                        <SelectItem value="Like new">Like new</SelectItem>
-                        <SelectItem value="Good">Good</SelectItem>
-                        <SelectItem value="Fair">Fair</SelectItem>
-                        <SelectItem value="Poor">Poor</SelectItem>
+                      <SelectContent className="rounded-xl border border-black bg-white data-[state=open]:bg-[#06402B] data-[state=open]:text-white">
+                        <SelectItem value="New with tags" className="hover:bg-[#06402B] hover:text-white">New with tags</SelectItem>
+                        <SelectItem value="Like new" className="hover:bg-[#06402B] hover:text-white">Like new</SelectItem>
+                        <SelectItem value="Good" className="hover:bg-[#06402B] hover:text-white">Good</SelectItem>
+                        <SelectItem value="Fair" className="hover:bg-[#06402B] hover:text-white">Fair</SelectItem>
+                        <SelectItem value="Poor" className="hover:bg-[#06402B] hover:text-white">Poor</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
