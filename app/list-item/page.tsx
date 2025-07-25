@@ -372,7 +372,6 @@ export default function ListItemPage() {
                       id="category"
                       name="category"
                       options={categories}
-                      onChange={setCategoryInput}
                       onSelect={handleCategorySelect}
                       placeholder="Category"
                       allowCustom={true}
@@ -385,7 +384,6 @@ export default function ListItemPage() {
                       id="brand"
                       name="brand"
                       options={effectiveBrandOptions}
-                      onChange={setBrandInput}
                       onSelect={handleBrandSelect}
                       placeholder="Brand"
                       allowCustom={true}
@@ -399,7 +397,10 @@ export default function ListItemPage() {
                       onValueChange={v => onSelect("condition", v)}
                       required
                     >
-                      <SelectTrigger className="h-12 w-full rounded-full border-2 border-gray-300 bg-white px-5 py-3 text-base font-normal text-black focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]">
+                      <SelectTrigger 
+                        className="h-12 w-full rounded-full bg-white px-5 py-3 text-base font-normal text-black focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]"
+                        style={{ border: '2px solid #d1d5db' }}
+                      >
                         <SelectValue placeholder="Condition" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border border-gray-300 bg-white">

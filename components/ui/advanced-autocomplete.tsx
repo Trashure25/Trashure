@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 interface AdvancedAutocompleteProps {
   options: string[]
   value?: string
-  onChange: (value: string) => void // called on every keystroke
+  onChange?: (value: string) => void // called on every keystroke
   onSelect?: (value: string) => void // called only on selection/Enter
   placeholder?: string
   allowCustom?: boolean
@@ -15,7 +15,7 @@ interface AdvancedAutocompleteProps {
   autoComplete?: string
 }
 
-export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
+export const AdvancedAutocomplete = React.memo<AdvancedAutocompleteProps>(({
   options,
   value = "",
   onChange,
@@ -83,6 +83,7 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
             setSearch(e.target.value)
             setOpen(true)
             setActiveIndex(-1)
+            onChange?.(e.target.value)
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
@@ -134,4 +135,4 @@ export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
       </PopoverContent>
     </Popover>
   )
-} 
+}) 
