@@ -9,23 +9,20 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/contexts/auth-context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-const passwordFormSchema = z
-  .object({
-    currentPassword: z.string().min(1, { message: "Current password is required." }),
-    newPassword: z.string().min(8, {
-      message: "Password must be at least 8 characters.",
-    }),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  })
+const passwordFormSchema = z.object({
+  currentPassword: z.string(),
+  newPassword: z.string(),
+  confirmPassword: z.string(),
+})
 
-type PasswordFormValues = z.infer<typeof passwordFormSchema>
+interface PasswordFormValues {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+}
 
 export function ChangePasswordForm() {
-  const { user, changePassword } = useAuth()
+  const { currentUser, changePassword } = useAuth()
 
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordFormSchema),
@@ -37,14 +34,18 @@ export function ChangePasswordForm() {
     mode: "onChange",
   })
 
-  function onSubmit(data: PasswordFormValues) {
-    if (user) {
-      const success = changePassword(user.email, data.currentPassword, data.newPassword)
-      if (success) {
+  async function onSubmit(data: PasswordFormValues) {
+    if (currentUser) {
+      try {
+        await changePassword({
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword,
+          confirmNewPassword: data.confirmPassword,
+        })
         alert("Password changed successfully!")
         form.reset()
-      } else {
-        alert("Incorrect current password.")
+      } catch (error) {
+        alert("Failed to change password. Please check your current password.")
       }
     }
   }

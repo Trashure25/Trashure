@@ -132,7 +132,7 @@ function TrashureNavbar() {
         </Link>
         {/* Search Bar */}
         <form className="flex-1 flex justify-center" onSubmit={e => { e.preventDefault(); const q = e.currentTarget.query.value.trim(); if(q) window.location.href = `/search?q=${encodeURIComponent(q)}`; }}>
-          <div className="flex w-full max-w-sm border border-gray-300 rounded-full overflow-hidden h-9 relative">
+          <div className="flex w-full max-w-sm border border-gray-300 rounded-full overflow-hidden h-9 relative focus-within:border-accent focus-within:ring-2 focus-within:ring-accent focus-within:ring-offset-0 transition-all">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-[#06402B]" />
             </span>
@@ -140,9 +140,9 @@ function TrashureNavbar() {
               name="query"
               type="search"
               placeholder="Search for anything"
-              className="flex-1 pl-10 pr-4 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 border-none rounded-none placeholder:text-gray-400"
+              className="flex-1 pl-10 pr-4 py-2 text-sm bg-white focus:outline-none border-none rounded-none placeholder:text-gray-400"
             />
-            <button type="submit" className="px-4 font-bold uppercase border-l border-gray-300 bg-white hover:bg-gray-100 text-xs text-black">Search</button>
+            <button type="submit" className="px-4 font-bold uppercase border-l border-gray-300 bg-white text-[#06402B] hover:bg-[#06402B] hover:text-white text-xs transition-colors">Search</button>
           </div>
         </form>
         {/* Actions */}

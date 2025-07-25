@@ -62,8 +62,8 @@ export default function ListingDetailPage() {
   useEffect(() => {
     if (currentUser) {
       const fetchUserListings = async () => {
-        const listings = await listingsService.getListingsByUserId(currentUser.id)
-        setUserListings(listings.filter((l) => l.status === "active" && l.id !== listing?.id))
+        const listings = await listingsService.getListingsForUser(currentUser.id)
+        setUserListings(listings.filter((l: any) => l.status === "active" && l.id !== listing?.id))
       }
       fetchUserListings()
     }
@@ -130,7 +130,7 @@ export default function ListingDetailPage() {
       <ContactSellerModal
         isOpen={isContactModalOpen}
         onOpenChange={setIsContactModalOpen}
-        sellerName={listing.seller || "the seller"}
+        sellerName={listing.user ? `${listing.user.firstName} ${listing.user.lastName}` : "the seller"}
       />
 
       <div className="container mx-auto py-8 px-4">

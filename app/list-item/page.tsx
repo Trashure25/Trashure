@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 import { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, ArrowRight, Loader2, Plus, Sparkles, Upload, X } from "lucide-react"
@@ -100,12 +100,12 @@ export default function ListItemPage() {
   ], [])
 
   // --- Static brand options fallback ---
-  const staticBrandOptions = [
+  const staticBrandOptions = useMemo(() => [
     "Nike", "Adidas", "New Balance", "Jordan", "Maison Margiela", "Converse", "Vans", "Asics", "Salomon", "Yeezy", "Reebok", "Puma", "Saucony", "Hoka", "Louis Vuitton", "Dior", "Gucci", "Prada", "Saint Laurent", "Balenciaga", "Off-White", "Stussy", "Essentials", "Fear of God", "Supreme", "Palace", "A Bathing Ape", "Comme des Garçons", "Vintage", "Chanel", "Miu Miu", "Fendi", "Celine", "Aime Leon Dore"
-  ];
+  ], []);
   const effectiveBrandOptions = useMemo(() => 
     brandOptions.length > 0 ? brandOptions : staticBrandOptions, 
-    [brandOptions]
+    [brandOptions, staticBrandOptions]
   );
 
   // ---------- guards ----------
@@ -145,10 +145,18 @@ export default function ListItemPage() {
     setFormData((s) => ({ ...s, [name]: value }))
   }
 
-  const onSelect = (k: string, v: string) => {
+  const onSelect = React.useCallback((k: string, v: string) => {
     setPricingStatus("idle")
     setFormData((s) => ({ ...s, [k]: v }))
-  }
+  }, [])
+
+  const handleCategorySelect = React.useCallback((v: string) => {
+    setFormData(s => ({ ...s, category: v }))
+  }, [])
+
+  const handleBrandSelect = React.useCallback((v: string) => {
+    setFormData(s => ({ ...s, brand: v }))
+  }, [])
 
   const handleEvaluatePrice = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -324,7 +332,7 @@ export default function ListItemPage() {
                       name="category"
                       options={categories}
                       value={formData.category}
-                      onSelect={v => setFormData(s => ({ ...s, category: v }))}
+                      onSelect={handleCategorySelect}
                       placeholder="Category"
                       allowCustom={true}
                       autoComplete="off"
@@ -337,7 +345,7 @@ export default function ListItemPage() {
                       name="brand"
                       options={effectiveBrandOptions}
                       value={formData.brand}
-                      onSelect={v => setFormData(s => ({ ...s, brand: v }))}
+                      onSelect={handleBrandSelect}
                       placeholder="Brand"
                       allowCustom={true}
                       autoComplete="off"
@@ -347,14 +355,14 @@ export default function ListItemPage() {
                     <Label htmlFor="condition">Condition *</Label>
                     <Select
                       value={formData.condition || ""}
-                      onValueChange={v => onSelect("condition", v)}
+                      onValueChange={(v) => onSelect("condition", v)}
                       required
                     >
                       <SelectTrigger 
-                        className="h-12 w-full rounded-full bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]"
+                        className="h-12 w-full rounded-full bg-white px-5 py-3 text-base font-normal focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B] [&[data-placeholder]]:text-gray-400"
                         style={{ border: '1px solid #d1d5db' }}
                       >
-                        <SelectValue placeholder="Condition" className="text-gray-400 data-[placeholder]:text-gray-400" />
+                        <SelectValue placeholder="Condition" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border border-gray-300 bg-white">
                         <SelectItem value="New with tags" className="hover:bg-[#198154] hover:text-white">New with tags</SelectItem>

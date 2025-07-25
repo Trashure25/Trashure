@@ -69,7 +69,7 @@ export default function DesignersPage() {
       try {
         const res = await fetch("/api/listings")
         const data = await res.json()
-        const brands = Array.from(new Set(data.map((item: any) => item.brand).filter(Boolean)))
+        const brands = Array.from(new Set(data.map((item: any) => String(item.brand)).filter(Boolean))) as string[];
         setBrandOptions(brands)
       } catch (e) {
         setBrandOptions([])

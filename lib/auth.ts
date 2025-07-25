@@ -1,47 +1,60 @@
 import { z } from "zod"
 
 // --- Validation Schemas ---
-export const signupSchema = z
-  .object({
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().min(1, "Last name is required"),
-    username: z.string().min(3, "Username must be at least 3 characters"),
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  })
+export const signupSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  username: z.string(),
+  email: z.string(),
+  password: z.string(),
+  confirmPassword: z.string(),
+})
 
 export const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
+  email: z.string(),
+  password: z.string(),
 })
 
 export const profileUpdateSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  email: z.string().email(), // Email is read-only in the form
+  firstName: z.string(),
+  lastName: z.string(),
+  username: z.string(),
+  email: z.string(),
 })
 
-export const passwordChangeSchema = z
-  .object({
-    currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: z.string().min(8, "New password must be at least 8 characters"),
-    confirmNewPassword: z.string(),
-  })
-  .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: "New passwords do not match",
-    path: ["confirmNewPassword"],
-  })
+export const passwordChangeSchema = z.object({
+  currentPassword: z.string(),
+  newPassword: z.string(),
+  confirmNewPassword: z.string(),
+})
 
-export type SignupData = z.infer<typeof signupSchema>
-export type LoginData = z.infer<typeof loginSchema>
-export type ProfileUpdateData = z.infer<typeof profileUpdateSchema>
-export type PasswordChangeData = z.infer<typeof passwordChangeSchema>
+// --- Type Definitions ---
+export interface SignupData {
+  firstName: string
+  lastName: string
+  username: string
+  email: string
+  password: string
+  confirmPassword: string
+}
+
+export interface LoginData {
+  email: string
+  password: string
+}
+
+export interface ProfileUpdateData {
+  firstName: string
+  lastName: string
+  username: string
+  email: string
+}
+
+export interface PasswordChangeData {
+  currentPassword: string
+  newPassword: string
+  confirmNewPassword: string
+}
 
 // --- User Type ---
 export interface User {
@@ -164,6 +177,38 @@ export const auth = {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email }),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return { success: false, error: error.message }
+    }
+
+    return { success: true }
+  },
+
+  async updateUserCredits(userId: string, credits: number): Promise<void> {
+    const response = await fetch(`/api/users/${userId}/credits`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ credits }),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to update credits')
+    }
+  },
+
+  async resetPassword(data: { email: string; newPassword: string }): Promise<{ success: boolean; error?: string }> {
+    const response = await fetch('/api/auth/reset-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
     })
 
     if (!response.ok) {

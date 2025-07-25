@@ -36,9 +36,9 @@ export function CategoryFilters({
   })
 
   // Get unique values for filters
-  const uniqueBrands = [...new Set(listings.map(item => item.brand).filter(Boolean))]
-  const uniqueConditions = [...new Set(listings.map(item => item.condition))]
-  const uniqueSizes = [...new Set(listings.map(item => item.size).filter(Boolean))]
+  const uniqueBrands = Array.from(new Set(listings.map(item => item.brand).filter(Boolean))) as string[]
+  const uniqueConditions = Array.from(new Set(listings.map(item => item.condition)))
+  const uniqueSizes = Array.from(new Set(listings.map(item => item.size).filter(Boolean))) as string[]
 
   const handleFilterChange = (filterType: string, value: string, checked: boolean) => {
     const newFilters = {
@@ -170,7 +170,7 @@ export function CategoryFilters({
               <div key={brand} className="flex items-center space-x-2">
                 <Checkbox
                   id={`brand-${brand}`}
-                  checked={filters.brand.includes(brand)}
+                  checked={filters.brand.includes(brand || '')}
                   onCheckedChange={(checked) =>
                     onFiltersChange({
                       ...filters,

@@ -58,7 +58,7 @@ export default function MenswearPage() {
       try {
         const res = await fetch("/api/listings")
         const data = await res.json()
-        const brands = Array.from(new Set(data.map((item: any) => item.brand).filter(Boolean)))
+        const brands = Array.from(new Set(data.map((item: any) => String(item.brand)).filter(Boolean))) as string[];
         setBrandOptions(brands)
       } catch (e) {
         setBrandOptions([])
@@ -118,10 +118,10 @@ export default function MenswearPage() {
     setFilteredListings(filtered)
   }, [listings, filters, sortBy])
 
-  const handleFilterChange = (key: string, value: string, checked: boolean) => {
+  const handleFilterChange = (key: keyof typeof filters, value: string, checked: boolean) => {
     setFilters(prev => ({
       ...prev,
-      [key]: checked ? [...prev[key], value] : prev[key].filter(v => v !== value)
+      [key]: checked ? [...prev[key], value] : prev[key].filter((v: string) => v !== value)
     }));
   };
 

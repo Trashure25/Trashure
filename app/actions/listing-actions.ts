@@ -31,7 +31,7 @@ export async function evaluateItemPrice(details: {
       model: openai("gpt-4o"),
       schema: z.object({
         /** Whole-number price in credits (10 credits = 1 USD). */
-        priceInCredits: z.number().int().positive(),
+        priceInCredits: z.number(),
       }),
       prompt: `
         You are an expert second-hand marketplace appraiser specializing in luxury fashion, streetwear, and designer items.
@@ -59,7 +59,7 @@ export async function evaluateItemPrice(details: {
         
         Search for current market prices and provide a realistic second-hand price in credits (10 credits = $1 USD).
       `,
-    })
+    }) as { object: { priceInCredits: number } }
 
     return { success: true, price: Math.ceil(object.priceInCredits * 1.05) }
   } catch (error) {

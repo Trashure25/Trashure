@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useAuth } from "@/contexts/auth-context"
 import { auth } from "@/lib/auth"
-import type { User } from "@/lib/database"
+import { User } from "@/lib/auth"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -36,7 +37,7 @@ interface Conversation {
 
 export default function MessagesPage() {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
+  const { currentUser } = useAuth()
   const [loading, setLoading] = useState(true)
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null)
   const [newMessage, setNewMessage] = useState("")
@@ -118,11 +119,10 @@ export default function MessagesPage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const currentUser = await auth.getCurrentUser()
         if (!currentUser) {
           router.push("/")
         } else {
-          setUser(currentUser)
+          // setUser(currentUser) // This line is removed as per the new_code
         }
       } catch (error) {
         console.error("Failed to fetch user", error)
@@ -132,7 +132,7 @@ export default function MessagesPage() {
       }
     }
     fetchUser()
-  }, [router])
+  }, [router, currentUser])
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
@@ -168,7 +168,7 @@ export default function MessagesPage() {
     )
   }
 
-  if (!user) {
+  if (!currentUser) {
     return null
   }
 
@@ -264,16 +264,16 @@ export default function MessagesPage() {
                   {selectedConv.messages.map((message) => (
                     <div
                       key={message.id}
-                      className={`flex ${message.senderId === user.id ? "justify-end" : "justify-start"}`}
+                      className={`flex ${message.senderId === currentUser.id ? "justify-end" : "justify-start"}`}
                     >
                       <div
                         className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                          message.senderId === user.id ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-900"
+                          message.senderId === currentUser.id ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-900"
                         }`}
                       >
                         <p className="text-sm">{message.content}</p>
                         <p
-                          className={`text-xs mt-1 ${message.senderId === user.id ? "text-blue-100" : "text-gray-500"}`}
+                          className={`text-xs mt-1 ${message.senderId === currentUser.id ? "text-blue-100" : "text-gray-500"}`}
                         >
                           {formatTime(message.timestamp)}
                         </p>

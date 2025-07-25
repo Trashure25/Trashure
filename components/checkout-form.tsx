@@ -10,16 +10,22 @@ import { useCart } from "@/contexts/cart-context"
 import { useRouter } from "next/navigation"
 
 const checkoutFormSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  address: z.string().min(5, "Address is required"),
-  city: z.string().min(2, "City is required"),
-  zip: z.string().min(5, "A valid ZIP code is required"),
-  country: z.string().min(2, "Country is required"),
+  name: z.string(),
+  address: z.string(),
+  city: z.string(),
+  zip: z.string(),
+  country: z.string(),
 })
 
-type CheckoutFormValues = z.infer<typeof checkoutFormSchema>
+interface CheckoutFormValues {
+  name: string
+  address: string
+  city: string
+  zip: string
+  country: string
+}
 
-export function CheckoutForm() {
+export function CheckoutForm({ credits, amount }: { credits: number; amount: number }) {
   const { clearCart } = useCart()
   const router = useRouter()
 
