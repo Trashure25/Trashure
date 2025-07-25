@@ -1,4 +1,5 @@
 import React from "react"
+import Link from "next/link"
 
 interface ItemCardProps {
   item: {
@@ -14,8 +15,9 @@ interface ItemCardProps {
 
 export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
   return (
-    <div
-      className="card group relative flex flex-col items-stretch p-0 overflow-hidden transition-transform duration-200 ease-in-out hover:scale-[1.025] hover:shadow-2xl focus-within:scale-[1.025] focus-within:shadow-2xl"
+    <Link
+      href={`/listing/${item.id}`}
+      className="card group relative flex flex-col items-stretch p-0 overflow-hidden transition-transform duration-200 ease-in-out hover:scale-[1.025] hover:shadow-2xl focus-within:scale-[1.025] focus-within:shadow-2xl cursor-pointer"
       tabIndex={0}
       aria-label={item.name}
     >
@@ -38,6 +40,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
         <div className="text-base font-semibold text-gray-900 truncate" title={item.name}>{item.name}</div>
         <div className="text-sm text-gray-500 truncate" title={item.designer}>{item.designer}</div>
       </div>
-    </div>
+    </Link>
   )
 }
