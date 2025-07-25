@@ -34,12 +34,12 @@ export default function MenswearPage() {
 
   // Fetch menswear listings
   useEffect(() => {
-    const fetchListings = async () => {
+    const fetchListings = async (retryCount = 0) => {
       try {
         console.log('Fetching menswear listings...')
         // Add timeout to prevent infinite loading
         const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 15000) // Increased timeout to 15 seconds
 
         const response = await fetch('/api/listings', {
           signal: controller.signal
@@ -48,6 +48,11 @@ export default function MenswearPage() {
         clearTimeout(timeoutId)
         console.log('Response status:', response.status)
 
+        if (response.status === 503) {
+          // Database connection error
+          throw new Error('Database connection failed')
+        }
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
@@ -55,61 +60,91 @@ export default function MenswearPage() {
         const data = await response.json()
         console.log('Fetched data:', data)
 
+        // Validate response
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid response format')
+        }
+
         const menswearListings = data.filter((listing: Listing) => 
           listing.category.startsWith('Menswear')
         )
         console.log('Filtered menswear listings:', menswearListings)
 
+        // Always set the real data, even if it's empty
         setListings(menswearListings)
         setFilteredListings(menswearListings)
       } catch (error) {
         console.error('Failed to fetch listings:', error)
 
-        // Add fallback data for demo purposes when database is unavailable
-        const fallbackData = [
-          {
-            id: 'menswear-1',
-            title: 'Nike Air Jordan 1 Retro High OG',
-            price: 4500,
-            brand: 'Nike',
-            size: 'US 10',
-            condition: 'Like new',
-            category: 'Menswear - Footwear',
-            description: 'Classic Air Jordan 1 in Chicago colorway',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          },
-          {
-            id: 'menswear-2',
-            title: 'Supreme Box Logo Hoodie',
-            price: 3200,
-            brand: 'Supreme',
-            size: 'LARGE',
-            condition: 'Good',
-            category: 'Menswear - Tops',
-            description: 'Rare Supreme box logo hoodie in excellent condition',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          },
-          {
-            id: 'menswear-3',
-            title: 'Levi\'s 501 Original Jeans',
-            price: 850,
-            brand: 'Levi\'s',
-            size: '32x32',
-            condition: 'New with tags',
-            category: 'Menswear - Bottoms',
-            description: 'Classic 501 jeans in perfect condition',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          }
-        ] as Listing[]
+        // Retry logic for connection errors
+        const isConnectionError = error instanceof Error && (
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('NetworkError') ||
+          error.message.includes('AbortError') ||
+          error.message.includes('timeout') ||
+          error.message.includes('Can\'t reach database server') ||
+          error.message.includes('Database connection failed')
+        )
+        
+        if (isConnectionError && retryCount < 2) {
+          console.log(`Connection error, retrying... (attempt ${retryCount + 1}/3)`)
+          setTimeout(() => fetchListings(retryCount + 1), 2000 * (retryCount + 1))
+          return
+        }
+        
+        if (isConnectionError) {
+          console.log('Database connection error detected after retries, showing fallback data')
+          // Add fallback data for demo purposes when database is unavailable
+          const fallbackData = [
+            {
+              id: 'menswear-1',
+              title: 'Nike Air Jordan 1 Retro High OG',
+              price: 4500,
+              brand: 'Nike',
+              size: 'US 10',
+              condition: 'Like new',
+              category: 'Menswear - Footwear',
+              description: 'Classic Air Jordan 1 in Chicago colorway',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            },
+            {
+              id: 'menswear-2',
+              title: 'Supreme Box Logo Hoodie',
+              price: 3200,
+              brand: 'Supreme',
+              size: 'LARGE',
+              condition: 'Good',
+              category: 'Menswear - Tops',
+              description: 'Rare Supreme box logo hoodie in excellent condition',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            },
+            {
+              id: 'menswear-3',
+              title: 'Levi\'s 501 Original Jeans',
+              price: 850,
+              brand: 'Levi\'s',
+              size: '32x32',
+              condition: 'New with tags',
+              category: 'Menswear - Bottoms',
+              description: 'Classic 501 jeans in perfect condition',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            }
+          ] as Listing[]
 
-        setListings(fallbackData)
-        setFilteredListings(fallbackData)
+          setListings(fallbackData)
+          setFilteredListings(fallbackData)
+        } else {
+          // For other errors, just show empty state
+          console.log('Non-connection error, showing empty state')
+          setListings([])
+          setFilteredListings([])
+        }
       } finally {
         setLoading(false)
       }

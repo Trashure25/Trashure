@@ -45,13 +45,13 @@ export default function DesignersPage() {
 
   // Fetch designer listings
   useEffect(() => {
-    const fetchListings = async () => {
+    const fetchListings = async (retryCount = 0) => {
       try {
         console.log('Fetching listings from /api/listings...')
         
         // Add timeout to prevent infinite loading
         const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 15000) // Increased timeout to 15 seconds
         
         const response = await fetch('/api/listings', {
           signal: controller.signal
@@ -60,6 +60,11 @@ export default function DesignersPage() {
         clearTimeout(timeoutId)
         console.log('Response status:', response.status)
         
+        if (response.status === 503) {
+          // Database connection error
+          throw new Error('Database connection failed')
+        }
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
@@ -67,48 +72,78 @@ export default function DesignersPage() {
         const data = await response.json()
         console.log('Fetched data:', data)
         
+        // Validate response
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid response format')
+        }
+        
         const designerListings = data.filter((listing: Listing) => 
           designerBrands.some(brand => listing.brand === brand)
         )
         console.log('Filtered designer listings:', designerListings)
         
+        // Always set the real data, even if it's empty
         setListings(designerListings)
         setFilteredListings(designerListings)
       } catch (error) {
         console.error('Failed to fetch listings:', error)
         
-        // Add fallback data for demo purposes when database is unavailable
-        const fallbackData = [
-          {
-            id: 'demo-1',
-            title: 'Louis Vuitton SS25 T-shirt',
-            price: 8925,
-            brand: 'Louis Vuitton',
-            size: 'MEDIUM',
-            condition: 'New with tags',
-            category: 'Menswear - Tops',
-            description: 'Exclusive Louis Vuitton Spring/Summer 2025 collection t-shirt',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          },
-          {
-            id: 'demo-2',
-            title: 'Dior Homme Classic Blazer',
-            price: 12500,
-            brand: 'Dior',
-            size: 'LARGE',
-            condition: 'Like new',
-            category: 'Menswear - Formal Wear',
-            description: 'Timeless Dior Homme blazer in pristine condition',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          }
-        ] as Listing[]
+        // Retry logic for connection errors
+        const isConnectionError = error instanceof Error && (
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('NetworkError') ||
+          error.message.includes('AbortError') ||
+          error.message.includes('timeout') ||
+          error.message.includes('Can\'t reach database server') ||
+          error.message.includes('Database connection failed')
+        )
         
-        setListings(fallbackData)
-        setFilteredListings(fallbackData)
+        if (isConnectionError && retryCount < 2) {
+          console.log(`Connection error, retrying... (attempt ${retryCount + 1}/3)`)
+          setTimeout(() => fetchListings(retryCount + 1), 2000 * (retryCount + 1))
+          return
+        }
+        
+        if (isConnectionError) {
+          console.log('Database connection error detected after retries, showing fallback data')
+          // Add fallback data for demo purposes when database is unavailable
+          const fallbackData = [
+            {
+              id: 'demo-1',
+              title: 'Louis Vuitton SS25 T-shirt',
+              price: 8925,
+              brand: 'Louis Vuitton',
+              size: 'MEDIUM',
+              condition: 'New with tags',
+              category: 'Menswear - Tops',
+              description: 'Exclusive Louis Vuitton Spring/Summer 2025 collection t-shirt',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            },
+            {
+              id: 'demo-2',
+              title: 'Dior Homme Classic Blazer',
+              price: 12500,
+              brand: 'Dior',
+              size: 'LARGE',
+              condition: 'Like new',
+              category: 'Menswear - Formal Wear',
+              description: 'Timeless Dior Homme blazer in pristine condition',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            }
+          ] as Listing[]
+          
+          setListings(fallbackData)
+          setFilteredListings(fallbackData)
+        } else {
+          // For other errors, just show empty state
+          console.log('Non-connection error, showing empty state')
+          setListings([])
+          setFilteredListings([])
+        }
       } finally {
         setLoading(false)
       }

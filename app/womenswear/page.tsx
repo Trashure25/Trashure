@@ -60,56 +60,75 @@ export default function WomenswearPage() {
         )
         console.log('Filtered womenswear listings:', womenswearListings)
 
+        // Always set the real data, even if it's empty
         setListings(womenswearListings)
         setFilteredListings(womenswearListings)
       } catch (error) {
         console.error('Failed to fetch listings:', error)
 
-        // Add fallback data for demo purposes when database is unavailable
-        const fallbackData = [
-          {
-            id: 'womenswear-1',
-            title: 'Chanel Classic Flap Bag',
-            price: 12500,
-            brand: 'Chanel',
-            size: 'Medium',
-            condition: 'Like new',
-            category: 'Womenswear - Accessories',
-            description: 'Timeless Chanel classic flap bag in black caviar leather',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          },
-          {
-            id: 'womenswear-2',
-            title: 'Zara Oversized Blazer',
-            price: 1200,
-            brand: 'Zara',
-            size: 'M',
-            condition: 'New with tags',
-            category: 'Womenswear - Tops',
-            description: 'Trendy oversized blazer perfect for office or casual wear',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          },
-          {
-            id: 'womenswear-3',
-            title: 'H&M High-Waisted Jeans',
-            price: 650,
-            brand: 'H&M',
-            size: '28',
-            condition: 'Good',
-            category: 'Womenswear - Bottoms',
-            description: 'Comfortable high-waisted jeans in perfect condition',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          }
-        ] as Listing[]
+        // Only show fallback data for genuine database connection errors
+        // Check if it's a network error or database connection issue
+        const isConnectionError = error instanceof Error && (
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('NetworkError') ||
+          error.message.includes('AbortError') ||
+          error.message.includes('timeout') ||
+          error.message.includes('Can\'t reach database server')
+        )
+        
+        if (isConnectionError) {
+          console.log('Database connection error detected, showing fallback data')
+          // Add fallback data for demo purposes when database is unavailable
+          const fallbackData = [
+            {
+              id: 'womenswear-1',
+              title: 'Chanel Classic Flap Bag',
+              price: 12500,
+              brand: 'Chanel',
+              size: 'Medium',
+              condition: 'Like new',
+              category: 'Womenswear - Accessories',
+              description: 'Timeless Chanel classic flap bag in black caviar leather',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            },
+            {
+              id: 'womenswear-2',
+              title: 'Zara Oversized Blazer',
+              price: 1200,
+              brand: 'Zara',
+              size: 'M',
+              condition: 'New with tags',
+              category: 'Womenswear - Tops',
+              description: 'Trendy oversized blazer perfect for office or casual wear',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            },
+            {
+              id: 'womenswear-3',
+              title: 'H&M High-Waisted Jeans',
+              price: 650,
+              brand: 'H&M',
+              size: '28',
+              condition: 'Good',
+              category: 'Womenswear - Bottoms',
+              description: 'Comfortable high-waisted jeans in perfect condition',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            }
+          ] as Listing[]
 
-        setListings(fallbackData)
-        setFilteredListings(fallbackData)
+          setListings(fallbackData)
+          setFilteredListings(fallbackData)
+        } else {
+          // For other errors, just show empty state
+          console.log('Non-connection error, showing empty state')
+          setListings([])
+          setFilteredListings([])
+        }
       } finally {
         setLoading(false)
       }

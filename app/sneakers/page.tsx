@@ -60,56 +60,75 @@ export default function SneakersPage() {
         )
         console.log('Filtered sneaker listings:', sneakerListings)
 
+        // Always set the real data, even if it's empty
         setListings(sneakerListings)
         setFilteredListings(sneakerListings)
       } catch (error) {
         console.error('Failed to fetch listings:', error)
 
-        // Add fallback data for demo purposes when database is unavailable
-        const fallbackData = [
-          {
-            id: 'sneakers-1',
-            title: 'Nike Air Jordan 1 Retro High OG',
-            price: 4500,
-            brand: 'Nike',
-            size: 'US 10',
-            condition: 'Like new',
-            category: 'Menswear - Footwear',
-            description: 'Classic Air Jordan 1 in Chicago colorway',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          },
-          {
-            id: 'sneakers-2',
-            title: 'Adidas Yeezy Boost 350 V2',
-            price: 3800,
-            brand: 'Adidas',
-            size: 'US 9',
-            condition: 'Good',
-            category: 'Menswear - Footwear',
-            description: 'Yeezy Boost 350 V2 in Zebra colorway',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          },
-          {
-            id: 'sneakers-3',
-            title: 'Converse Chuck Taylor All Star',
-            price: 850,
-            brand: 'Converse',
-            size: 'US 8',
-            condition: 'New with tags',
-            category: 'Menswear - Footwear',
-            description: 'Classic Chuck Taylor in white canvas',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          }
-        ] as Listing[]
+        // Only show fallback data for genuine database connection errors
+        // Check if it's a network error or database connection issue
+        const isConnectionError = error instanceof Error && (
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('NetworkError') ||
+          error.message.includes('AbortError') ||
+          error.message.includes('timeout') ||
+          error.message.includes('Can\'t reach database server')
+        )
+        
+        if (isConnectionError) {
+          console.log('Database connection error detected, showing fallback data')
+          // Add fallback data for demo purposes when database is unavailable
+          const fallbackData = [
+            {
+              id: 'sneakers-1',
+              title: 'Nike Air Jordan 1 Retro High OG',
+              price: 4500,
+              brand: 'Nike',
+              size: 'US 10',
+              condition: 'Like new',
+              category: 'Menswear - Footwear',
+              description: 'Classic Air Jordan 1 in Chicago colorway',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            },
+            {
+              id: 'sneakers-2',
+              title: 'Adidas Yeezy Boost 350 V2',
+              price: 3800,
+              brand: 'Adidas',
+              size: 'US 9',
+              condition: 'Good',
+              category: 'Menswear - Footwear',
+              description: 'Yeezy Boost 350 V2 in Zebra colorway',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            },
+            {
+              id: 'sneakers-3',
+              title: 'Converse Chuck Taylor All Star',
+              price: 850,
+              brand: 'Converse',
+              size: 'US 8',
+              condition: 'New with tags',
+              category: 'Menswear - Footwear',
+              description: 'Classic Chuck Taylor in white canvas',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            }
+          ] as Listing[]
 
-        setListings(fallbackData)
-        setFilteredListings(fallbackData)
+          setListings(fallbackData)
+          setFilteredListings(fallbackData)
+        } else {
+          // For other errors, just show empty state
+          console.log('Non-connection error, showing empty state')
+          setListings([])
+          setFilteredListings([])
+        }
       } finally {
         setLoading(false)
       }

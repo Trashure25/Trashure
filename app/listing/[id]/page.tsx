@@ -13,6 +13,7 @@ import { useToast } from "@/components/ui/use-toast"
 import TradeOfferModal from "@/components/trade-offer-modal"
 import ContactSellerModal from "@/components/contact-seller-modal"
 import Image from "next/image"
+import { favoritesService } from "@/lib/favorites"
 
 export default function ListingDetailPage() {
   const params = useParams()
@@ -25,6 +26,9 @@ export default function ListingDetailPage() {
   const [isTradeModalOpen, setIsTradeModalOpen] = useState(false)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [userListings, setUserListings] = useState<Listing[]>([])
+  const [isFavorited, setIsFavorited] = useState(false)
+  const [favoriteId, setFavoriteId] = useState<string | null>(null)
+  const [isFavoriteLoading, setIsFavoriteLoading] = useState(false)
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -97,6 +101,97 @@ export default function ListingDetailPage() {
       fetchListing()
     }
   }, [params.id, router, toast])
+
+  useEffect(() => {
+    if (currentUser && listing) {
+      const checkFavoriteStatus = async () => {
+        try {
+          const favorited = await favoritesService.checkIfFavorited(currentUser.id, listing.id)
+          const favId = await favoritesService.getFavoriteId(currentUser.id, listing.id)
+          setIsFavorited(favorited)
+          setFavoriteId(favId)
+        } catch (error) {
+          console.error('Error checking favorite status:', error)
+        }
+      }
+      checkFavoriteStatus()
+    }
+  }, [currentUser, listing])
+
+  const handleToggleFavorite = async () => {
+    if (!currentUser) {
+      toast({
+        title: "Please log in",
+        description: "You must be logged in to favorite items.",
+        variant: "destructive",
+      })
+      router.push("/login")
+      return
+    }
+
+    setIsFavoriteLoading(true)
+    try {
+      if (isFavorited && favoriteId) {
+        await favoritesService.removeFavorite(favoriteId)
+        setIsFavorited(false)
+        setFavoriteId(null)
+        toast({
+          title: "Removed from favorites",
+          description: "Item has been removed from your favorites.",
+        })
+      } else {
+        const newFavorite = await favoritesService.addFavorite({
+          userId: currentUser.id,
+          listingId: listing.id,
+        })
+        setIsFavorited(true)
+        setFavoriteId(newFavorite.id)
+        toast({
+          title: "Added to favorites",
+          description: "Item has been added to your favorites.",
+        })
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update favorites. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsFavoriteLoading(false)
+    }
+  }
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: listing.title,
+          text: `Check out this item: ${listing.title}`,
+          url: window.location.href,
+        })
+      } catch (error) {
+        console.error('Error sharing:', error)
+      }
+    } else {
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(window.location.href)
+        toast({
+          title: "Link copied",
+          description: "Listing link has been copied to your clipboard.",
+        })
+      } catch (error) {
+        console.error('Error copying to clipboard:', error)
+        toast({
+          title: "Error",
+          description: "Failed to copy link. Please try again.",
+          variant: "destructive",
+        })
+      }
+    }
+  }
 
   useEffect(() => {
     if (currentUser) {
@@ -221,10 +316,10 @@ export default function ListingDetailPage() {
                   {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
                 </Badge>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Heart className="w-4 h-4" />
+                  <Button variant="outline" size="sm" onClick={handleToggleFavorite} disabled={isFavoriteLoading}>
+                    <Heart className={`w-4 h-4 ${isFavorited ? "fill-red-500" : ""}`} />
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={handleShare} disabled={isFavoriteLoading}>
                     <Share2 className="w-4 h-4" />
                   </Button>
                 </div>

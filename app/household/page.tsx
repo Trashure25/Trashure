@@ -60,56 +60,75 @@ export default function HouseholdPage() {
         )
         console.log('Filtered household listings:', householdListings)
 
+        // Always set the real data, even if it's empty
         setListings(householdListings)
         setFilteredListings(householdListings)
       } catch (error) {
         console.error('Failed to fetch listings:', error)
 
-        // Add fallback data for demo purposes when database is unavailable
-        const fallbackData = [
-          {
-            id: 'household-1',
-            title: 'IKEA Malm Bed Frame',
-            price: 2800,
-            brand: 'IKEA',
-            size: 'Queen',
-            condition: 'Like new',
-            category: 'Household - Furniture',
-            description: 'Modern bed frame in excellent condition',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          },
-          {
-            id: 'household-2',
-            title: 'KitchenAid Stand Mixer',
-            price: 4200,
-            brand: 'KitchenAid',
-            size: '5 Quart',
-            condition: 'Good',
-            category: 'Household - Appliances',
-            description: 'Professional stand mixer in working condition',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          },
-          {
-            id: 'household-3',
-            title: 'West Elm Coffee Table',
-            price: 1800,
-            brand: 'West Elm',
-            size: 'Standard',
-            condition: 'New with tags',
-            category: 'Household - Furniture',
-            description: 'Modern coffee table with storage',
-            images: ['/placeholder.svg'],
-            createdAt: new Date().toISOString(),
-            status: 'active'
-          }
-        ] as Listing[]
+        // Only show fallback data for genuine database connection errors
+        // Check if it's a network error or database connection issue
+        const isConnectionError = error instanceof Error && (
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('NetworkError') ||
+          error.message.includes('AbortError') ||
+          error.message.includes('timeout') ||
+          error.message.includes('Can\'t reach database server')
+        )
+        
+        if (isConnectionError) {
+          console.log('Database connection error detected, showing fallback data')
+          // Add fallback data for demo purposes when database is unavailable
+          const fallbackData = [
+            {
+              id: 'household-1',
+              title: 'IKEA Malm Bed Frame',
+              price: 2800,
+              brand: 'IKEA',
+              size: 'Queen',
+              condition: 'Like new',
+              category: 'Household - Furniture',
+              description: 'Modern bed frame in excellent condition',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            },
+            {
+              id: 'household-2',
+              title: 'KitchenAid Stand Mixer',
+              price: 4200,
+              brand: 'KitchenAid',
+              size: '5 Quart',
+              condition: 'Good',
+              category: 'Household - Appliances',
+              description: 'Professional stand mixer in working condition',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            },
+            {
+              id: 'household-3',
+              title: 'West Elm Coffee Table',
+              price: 1800,
+              brand: 'West Elm',
+              size: 'Standard',
+              condition: 'New with tags',
+              category: 'Household - Furniture',
+              description: 'Modern coffee table with storage',
+              images: ['/placeholder.svg'],
+              createdAt: new Date().toISOString(),
+              status: 'active'
+            }
+          ] as Listing[]
 
-        setListings(fallbackData)
-        setFilteredListings(fallbackData)
+          setListings(fallbackData)
+          setFilteredListings(fallbackData)
+        } else {
+          // For other errors, just show empty state
+          console.log('Non-connection error, showing empty state')
+          setListings([])
+          setFilteredListings([])
+        }
       } finally {
         setLoading(false)
       }

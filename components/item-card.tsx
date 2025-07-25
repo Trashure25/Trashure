@@ -1,5 +1,10 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Heart } from "lucide-react"
+import { useAuth } from "@/contexts/auth-context"
+import { favoritesService } from "@/lib/favorites"
+import { toast } from "@/hooks/use-toast"
 
 interface ItemCardProps {
   item: {
@@ -14,6 +19,74 @@ interface ItemCardProps {
 }
 
 export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
+  const { currentUser } = useAuth()
+  const [isFavorited, setIsFavorited] = useState(false)
+  const [favoriteId, setFavoriteId] = useState<string | null>(null)
+  const [isFavoriteLoading, setIsFavoriteLoading] = useState(false)
+
+  useEffect(() => {
+    if (currentUser) {
+      const checkFavoriteStatus = async () => {
+        try {
+          const favorited = await favoritesService.checkIfFavorited(currentUser.id, item.id)
+          const favId = await favoritesService.getFavoriteId(currentUser.id, item.id)
+          setIsFavorited(favorited)
+          setFavoriteId(favId)
+        } catch (error) {
+          console.error('Error checking favorite status:', error)
+        }
+      }
+      checkFavoriteStatus()
+    }
+  }, [currentUser, item.id])
+
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    if (!currentUser) {
+      toast({
+        title: "Please log in",
+        description: "You must be logged in to favorite items.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsFavoriteLoading(true)
+    try {
+      if (isFavorited && favoriteId) {
+        await favoritesService.removeFavorite(favoriteId)
+        setIsFavorited(false)
+        setFavoriteId(null)
+        toast({
+          title: "Removed from favorites",
+          description: "Item has been removed from your favorites.",
+        })
+      } else {
+        const newFavorite = await favoritesService.addFavorite({
+          userId: currentUser.id,
+          listingId: item.id,
+        })
+        setIsFavorited(true)
+        setFavoriteId(newFavorite.id)
+        toast({
+          title: "Added to favorites",
+          description: "Item has been added to your favorites.",
+        })
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update favorites. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsFavoriteLoading(false)
+    }
+  }
+
   return (
     <Link
       href={`/listing/${item.id}`}
@@ -31,6 +104,15 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
         {item.isNew && (
           <span className="absolute top-3 left-3 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wide">New</span>
         )}
+        <Button
+          variant="outline"
+          size="sm"
+          className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm"
+          onClick={handleToggleFavorite}
+          disabled={isFavoriteLoading}
+        >
+          <Heart className={`w-4 h-4 ${isFavorited ? "fill-red-500 text-red-500" : ""}`} />
+        </Button>
       </div>
       <div className="flex flex-col gap-1 p-4 bg-white rounded-b-2xl">
         <div className="flex items-center justify-between mb-1">

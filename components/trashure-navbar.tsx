@@ -165,6 +165,7 @@ function TrashureNavbar() {
                 {profileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-2">
                     <Link href="/my-listings" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Listings</Link>
+                    <Link href="/favorites" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Favorites</Link>
                     <Link href="/account-settings" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">Account Settings</Link>
                     <Link href="/profile" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">Profile</Link>
                     <button
