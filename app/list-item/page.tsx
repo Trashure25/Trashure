@@ -372,7 +372,6 @@ export default function ListItemPage() {
                       id="category"
                       name="category"
                       options={categories}
-                      value={categoryInput}
                       onChange={setCategoryInput}
                       onSelect={handleCategorySelect}
                       placeholder="Category"
@@ -386,7 +385,6 @@ export default function ListItemPage() {
                       id="brand"
                       name="brand"
                       options={effectiveBrandOptions}
-                      value={brandInput}
                       onChange={setBrandInput}
                       onSelect={handleBrandSelect}
                       placeholder="Brand"
@@ -401,10 +399,10 @@ export default function ListItemPage() {
                       onValueChange={v => onSelect("condition", v)}
                       required
                     >
-                      <SelectTrigger className="h-12 w-full rounded-full border border-gray-300 bg-gray-50 px-5 py-3 text-base font-normal text-gray-400 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]">
+                      <SelectTrigger className="h-12 w-full rounded-full border-2 border-gray-300 bg-white px-5 py-3 text-base font-normal text-black focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all hover:bg-[#06402B] hover:border-[#06402B] data-[state=open]:bg-[#06402B] data-[state=open]:border-[#06402B]">
                         <SelectValue placeholder="Condition" />
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl border border-gray-300 bg-white data-[state=open]:bg-[#06402B] data-[state=open]:text-white">
+                      <SelectContent className="rounded-xl border border-gray-300 bg-white">
                         <SelectItem value="New with tags" className="hover:bg-[#198154] hover:text-white">New with tags</SelectItem>
                         <SelectItem value="Like new" className="hover:bg-[#198154] hover:text-white">Like new</SelectItem>
                         <SelectItem value="Good" className="hover:bg-[#198154] hover:text-white">Good</SelectItem>

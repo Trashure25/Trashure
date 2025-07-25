@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 
 interface AdvancedAutocompleteProps {
   options: string[]
-  value: string
+  value?: string
   onChange: (value: string) => void // called on every keystroke
   onSelect?: (value: string) => void // called only on selection/Enter
   placeholder?: string
@@ -17,7 +17,7 @@ interface AdvancedAutocompleteProps {
 
 export const AdvancedAutocomplete: React.FC<AdvancedAutocompleteProps> = ({
   options,
-  value,
+  value = "",
   onChange,
   onSelect,
   placeholder = "",
