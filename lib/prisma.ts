@@ -28,15 +28,32 @@ export async function withRetry<T>(
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await operation();
-    } catch (error) {
+    } catch (error: any) {
       lastError = error as Error;
       console.error(`Database operation failed (attempt ${attempt}/${maxRetries}):`, error);
+      
+      // Handle prepared statement errors specifically
+      const isPreparedStatementError = error?.meta?.code === '42P05' || 
+                                      error?.meta?.code === '26000' ||
+                                      error?.message?.includes('prepared statement');
+      
+      if (isPreparedStatementError) {
+        console.log(`Prepared statement error detected (attempt ${attempt}), treating as retryable`);
+        if (attempt === maxRetries) {
+          console.log('Max retries reached for prepared statement error, throwing');
+          throw lastError;
+        }
+        // For prepared statement errors, use a shorter delay
+        const delay = Math.min(500 * attempt, 2000);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
       
       if (attempt === maxRetries) {
         throw lastError;
       }
       
-      // Exponential backoff with jitter
+      // Exponential backoff with jitter for other errors
       const delay = Math.min(baseDelay * Math.pow(2, attempt - 1) + Math.random() * 1000, maxDelay);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
@@ -60,7 +77,11 @@ export async function testDatabaseConnection(): Promise<boolean> {
     console.error('Database connection test failed:', error);
     
     // Handle prepared statement errors specifically
-    if (error?.meta?.code === '42P05' || error?.message?.includes('prepared statement')) {
+    const isPreparedStatementError = error?.meta?.code === '42P05' || 
+                                    error?.meta?.code === '26000' ||
+                                    error?.message?.includes('prepared statement');
+    
+    if (isPreparedStatementError) {
       console.log('Prepared statement conflict detected, but connection is working');
       return true; // Connection is working, just a statement conflict
     }
