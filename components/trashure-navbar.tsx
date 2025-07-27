@@ -13,6 +13,7 @@ function TrashureNavbar() {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const profileMenuRef = useRef<HTMLDivElement>(null)
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pathname = usePathname();
 
   const getInitials = (firstName?: string, lastName?: string) => {
@@ -121,6 +122,15 @@ function TrashureNavbar() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [profileMenuOpen]);
 
+  // Cleanup hover timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <header className="w-full border-b border-gray-200 bg-white">
       {/* Top Row */}
@@ -195,8 +205,18 @@ function TrashureNavbar() {
               href={item.href}
               className="uppercase font-bold tracking-widest text-xs text-black px-1 py-0.5 hover:underline hover:decoration-2 hover:underline-offset-4 transition-colors"
               onClick={() => setProfileMenuOpen(false)}
-              onMouseEnter={() => setHoveredItem(item.name)}
-              onMouseLeave={() => setHoveredItem(null)}
+              onMouseEnter={() => {
+                if (hoverTimeoutRef.current) {
+                  clearTimeout(hoverTimeoutRef.current)
+                  hoverTimeoutRef.current = null
+                }
+                setHoveredItem(item.name)
+              }}
+              onMouseLeave={() => {
+                hoverTimeoutRef.current = setTimeout(() => {
+                  setHoveredItem(null)
+                }, 150) // Small delay to allow moving to dropdown
+              }}
             >
               {item.name}
             </Link>
@@ -204,8 +224,18 @@ function TrashureNavbar() {
             {item.subcategories && item.subcategories.length > 0 && hoveredItem === item.name && (
               <div 
                 className="absolute left-1/2 top-full -translate-x-1/2 mt-2 min-w-max bg-white border border-gray-200 z-50 shadow-xl"
-                onMouseEnter={() => setHoveredItem(item.name)}
-                onMouseLeave={() => setHoveredItem(null)}
+                onMouseEnter={() => {
+                  if (hoverTimeoutRef.current) {
+                    clearTimeout(hoverTimeoutRef.current)
+                    hoverTimeoutRef.current = null
+                  }
+                  setHoveredItem(item.name)
+                }}
+                onMouseLeave={() => {
+                  hoverTimeoutRef.current = setTimeout(() => {
+                    setHoveredItem(null)
+                  }, 150) // Small delay to allow moving back to nav item
+                }}
               >
                 <div className="flex flex-col py-2">
                   {item.subcategories.map((subcategory) => (
