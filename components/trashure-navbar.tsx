@@ -223,7 +223,7 @@ function TrashureNavbar() {
             {/* Dropdown on hover */}
             {item.subcategories && item.subcategories.length > 0 && hoveredItem === item.name && (
               <div 
-                className="absolute left-1/2 top-full -translate-x-1/2 mt-2 min-w-max bg-white border border-gray-200 z-50 shadow-xl"
+                className="absolute left-0 top-full mt-2 w-64 bg-white border border-gray-200 z-50 shadow-xl rounded-sm"
                 onMouseEnter={() => {
                   if (hoverTimeoutRef.current) {
                     clearTimeout(hoverTimeoutRef.current)
