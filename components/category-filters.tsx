@@ -85,7 +85,7 @@ export function CategoryFilters({
         <div>
           <label className="text-sm font-medium mb-2 block">Sort By</label>
           <Select value={sortBy} onValueChange={handleSortChange}>
-            <SelectTrigger className={sortBy === 'newest' ? 'bg-[#06402B] text-white' : ''}>
+            <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -143,7 +143,6 @@ export function CategoryFilters({
                         : filters.category.filter((v: string) => v !== category)
                     })
                   }
-                  className={filters.category.includes(category) ? 'bg-[#06402B] border-[#06402B]' : ''}
                 />
                 <label htmlFor={`category-${category}`} className="text-sm">
                   {category}

@@ -389,7 +389,7 @@ export default function SneakersPage() {
         {/* Main Content */}
         <div className="flex-1">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold mb-2">Sneakers</h1>
+      <h1 className="text-3xl font-bold mb-2">Sneakers</h1>
             <p className="text-gray-600 mb-4">From iconic classics to the latest drops, find your next pair here.</p>
             <p className="text-sm text-gray-500">
               {filteredListings.length} item{filteredListings.length !== 1 ? 's' : ''} found
