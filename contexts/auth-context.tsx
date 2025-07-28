@@ -20,6 +20,7 @@ interface AuthContextType {
   updateProfile: (data: ProfileUpdateData) => Promise<void>
   changePassword: (data: PasswordChangeData) => Promise<void>
   updateAvatar: (avatarUrl: string) => Promise<void>
+  reloadUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -112,6 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     updateProfile,
     changePassword,
     updateAvatar,
+    reloadUser,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

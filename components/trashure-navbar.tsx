@@ -6,12 +6,12 @@ import Link from "next/link"
 import Image from "next/image"
 import { Search } from "lucide-react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { useRef, useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 import { MessageCircle } from "lucide-react"
 
 function TrashureNavbar() {
-  const { currentUser, isLoading, logout } = useAuth()
+  const { currentUser, logout, reloadUser } = useAuth()
   const router = useRouter()
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
@@ -211,6 +211,20 @@ function TrashureNavbar() {
                         className="block px-4 py-1 text-xs text-blue-600 hover:bg-gray-100"
                       >
                         Debug Role
+                      </button>
+                      <button
+                        onClick={async () => {
+                          try {
+                            // Force refresh the user session using auth context
+                            await reloadUser()
+                            console.log('User session refreshed')
+                          } catch (error) {
+                            console.error('Refresh failed:', error)
+                          }
+                        }}
+                        className="block px-4 py-1 text-xs text-green-600 hover:bg-gray-100"
+                      >
+                        Force Refresh
                       </button>
                     </div>
                     <button
