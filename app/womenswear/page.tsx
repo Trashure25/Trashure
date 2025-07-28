@@ -278,7 +278,7 @@ export default function WomenswearPage() {
               <div>
                 <label className="text-sm font-medium mb-2 block">Sort By</label>
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger>
+                  <SelectTrigger className={sortBy ? "!bg-[#06402B] !text-white !border-[#06402B]" : ""}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
