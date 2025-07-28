@@ -6,13 +6,15 @@ import { useAuth } from "@/contexts/auth-context"
 import type { Listing } from "@/lib/listings"
 import { listingsService } from "@/lib/listings"
 import { messagesService } from "@/lib/messages"
+import { reportsService } from "@/lib/reports"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, MessageCircle, Heart, Share2, Loader2, Calendar, Package, Shield } from "lucide-react"
+import { ArrowLeft, MessageCircle, Heart, Share2, Loader2, Calendar, Package, Shield, AlertTriangle } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import TradeOfferModal from "@/components/trade-offer-modal"
 import ContactSellerModal from "@/components/contact-seller-modal"
+import ReportUserModal from "@/components/report-user-modal"
 import Image from "next/image"
 import { favoritesService } from "@/lib/favorites"
 import Link from "next/link"
@@ -32,6 +34,8 @@ export default function ListingDetailPage() {
   const [isFavorited, setIsFavorited] = useState(false)
   const [favoriteId, setFavoriteId] = useState<string | null>(null)
   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false)
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
+  const [hasReportedSeller, setHasReportedSeller] = useState(false)
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -61,7 +65,9 @@ export default function ListingDetailPage() {
             user: {
               firstName: 'Demo',
               lastName: 'User',
-              username: 'demouser'
+              username: 'demouser',
+              trustScore: 75,
+              avatarUrl: undefined
             }
           }
           
@@ -90,7 +96,9 @@ export default function ListingDetailPage() {
           user: {
             firstName: 'Demo',
             lastName: 'User',
-            username: 'demouser'
+            username: 'demouser',
+            trustScore: 75,
+            avatarUrl: undefined
           }
         }
         
@@ -118,6 +126,19 @@ export default function ListingDetailPage() {
         }
       }
       checkFavoriteStatus()
+
+      // Check if user has reported the seller
+      if (listing.user && currentUser.id !== listing.userId) {
+        const checkReportStatus = async () => {
+          try {
+            const hasReported = await reportsService.checkIfReported(currentUser.id, listing.userId)
+            setHasReportedSeller(hasReported)
+          } catch (error) {
+            console.error('Error checking report status:', error)
+          }
+        }
+        checkReportStatus()
+      }
     }
   }, [currentUser, listing])
 
@@ -303,6 +324,16 @@ export default function ListingDetailPage() {
         sellerName={listing.user ? `${listing.user.firstName} ${listing.user.lastName}` : "the seller"}
       />
 
+      {/* Report User Modal */}
+      {listing?.user && currentUser && (
+        <ReportUserModal
+          isOpen={isReportModalOpen}
+          onOpenChange={setIsReportModalOpen}
+          reportedUserId={listing.userId}
+          reportedUserName={`${listing.user.firstName} ${listing.user.lastName}`}
+        />
+      )}
+
       <div className="container mx-auto py-8 px-4">
         <Button variant="ghost" onClick={() => router.back()} className="mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -425,7 +456,7 @@ export default function ListingDetailPage() {
                           {listing.user.firstName} {listing.user.lastName}
                         </span>
                         <Badge variant="outline" className="text-xs">
-                          Trust Score: 85
+                          Trust Score: {listing.user.trustScore || 0}
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600">@{listing.user.username}</p>
@@ -435,6 +466,19 @@ export default function ListingDetailPage() {
                         View Profile
                       </Button>
                     </Link>
+                    
+                    {!isOwner && currentUser && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setIsReportModalOpen(true)}
+                        disabled={hasReportedSeller}
+                        className={hasReportedSeller ? "opacity-50" : ""}
+                      >
+                        <AlertTriangle className="w-4 h-4 mr-1" />
+                        {hasReportedSeller ? "Reported" : "Report"}
+                      </Button>
+                    )}
                   </div>
                 </div>
               </>

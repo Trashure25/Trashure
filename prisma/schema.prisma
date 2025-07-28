@@ -16,7 +16,10 @@ model User {
   firstName  String
   lastName   String
   avatarUrl  String?
-  trustScore Int      @default(50)
+  trustScore Int      @default(70)
+  role       String   @default("user") // user, admin, moderator
+  isBanned   Boolean  @default(false)
+  banReason  String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   listings   Listing[]
@@ -25,10 +28,18 @@ model User {
   conversationsAsUser1 Conversation[] @relation("User1Conversations")
   conversationsAsUser2 Conversation[] @relation("User2Conversations")
   messages             Message[]
+  // Reporting relationships
+  reportsFiled         Report[] @relation("ReporterUser")
+  reportsReceived      Report[] @relation("ReportedUser")
+  // Admin actions
+  reportsReviewed      Report[] @relation("ReviewedByAdmin")
 
   @@index([email])
   @@index([username])
   @@index([createdAt])
+  @@index([trustScore])
+  @@index([role])
+  @@index([isBanned])
 }
 
 model Listing {
@@ -113,4 +124,31 @@ model Message {
   @@index([conversationId])
   @@index([senderId])
   @@index([createdAt])
+}
+
+// Reporting model
+model Report {
+  id          String   @id @default(uuid())
+  reporterId  String   // User who filed the report
+  reportedId  String   // User being reported
+  reason      String   // Reason for the report
+  description String?  // Additional details
+  status      String   @default("pending") // pending, reviewed, resolved, dismissed
+  adminNotes  String?  // Admin notes on the report
+  reviewedBy  String?  // Admin who reviewed the report
+  reviewedAt  DateTime? // When the report was reviewed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relationships
+  reporter    User     @relation("ReporterUser", fields: [reporterId], references: [id], onDelete: Cascade)
+  reported    User     @relation("ReportedUser", fields: [reportedId], references: [id], onDelete: Cascade)
+  reviewer    User?    @relation("ReviewedByAdmin", fields: [reviewedBy], references: [id], onDelete: SetNull)
+
+  @@unique([reporterId, reportedId]) // Prevent duplicate reports from same user
+  @@index([reporterId])
+  @@index([reportedId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([reviewedBy])
 }

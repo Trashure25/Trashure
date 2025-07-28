@@ -32,6 +32,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
               firstName: true,
               lastName: true,
               username: true,
+              trustScore: true,
+              avatarUrl: true,
             }
           }
         }

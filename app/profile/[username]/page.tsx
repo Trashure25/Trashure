@@ -5,16 +5,18 @@ import { useParams, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { messagesService } from "@/lib/messages"
 import { listingsService } from "@/lib/listings"
+import { reportsService } from "@/lib/reports"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, MessageCircle, Star, Package, Calendar, Shield, Loader2 } from "lucide-react"
+import { ArrowLeft, MessageCircle, Star, Package, Calendar, Shield, Loader2, AlertTriangle } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import Image from "next/image"
 import Link from "next/link"
 import type { Listing } from "@/lib/listings"
+import ReportUserModal from "@/components/report-user-modal"
 
 interface UserProfile {
   id: string
@@ -37,6 +39,8 @@ export default function UserProfilePage() {
   const [userListings, setUserListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'listings' | 'reviews'>('listings')
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
+  const [hasReported, setHasReported] = useState(false)
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -58,6 +62,16 @@ export default function UserProfilePage() {
         if (listingsResponse.ok) {
           const listingsData = await listingsResponse.json()
           setUserListings(listingsData.listings || listingsData)
+        }
+
+        // Check if current user has reported this user
+        if (currentUser && currentUser.id !== userData.id) {
+          try {
+            const hasReportedUser = await reportsService.checkIfReported(currentUser.id, userData.id)
+            setHasReported(hasReportedUser)
+          } catch (error) {
+            console.error('Error checking report status:', error)
+          }
         }
       } catch (error) {
         console.error('Failed to fetch user profile:', error)
@@ -197,6 +211,18 @@ export default function UserProfilePage() {
                     Message
                   </Button>
                 )}
+                
+                {!isOwnProfile && currentUser && (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsReportModalOpen(true)}
+                    disabled={hasReported}
+                    className={hasReported ? "opacity-50" : ""}
+                  >
+                    <AlertTriangle className="w-4 h-4 mr-2" />
+                    {hasReported ? "Reported" : "Report"}
+                  </Button>
+                )}
               </div>
               
               <div className="flex items-center gap-6">
@@ -306,6 +332,15 @@ export default function UserProfilePage() {
             </p>
           </CardContent>
         </Card>
+      )}
+      {/* Report User Modal */}
+      {userProfile && currentUser && (
+        <ReportUserModal
+          isOpen={isReportModalOpen}
+          onOpenChange={setIsReportModalOpen}
+          reportedUserId={userProfile.id}
+          reportedUserName={`${userProfile.firstName} ${userProfile.lastName}`}
+        />
       )}
     </div>
   )
