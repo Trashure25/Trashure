@@ -192,6 +192,27 @@ function TrashureNavbar() {
                     {currentUser.role === 'admin' && (
                       <Link href="/admin" className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 font-medium">Admin Dashboard</Link>
                     )}
+                    {/* Debug section - remove after testing */}
+                    <div className="border-t border-gray-200 mt-2 pt-2">
+                      <div className="px-4 py-1 text-xs text-gray-500">
+                        Role: {currentUser.role || 'undefined'}
+                      </div>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const response = await fetch('/api/debug-user')
+                            const data = await response.json()
+                            console.log('Debug user data:', data)
+                            alert(`Role: ${data.user?.role || 'undefined'}\nIs Admin: ${data.isAdmin}`)
+                          } catch (error) {
+                            console.error('Debug failed:', error)
+                          }
+                        }}
+                        className="block px-4 py-1 text-xs text-blue-600 hover:bg-gray-100"
+                      >
+                        Debug Role
+                      </button>
+                    </div>
                     <button
                       onClick={async () => { 
                         setProfileMenuOpen(false); 
