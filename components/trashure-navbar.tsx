@@ -1,15 +1,18 @@
 "use client"
 
 import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { Search } from "lucide-react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { useRef, useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
+import { MessageCircle } from "lucide-react"
 
 function TrashureNavbar() {
-  const { currentUser, isLoading } = useAuth()
+  const { currentUser, isLoading, logout } = useAuth()
+  const router = useRouter()
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const profileMenuRef = useRef<HTMLDivElement>(null)
@@ -161,6 +164,13 @@ function TrashureNavbar() {
             <>
               <Link href="/list-item" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">List Item</Link>
               <Link href="/purchase-credits" className="px-3 h-8 flex items-center justify-center font-bold uppercase bg-accent text-white border border-black hover:bg-[#04331f] text-xs ml-1">Purchase Credits</Link>
+              <Link 
+                href="/messages" 
+                className="h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center bg-white text-black hover:bg-gray-50 transition-colors ml-2"
+                title="Messages"
+              >
+                <MessageCircle className="h-4 w-4" />
+              </Link>
               <div className="relative ml-2" ref={profileMenuRef}>
                 <button
                   className="h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center bg-white text-black font-bold text-xs focus:outline-none"
@@ -176,10 +186,19 @@ function TrashureNavbar() {
                   <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-2">
                     <Link href="/my-listings" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Listings</Link>
                     <Link href="/favorites" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Favorites</Link>
+                    <Link href="/messages" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Messages</Link>
                     <Link href="/account-settings" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">Account Settings</Link>
                     <Link href="/profile" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">Profile</Link>
                     <button
-                      onClick={() => { setProfileMenuOpen(false); if (typeof window !== 'undefined') { window.location.href = '/api/auth/logout'; } }}
+                      onClick={async () => { 
+                        setProfileMenuOpen(false); 
+                        try {
+                          await logout();
+                          router.push('/');
+                        } catch (error) {
+                          console.error('Logout failed:', error);
+                        }
+                      }}
                       className="mx-auto mt-3 px-4 py-2 bg-[#950606] text-white rounded-md font-bold text-sm hover:bg-[#7a0505] block"
                     >
                       Log Out

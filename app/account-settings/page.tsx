@@ -308,6 +308,20 @@ export default function AccountSettingsPage() {
                   variant="link"
                   className="p-0 h-auto text-base text-gray-700 hover:text-primary font-normal"
                 >
+                  <Link href="/favorites">My Favorites</Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="link"
+                  className="p-0 h-auto text-base text-gray-700 hover:text-primary font-normal"
+                >
+                  <Link href="/messages">My Messages</Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="link"
+                  className="p-0 h-auto text-base text-gray-700 hover:text-primary font-normal"
+                >
                   <Link href="/purchase-credits">Purchase Credits</Link>
                 </Button>
                 <Separator className="my-2" />
