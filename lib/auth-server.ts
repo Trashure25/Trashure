@@ -49,6 +49,9 @@ export async function getCurrentUserFromRequest(req: NextRequest): Promise<User 
           lastName: true,
           avatarUrl: true,
           trustScore: true,
+          role: true,
+          isBanned: true,
+          banReason: true,
           createdAt: true,
           updatedAt: true
         }
