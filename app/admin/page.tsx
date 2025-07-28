@@ -2,81 +2,256 @@
 
 import { useEffect, useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
-import { adminService } from "@/lib/admin"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { 
   Shield, 
   Users, 
-  AlertTriangle, 
-  FileText, 
+  Flag, 
+  Package, 
   BarChart3, 
+  Search, 
+  Eye, 
+  Ban, 
+  CheckCircle, 
+  XCircle,
   Loader2,
+  AlertTriangle,
   UserCheck,
   UserX,
-  Clock,
-  TrendingUp
+  MessageSquare,
+  DollarSign,
+  TrendingUp,
+  Activity
 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
 
-interface DashboardStats {
-  totalUsers: number
-  totalReports: number
-  pendingReports: number
-  bannedUsers: number
-  recentReports: number
+interface User {
+  id: string
+  email: string
+  username: string
+  firstName: string
+  lastName: string
+  role: string
+  trustScore: number
+  isBanned: boolean
+  banReason?: string
+  createdAt: string
+  listings: any[]
 }
 
-export default function AdminDashboard() {
+interface Report {
+  id: string
+  reporterId: string
+  reportedId: string
+  reason: string
+  description?: string
+  status: string
+  adminNotes?: string
+  createdAt: string
+  reporter: User
+  reported: User
+}
+
+interface Listing {
+  id: string
+  title: string
+  price: number
+  status: string
+  createdAt: string
+  user: User
+}
+
+interface PlatformStats {
+  totalUsers: number
+  totalListings: number
+  totalReports: number
+  activeListings: number
+  bannedUsers: number
+  pendingReports: number
+}
+
+export default function AdminPage() {
   const { currentUser } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
-  const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'reports' | 'listings'>('overview')
+  
+  // Data states
+  const [users, setUsers] = useState<User[]>([])
+  const [reports, setReports] = useState<Report[]>([])
+  const [listings, setListings] = useState<Listing[]>([])
+  const [stats, setStats] = useState<PlatformStats>({
+    totalUsers: 0,
+    totalListings: 0,
+    totalReports: 0,
+    activeListings: 0,
+    bannedUsers: 0,
+    pendingReports: 0
+  })
+
+  // Search and filter states
+  const [userSearch, setUserSearch] = useState("")
+  const [reportStatusFilter, setReportStatusFilter] = useState("all")
+  const [listingStatusFilter, setListingStatusFilter] = useState("all")
+
+  // Modal states
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [adminNotes, setAdminNotes] = useState("")
+  const [banReason, setBanReason] = useState("")
 
   useEffect(() => {
-    const checkAdminAndLoadData = async () => {
-      try {
-        setLoading(true)
-        
-        // Check if user is admin
-        const adminStatus = await adminService.checkAdminStatus()
-        setIsAdmin(adminStatus)
-        
-        if (!adminStatus) {
-          toast({
-            title: "Access Denied",
-            description: "You don't have permission to access the admin dashboard.",
-            variant: "destructive",
-          })
-          router.push("/")
-          return
-        }
-
-        // Load dashboard stats
-        const dashboardStats = await adminService.getDashboardStats()
-        setStats(dashboardStats)
-      } catch (error) {
-        console.error('Error loading admin dashboard:', error)
-        toast({
-          title: "Error",
-          description: "Failed to load admin dashboard.",
-          variant: "destructive",
-        })
-      } finally {
-        setLoading(false)
-      }
+    if (!currentUser) {
+      router.push("/login")
+      return
     }
 
-    if (currentUser) {
-      checkAdminAndLoadData()
+    if (currentUser.role !== "admin") {
+      router.push("/")
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to access the admin panel.",
+        variant: "destructive",
+      })
+      return
     }
+
+    fetchAdminData()
   }, [currentUser, router, toast])
+
+  const fetchAdminData = async () => {
+    try {
+      setLoading(true)
+      
+      // Fetch all data in parallel
+      const [usersRes, reportsRes, listingsRes, statsRes] = await Promise.all([
+        fetch('/api/admin/users'),
+        fetch('/api/admin/reports'),
+        fetch('/api/admin/listings'),
+        fetch('/api/admin/stats')
+      ])
+
+      if (usersRes.ok) {
+        const usersData = await usersRes.json()
+        setUsers(usersData.users || usersData)
+      }
+
+      if (reportsRes.ok) {
+        const reportsData = await reportsRes.json()
+        setReports(reportsData.reports || reportsData)
+      }
+
+      if (listingsRes.ok) {
+        const listingsData = await listingsRes.json()
+        setListings(listingsData.listings || listingsData)
+      }
+
+      if (statsRes.ok) {
+        const statsData = await statsRes.json()
+        setStats(statsData)
+      }
+
+    } catch (error) {
+      console.error('Failed to fetch admin data:', error)
+      toast({
+        title: "Error",
+        description: "Failed to load admin data.",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleReportAction = async (reportId: string, action: 'resolve' | 'dismiss', notes?: string) => {
+    try {
+      const response = await fetch(`/api/admin/reports/${reportId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: action === 'resolve' ? 'resolved' : 'dismissed',
+          adminNotes: notes || adminNotes,
+          reviewedBy: currentUser?.id
+        })
+      })
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: `Report ${action === 'resolve' ? 'resolved' : 'dismissed'} successfully.`,
+        })
+        fetchAdminData() // Refresh data
+        setSelectedReport(null)
+        setAdminNotes("")
+      } else {
+        throw new Error('Failed to update report')
+      }
+    } catch (error) {
+      console.error('Failed to update report:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update report status.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleUserAction = async (userId: string, action: 'ban' | 'unban' | 'promote' | 'demote') => {
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          banReason: action === 'ban' ? banReason : undefined
+        })
+      })
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: `User ${action} successful.`,
+        })
+        fetchAdminData() // Refresh data
+        setSelectedUser(null)
+        setBanReason("")
+      } else {
+        throw new Error('Failed to update user')
+      }
+    } catch (error) {
+      console.error('Failed to update user:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update user status.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const filteredUsers = users.filter(user => 
+    user.email.toLowerCase().includes(userSearch.toLowerCase()) ||
+    user.username.toLowerCase().includes(userSearch.toLowerCase()) ||
+    user.firstName.toLowerCase().includes(userSearch.toLowerCase()) ||
+    user.lastName.toLowerCase().includes(userSearch.toLowerCase())
+  )
+
+  const filteredReports = reports.filter(report => 
+    reportStatusFilter === "all" || report.status === reportStatusFilter
+  )
+
+  const filteredListings = listings.filter(listing => 
+    listingStatusFilter === "all" || listing.status === listingStatusFilter
+  )
 
   if (loading) {
     return (
@@ -88,17 +263,8 @@ export default function AdminDashboard() {
     )
   }
 
-  if (!isAdmin) {
-    return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="text-center">
-          <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-6">You don't have permission to access the admin dashboard.</p>
-          <Button onClick={() => router.push("/")}>Go Home</Button>
-        </div>
-      </div>
-    )
+  if (!currentUser || currentUser.role !== "admin") {
+    return null
   }
 
   return (
@@ -107,225 +273,464 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Shield className="w-8 h-8 text-blue-600" />
+            <Shield className="w-8 h-8 text-red-600" />
             Admin Dashboard
           </h1>
-          <p className="text-gray-600 mt-1">Manage users, reports, and platform safety</p>
+          <p className="text-gray-600 mt-1">Manage users, reports, and platform statistics</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => router.push("/")}>
-            Back to Site
-          </Button>
-        </div>
+        <Badge variant="outline" className="text-sm">
+          Admin Access
+        </Badge>
       </div>
 
-      {/* Stats Cards */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalUsers}</div>
-              <p className="text-xs text-muted-foreground">
-                Registered users
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Reports</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-orange-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.pendingReports}</div>
-              <p className="text-xs text-muted-foreground">
-                Need review
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Banned Users</CardTitle>
-              <UserX className="h-4 w-4 text-red-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.bannedUsers}</div>
-              <p className="text-xs text-muted-foreground">
-                Suspended accounts
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Recent Reports</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.recentReports}</div>
-              <p className="text-xs text-muted-foreground">
-                Last 7 days
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Admin Actions */}
-      <Tabs defaultValue="reports" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="reports" className="flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            Reports
+      <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview" className="flex items-center gap-2">
+            <BarChart3 className="w-4 h-4" />
+            Overview
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="w-4 h-4" />
             Users
           </TabsTrigger>
-          <TabsTrigger value="stats" className="flex items-center gap-2">
-            <BarChart3 className="w-4 h-4" />
-            Statistics
+          <TabsTrigger value="reports" className="flex items-center gap-2">
+            <Flag className="w-4 h-4" />
+            Reports
+          </TabsTrigger>
+          <TabsTrigger value="listings" className="flex items-center gap-2">
+            <Package className="w-4 h-4" />
+            Listings
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="reports" className="space-y-4">
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Total Users</p>
+                    <p className="text-2xl font-bold">{stats.totalUsers}</p>
+                  </div>
+                  <Users className="w-8 h-8 text-blue-500" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Active Listings</p>
+                    <p className="text-2xl font-bold">{stats.activeListings}</p>
+                  </div>
+                  <Package className="w-8 h-8 text-green-500" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Pending Reports</p>
+                    <p className="text-2xl font-bold">{stats.pendingReports}</p>
+                  </div>
+                  <Flag className="w-8 h-8 text-red-500" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Banned Users</p>
+                    <p className="text-2xl font-bold">{stats.bannedUsers}</p>
+                  </div>
+                  <UserX className="w-8 h-8 text-orange-500" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Total Listings</p>
+                    <p className="text-2xl font-bold">{stats.totalListings}</p>
+                  </div>
+                  <TrendingUp className="w-8 h-8 text-purple-500" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Total Reports</p>
+                    <p className="text-2xl font-bold">{stats.totalReports}</p>
+                  </div>
+                  <AlertTriangle className="w-8 h-8 text-yellow-500" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Recent Activity */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-orange-500" />
-                Report Management
+                <Activity className="w-5 h-5" />
+                Recent Activity
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold">Pending Reports</h3>
-                    <p className="text-sm text-gray-600">
-                      Review and take action on user reports
-                    </p>
-                  </div>
-                  <Link href="/admin/reports">
-                    <Button>
-                      <FileText className="w-4 h-4 mr-2" />
-                      View All Reports
-                    </Button>
-                  </Link>
-                </div>
-                
-                {stats && stats.pendingReports > 0 && (
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-5 h-5 text-orange-500" />
-                      <span className="font-semibold text-orange-800">
-                        {stats.pendingReports} reports need your attention
-                      </span>
+                {reports.slice(0, 5).map((report) => (
+                  <div key={report.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Flag className="w-4 h-4 text-red-500" />
+                      <div>
+                        <p className="text-sm font-medium">
+                          Report filed by {report.reporter.username}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          Against {report.reported.username} - {report.reason}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-sm text-orange-700 mt-1">
-                      Review these reports to maintain platform safety
-                    </p>
+                    <Badge variant={report.status === 'pending' ? 'default' : 'secondary'}>
+                      {report.status}
+                    </Badge>
                   </div>
-                )}
+                ))}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="users" className="space-y-4">
+        {/* Users Tab */}
+        <TabsContent value="users" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Search users..."
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
+            </div>
+          </div>
+
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-blue-500" />
-                User Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-semibold">User Management</h3>
-                    <p className="text-sm text-gray-600">
-                      View, ban, and manage user accounts
-                    </p>
-                  </div>
-                  <Link href="/admin/users">
-                    <Button>
-                      <Users className="w-4 h-4 mr-2" />
-                      Manage Users
-                    </Button>
-                  </Link>
-                </div>
-                
-                {stats && stats.bannedUsers > 0 && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <div className="flex items-center gap-2">
-                      <UserX className="w-5 h-5 text-red-500" />
-                      <span className="font-semibold text-red-800">
-                        {stats.bannedUsers} banned users
-                      </span>
-                    </div>
-                    <p className="text-sm text-red-700 mt-1">
-                      Review banned accounts and consider reinstatement
-                    </p>
-                  </div>
-                )}
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        User
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Role
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Trust Score
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredUsers.map((user) => (
+                      <tr key={user.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {user.firstName} {user.lastName}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              @{user.username} • {user.email}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
+                            {user.role}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`text-sm font-medium ${
+                            user.trustScore >= 80 ? 'text-green-600' :
+                            user.trustScore >= 60 ? 'text-yellow-600' : 'text-red-600'
+                          }`}>
+                            {user.trustScore}/100
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {user.isBanned ? (
+                            <Badge variant="destructive">Banned</Badge>
+                          ) : (
+                            <Badge variant="outline">Active</Badge>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedUser(user)}
+                              >
+                                <Eye className="w-4 h-4 mr-1" />
+                                Actions
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Manage User: {user.firstName} {user.lastName}</DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                  <Button
+                                    variant={user.isBanned ? "outline" : "destructive"}
+                                    onClick={() => handleUserAction(user.id, user.isBanned ? 'unban' : 'ban')}
+                                  >
+                                    {user.isBanned ? <UserCheck className="w-4 h-4 mr-1" /> : <Ban className="w-4 h-4 mr-1" />}
+                                    {user.isBanned ? 'Unban' : 'Ban'}
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => handleUserAction(user.id, user.role === 'admin' ? 'demote' : 'promote')}
+                                  >
+                                    {user.role === 'admin' ? 'Demote' : 'Promote to Admin'}
+                                  </Button>
+                                </div>
+                                {!user.isBanned && (
+                                  <div>
+                                    <label className="text-sm font-medium">Ban Reason (if banning):</label>
+                                    <Textarea
+                                      value={banReason}
+                                      onChange={(e) => setBanReason(e.target.value)}
+                                      placeholder="Enter reason for ban..."
+                                      className="mt-1"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="stats" className="space-y-4">
+        {/* Reports Tab */}
+        <TabsContent value="reports" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <Select value={reportStatusFilter} onValueChange={setReportStatusFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Reports</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
+                <SelectItem value="dismissed">Dismissed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-4">
+            {filteredReports.map((report) => (
+              <Card key={report.id}>
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant={report.status === 'pending' ? 'default' : 'secondary'}>
+                          {report.status}
+                        </Badge>
+                        <span className="text-sm text-gray-500">
+                          {new Date(report.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <h3 className="font-medium mb-2">
+                        Report by {report.reporter.username} against {report.reported.username}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-2">
+                        <strong>Reason:</strong> {report.reason}
+                      </p>
+                      {report.description && (
+                        <p className="text-sm text-gray-600 mb-2">
+                          <strong>Description:</strong> {report.description}
+                        </p>
+                      )}
+                      {report.adminNotes && (
+                        <p className="text-sm text-gray-600 mb-2">
+                          <strong>Admin Notes:</strong> {report.adminNotes}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex gap-2 ml-4">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedReport(report)}
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            Review
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Review Report</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <h4 className="font-medium mb-2">Report Details</h4>
+                              <p><strong>Reporter:</strong> {report.reporter.username}</p>
+                              <p><strong>Reported:</strong> {report.reported.username}</p>
+                              <p><strong>Reason:</strong> {report.reason}</p>
+                              {report.description && (
+                                <p><strong>Description:</strong> {report.description}</p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium">Admin Notes:</label>
+                              <Textarea
+                                value={adminNotes}
+                                onChange={(e) => setAdminNotes(e.target.value)}
+                                placeholder="Add admin notes..."
+                                className="mt-1"
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => handleReportAction(report.id, 'resolve')}
+                                className="flex-1"
+                              >
+                                <CheckCircle className="w-4 h-4 mr-1" />
+                                Resolve
+                              </Button>
+                              <Button
+                                variant="outline"
+                                onClick={() => handleReportAction(report.id, 'dismiss')}
+                                className="flex-1"
+                              >
+                                <XCircle className="w-4 h-4 mr-1" />
+                                Dismiss
+                              </Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* Listings Tab */}
+        <TabsContent value="listings" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <Select value={listingStatusFilter} onValueChange={setListingStatusFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Listings</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="sold">Sold</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-green-500" />
-                Platform Statistics
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="font-semibold">User Statistics</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Total Users:</span>
-                      <span className="font-semibold">{stats?.totalUsers || 0}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Banned Users:</span>
-                      <span className="font-semibold text-red-600">{stats?.bannedUsers || 0}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Active Users:</span>
-                      <span className="font-semibold text-green-600">
-                        {(stats?.totalUsers || 0) - (stats?.bannedUsers || 0)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <h3 className="font-semibold">Report Statistics</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Total Reports:</span>
-                      <span className="font-semibold">{stats?.totalReports || 0}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Pending Review:</span>
-                      <span className="font-semibold text-orange-600">{stats?.pendingReports || 0}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Recent (7 days):</span>
-                      <span className="font-semibold">{stats?.recentReports || 0}</span>
-                    </div>
-                  </div>
-                </div>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Listing
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Seller
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Price
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Created
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredListings.map((listing) => (
+                      <tr key={listing.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {listing.title}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              ID: {listing.id}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {listing.user.firstName} {listing.user.lastName}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            @{listing.user.username}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm font-medium text-gray-900">
+                            {listing.price} Credits
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <Badge variant={
+                            listing.status === 'active' ? 'default' :
+                            listing.status === 'sold' ? 'secondary' : 'outline'
+                          }>
+                            {listing.status}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(listing.createdAt).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>

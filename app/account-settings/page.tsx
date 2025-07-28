@@ -324,6 +324,15 @@ export default function AccountSettingsPage() {
                 >
                   <Link href="/purchase-credits">Purchase Credits</Link>
                 </Button>
+                {currentUser.role === 'admin' && (
+                  <Button
+                    asChild
+                    variant="link"
+                    className="p-0 h-auto text-base text-red-600 hover:text-red-700 font-medium"
+                  >
+                    <Link href="/admin">Admin Dashboard</Link>
+                  </Button>
+                )}
                 <Separator className="my-2" />
                 <Button
                   variant="destructive"

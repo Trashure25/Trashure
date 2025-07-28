@@ -10,19 +10,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Fetch all reports with reporter and reported user details
-    const reports = await prisma.report.findMany({
+    // Fetch all listings with user details
+    const listings = await prisma.listing.findMany({
       include: {
-        reporter: {
-          select: {
-            id: true,
-            username: true,
-            firstName: true,
-            lastName: true,
-            email: true
-          }
-        },
-        reported: {
+        user: {
           select: {
             id: true,
             username: true,
@@ -37,11 +28,11 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({ reports })
+    return NextResponse.json({ listings })
   } catch (error) {
-    console.error('Failed to fetch reports:', error)
+    console.error('Failed to fetch listings:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch reports' },
+      { error: 'Failed to fetch listings' },
       { status: 500 }
     )
   }

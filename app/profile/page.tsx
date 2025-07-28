@@ -295,6 +295,23 @@ export default function ProfilePage() {
                         </Button>
                       </Link>
                     </div>
+
+                    {currentUser.role === 'admin' && (
+                      <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
+                        <div className="flex items-center gap-3">
+                          <Shield className="w-5 h-5 text-red-600" />
+                          <div>
+                            <p className="font-medium text-red-800">Admin Dashboard</p>
+                            <p className="text-sm text-red-600">Manage users, reports, and platform</p>
+                          </div>
+                        </div>
+                        <Link href="/admin">
+                          <Button variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
+                            Access
+                          </Button>
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -464,6 +481,15 @@ export default function ProfilePage() {
                         My Favorites
                       </Button>
                     </Link>
+
+                    {currentUser.role === 'admin' && (
+                      <Link href="/admin">
+                        <Button variant="outline" className="w-full justify-start text-red-600 hover:text-red-700">
+                          <Shield className="w-4 h-4 mr-2" />
+                          Admin Dashboard
+                        </Button>
+                      </Link>
+                    )}
 
                     <Separator />
 

@@ -189,6 +189,9 @@ function TrashureNavbar() {
                     <Link href="/messages" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Messages</Link>
                     <Link href="/account-settings" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">Account Settings</Link>
                     <Link href="/profile" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">Profile</Link>
+                    {currentUser.role === 'admin' && (
+                      <Link href="/admin" className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 font-medium">Admin Dashboard</Link>
+                    )}
                     <button
                       onClick={async () => { 
                         setProfileMenuOpen(false); 
