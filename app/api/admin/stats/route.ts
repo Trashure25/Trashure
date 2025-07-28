@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getCurrentUser } from '@/lib/auth-server'
+import { getCurrentUserFromRequest } from '@/lib/auth-server'
 
 export async function GET(request: NextRequest) {
   try {
     // Check if user is admin
-    const currentUser = await getCurrentUser()
+    const currentUser = await getCurrentUserFromRequest(request)
     if (!currentUser || currentUser.role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
