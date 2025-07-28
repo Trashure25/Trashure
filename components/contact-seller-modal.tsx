@@ -47,7 +47,7 @@ export default function ContactSellerModal({ isOpen, onOpenChange, sellerName }:
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-white border border-gray-200 shadow-xl">
         <DialogHeader>
           <DialogTitle>Contact Seller</DialogTitle>
           <DialogDescription>Send a message to {sellerName} about this item.</DialogDescription>

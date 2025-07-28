@@ -304,7 +304,7 @@ export default function AdminReportsPage() {
 
       {/* Review Modal */}
       <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] bg-white border border-gray-200 shadow-xl">
           <DialogHeader>
             <DialogTitle>Review Report</DialogTitle>
             <DialogDescription>

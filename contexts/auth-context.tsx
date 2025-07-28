@@ -46,22 +46,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let isMounted = true
     setIsLoading(true)
-    auth.getCurrentUser()
-      .then(user => {
+    
+    const loadUser = async () => {
+      try {
+        const user = await auth.getCurrentUser()
         if (!isMounted) return
+        console.log('Auth context loaded user:', user)
         setCurrentUser(user)
-      })
-      .catch((error: any) => {
+      } catch (error: any) {
         if (!isMounted) return
+        console.log('Auth context error loading user:', error)
         setCurrentUser(null)
         // Edge case: session expired, user deleted, or invalid token
         if (error?.status === 401 || error?.message?.includes('Not authenticated')) {
-          toast.error('Session expired. Please log in again.')
+          console.log('Session expired or not authenticated')
         }
-      })
-      .finally(() => { if (isMounted) setIsLoading(false) })
-    return () => { isMounted = false }
-  }, [reloadUser])
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+          console.log('Auth context loading finished')
+        }
+      }
+    }
+
+    // Add a small delay to ensure the page is fully hydrated
+    const timer = setTimeout(loadUser, 100)
+    
+    return () => {
+      isMounted = false
+      clearTimeout(timer)
+    }
+  }, [])
 
   // Optionally: Listen for storage events to sync logout across tabs (future-proof)
   // useEffect(() => {

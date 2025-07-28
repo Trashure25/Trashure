@@ -116,12 +116,27 @@ export const auth = {
   },
 
   async getCurrentUser(): Promise<User | null> {
-    const response = await fetch('/api/auth/me', {
-      method: 'GET',
-      credentials: 'include',
-    })
-    if (!response.ok) return null
-    return await response.json()
+    try {
+      console.log('Fetching current user from /api/auth/me')
+      const response = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+      })
+      
+      console.log('Auth me response status:', response.status)
+      
+      if (!response.ok) {
+        console.log('Auth me response not ok:', response.status, response.statusText)
+        return null
+      }
+      
+      const user = await response.json()
+      console.log('Auth me response user:', user)
+      return user
+    } catch (error) {
+      console.error('Error fetching current user:', error)
+      return null
+    }
   },
 
   async updateProfile(userId: string, data: ProfileUpdateData): Promise<User> {

@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation"
 import { MessageCircle } from "lucide-react"
 
 function TrashureNavbar() {
-  const { currentUser, logout, reloadUser } = useAuth()
+  const { currentUser, logout, reloadUser, isLoading } = useAuth()
   const router = useRouter()
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
@@ -160,7 +160,12 @@ function TrashureNavbar() {
         </form>
         {/* Actions */}
         <div className="flex items-center gap-1">
-          {currentUser ? (
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+              <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          ) : currentUser ? (
             <>
               <Link href="/list-item" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">List Item</Link>
               <Link href="/purchase-credits" className="px-3 h-8 flex items-center justify-center font-bold uppercase bg-accent text-white border border-black hover:bg-[#04331f] text-xs ml-1">Purchase Credits</Link>
@@ -184,52 +189,17 @@ function TrashureNavbar() {
                 </button>
                 {profileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-2">
-                    <Link href="/my-listings" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Listings</Link>
-                    <Link href="/favorites" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Favorites</Link>
-                    <Link href="/messages" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Messages</Link>
-                    <Link href="/account-settings" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">Account Settings</Link>
                     <Link href="/profile" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">Profile</Link>
                     {currentUser.role === 'admin' && (
                       <Link href="/admin" className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 font-medium">Admin Dashboard</Link>
                     )}
-                    {/* Debug section - remove after testing */}
-                    <div className="border-t border-gray-200 mt-2 pt-2">
-                      <div className="px-4 py-1 text-xs text-gray-500">
-                        Role: {currentUser.role || 'undefined'}
-                      </div>
-                      <button
-                        onClick={async () => {
-                          try {
-                            const response = await fetch('/api/debug-user')
-                            const data = await response.json()
-                            console.log('Debug user data:', data)
-                            alert(`Role: ${data.user?.role || 'undefined'}\nIs Admin: ${data.isAdmin}`)
-                          } catch (error) {
-                            console.error('Debug failed:', error)
-                          }
-                        }}
-                        className="block px-4 py-1 text-xs text-blue-600 hover:bg-gray-100"
-                      >
-                        Debug Role
-                      </button>
-                      <button
-                        onClick={async () => {
-                          try {
-                            // Force refresh the user session using auth context
-                            await reloadUser()
-                            console.log('User session refreshed')
-                          } catch (error) {
-                            console.error('Refresh failed:', error)
-                          }
-                        }}
-                        className="block px-4 py-1 text-xs text-green-600 hover:bg-gray-100"
-                      >
-                        Force Refresh
-                      </button>
-                    </div>
+                    <Link href="/messages" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Messages</Link>
+                    <Link href="/favorites" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Favorites</Link>
+                    <Link href="/my-listings" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">My Listings</Link>
+                    <Link href="/account-settings" className="block px-4 py-2 text-sm text-black hover:bg-gray-100">Account Settings</Link>
                     <button
-                      onClick={async () => { 
-                        setProfileMenuOpen(false); 
+                      onClick={async () => {
+                        setProfileMenuOpen(false);
                         try {
                           await logout();
                           router.push('/');

@@ -497,7 +497,7 @@ export default function AdminPage() {
                                 Actions
                               </Button>
                             </DialogTrigger>
-                            <DialogContent>
+                            <DialogContent className="bg-white border border-gray-200 shadow-xl">
                               <DialogHeader>
                                 <DialogTitle>Manage User: {user.firstName} {user.lastName}</DialogTitle>
                               </DialogHeader>
@@ -600,7 +600,7 @@ export default function AdminPage() {
                             Review
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="bg-white border border-gray-200 shadow-xl">
                           <DialogHeader>
                             <DialogTitle>Review Report</DialogTitle>
                           </DialogHeader>
