@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { auth } from "@/lib/auth"
+import { useAuth } from "@/contexts/auth-context"
 import { PageTransition } from "@/components/page-transition"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2 } from "lucide-react"
@@ -11,19 +11,29 @@ import { motion } from "framer-motion"
 export default function PaymentSuccessPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { currentUser } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const creditsAdded = Number.parseInt(searchParams.get("credits") || "0")
 
   useEffect(() => {
     const updateUserCredits = async () => {
-      if (creditsAdded > 0) {
+      if (creditsAdded > 0 && currentUser) {
         try {
-          const user = await auth.getCurrentUser()
-          if (user) {
-            await auth.updateUserCredits(user.id, creditsAdded)
-          } else {
-            throw new Error("User not found")
+          // Call the API directly instead of using auth service
+          const response = await fetch('/api/users/credits', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: currentUser.id,
+              credits: creditsAdded
+            }),
+          })
+          
+          if (!response.ok) {
+            throw new Error("Failed to update credits")
           }
         } catch (err) {
           setError("Failed to update your credits. Please contact support.")
@@ -32,8 +42,11 @@ export default function PaymentSuccessPage() {
       setIsLoading(false)
     }
 
-    updateUserCredits()
-  }, [creditsAdded])
+    // Only run when currentUser is available
+    if (currentUser !== undefined) {
+      updateUserCredits()
+    }
+  }, [creditsAdded, currentUser])
 
   return (
     <PageTransition>

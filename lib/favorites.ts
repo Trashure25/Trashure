@@ -60,7 +60,9 @@ export const favoritesService = {
       throw new Error('Failed to fetch user favorites');
     }
 
-    return response.json();
+    const data = await response.json();
+    // Handle paginated response
+    return data.favorites || data;
   },
 
   async checkIfFavorited(userId: string, listingId: string): Promise<boolean> {

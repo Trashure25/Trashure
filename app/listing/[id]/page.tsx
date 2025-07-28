@@ -9,12 +9,14 @@ import { messagesService } from "@/lib/messages"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, MessageCircle, Heart, Share2, Loader2, Calendar, Package } from "lucide-react"
+import { ArrowLeft, MessageCircle, Heart, Share2, Loader2, Calendar, Package, Shield } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import TradeOfferModal from "@/components/trade-offer-modal"
 import ContactSellerModal from "@/components/contact-seller-modal"
 import Image from "next/image"
 import { favoritesService } from "@/lib/favorites"
+import Link from "next/link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function ListingDetailPage() {
   const params = useParams()
@@ -404,6 +406,40 @@ export default function ListingDetailPage() {
               <span>Listed on {new Date(listing.createdAt).toLocaleDateString()}</span>
             </div>
 
+            {/* Seller Info */}
+            {listing.user && (
+              <>
+                <Separator />
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-gray-900">Seller</h3>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={listing.user.avatarUrl || undefined} alt="Seller avatar" />
+                      <AvatarFallback>
+                        {listing.user.firstName[0]}{listing.user.lastName[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">
+                          {listing.user.firstName} {listing.user.lastName}
+                        </span>
+                        <Badge variant="outline" className="text-xs">
+                          Trust Score: 85
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-600">@{listing.user.username}</p>
+                    </div>
+                    <Link href={`/profile/${listing.user.username}`}>
+                      <Button variant="outline" size="sm">
+                        View Profile
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </>
+            )}
+
             {!isOwner && (
               <div className="space-y-3">
                 <Button onClick={handleMakeOffer} className="w-full" size="lg">
@@ -414,6 +450,14 @@ export default function ListingDetailPage() {
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Contact Seller
                 </Button>
+                {listing.user && (
+                  <Link href={`/profile/${listing.user.username}`}>
+                    <Button variant="ghost" className="w-full" size="lg">
+                      <Shield className="w-4 h-4 mr-2" />
+                      View Seller Profile
+                    </Button>
+                  </Link>
+                )}
               </div>
             )}
 

@@ -53,7 +53,7 @@ export default function TradeOfferModal({ isOpen, onOpenChange, userListings, ta
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-white">
         <DialogHeader>
           <DialogTitle>Make a Trade Offer</DialogTitle>
           <DialogDescription>Select one of your items to offer in trade for &quot;{targetListing.title}&quot;.</DialogDescription>

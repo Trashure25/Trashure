@@ -16,14 +16,16 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Loader2, Heart, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { toast } from "@/hooks/use-toast"
+import { useToast } from "@/components/ui/use-toast"
 import type { Favorite } from "@/lib/favorites"
 
 export default function FavoritesPage() {
   const { currentUser } = useAuth()
   const router = useRouter()
+  const { toast } = useToast()
   const [favorites, setFavorites] = useState<Favorite[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!currentUser) {
@@ -34,10 +36,13 @@ export default function FavoritesPage() {
     const fetchFavorites = async () => {
       try {
         setLoading(true)
+        setError(null)
         const userFavorites = await favoritesService.getUserFavorites(currentUser.id)
-        setFavorites(userFavorites)
+        setFavorites(userFavorites || [])
       } catch (error) {
         console.error('Failed to fetch favorites:', error)
+        setError('Failed to load favorites')
+        setFavorites([])
         toast({
           title: "Error",
           description: "Failed to load your favorites. Please try again.",
@@ -49,7 +54,27 @@ export default function FavoritesPage() {
     }
 
     fetchFavorites()
-  }, [currentUser, router])
+  }, [currentUser, router, toast])
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
+          <p className="text-gray-600 mb-6">We're sorry, but something unexpected happened. Please try again.</p>
+          <div className="space-y-3">
+            <Button onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+            <Button variant="outline" onClick={() => router.push('/')}>
+              Go Home
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const handleRemoveFavorite = async (favoriteId: string) => {
     try {

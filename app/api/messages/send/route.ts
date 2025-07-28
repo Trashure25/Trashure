@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma, withRetry, testDatabaseConnection } from '@/lib/prisma'
-import { auth } from '@/lib/auth'
+import { getCurrentUserFromRequest } from '@/lib/auth-server'
 
 // POST /api/messages/send - Send a new message
 export async function POST(request: NextRequest) {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user from auth
-    const user = await auth.getCurrentUser()
+    const user = await getCurrentUserFromRequest(request)
     if (!user) {
       return NextResponse.json(
         { error: 'Not authenticated' },
