@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import type { Listing } from "@/lib/listings"
 import { listingsService } from "@/lib/listings"
+import { messagesService } from "@/lib/messages"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -216,8 +217,41 @@ export default function ListingDetailPage() {
     callback()
   }
 
-  const handleContactSeller = () => {
-    handleAuthCheck(() => setIsContactModalOpen(true))
+  const handleContactSeller = async () => {
+    handleAuthCheck(async () => {
+      if (!currentUser || !listing) return
+      
+      try {
+        // Check if conversation already exists
+        const conversations = await messagesService.getConversations(currentUser.id)
+        const existingConversation = conversations.find(conv => 
+          conv.listingId === listing.id && 
+          (conv.user1Id === listing.userId || conv.user2Id === listing.userId)
+        )
+        
+        if (existingConversation) {
+          // Navigate to existing conversation
+          router.push(`/messages?conversation=${existingConversation.id}`)
+        } else {
+          // Create new conversation
+          const conversation = await messagesService.createConversation({
+            otherUserId: listing.userId,
+            listingId: listing.id,
+            initialMessage: `Hi! I'm interested in your ${listing.title}. Is it still available?`
+          })
+          
+          // Navigate to new conversation
+          router.push(`/messages?conversation=${conversation.id}`)
+        }
+      } catch (error) {
+        console.error('Failed to create conversation:', error)
+        toast({
+          title: "Error",
+          description: "Failed to start conversation. Please try again.",
+          variant: "destructive",
+        })
+      }
+    })
   }
 
   const handleMakeOffer = () => {
