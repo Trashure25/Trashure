@@ -4,6 +4,7 @@ import { ShieldCheck } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Separator } from "@/components/ui/separator"
 
 interface TrustScoreCardProps {
   score: number
@@ -35,7 +36,8 @@ export function TrustScoreCard({ score }: TrustScoreCardProps) {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <p className="text-xs text-muted-foreground mt-2 text-center">
+        <Separator className="my-3" />
+        <p className="text-xs text-muted-foreground text-center">
           System Secured by <span className="font-semibold text-primary">Trustscore</span>
         </p>
       </CardContent>
