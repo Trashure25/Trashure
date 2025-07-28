@@ -85,13 +85,13 @@ export default function ReportUserModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-white text-gray-900">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 text-gray-900 font-semibold">
             <AlertTriangle className="w-5 h-5 text-red-500" />
             Report User
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-gray-600">
             Report {reportedUserName} for violating our community guidelines. 
             This will help us maintain a safe marketplace for everyone.
           </DialogDescription>
@@ -99,14 +99,14 @@ export default function ReportUserModal({
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="reason">Reason for report *</Label>
+            <Label htmlFor="reason" className="text-gray-900 font-medium">Reason for report *</Label>
             <Select value={reason} onValueChange={setReason}>
-              <SelectTrigger>
+              <SelectTrigger className="text-gray-900 bg-white border-gray-300">
                 <SelectValue placeholder="Select a reason" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 {REPORT_REASONS.map((reportReason) => (
-                  <SelectItem key={reportReason} value={reportReason}>
+                  <SelectItem key={reportReason} value={reportReason} className="text-gray-900">
                     {reportReason}
                   </SelectItem>
                 ))}
@@ -115,13 +115,14 @@ export default function ReportUserModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Additional details (optional)</Label>
+            <Label htmlFor="description" className="text-gray-900 font-medium">Additional details (optional)</Label>
             <Textarea
               id="description"
               placeholder="Please provide any additional context or details about the issue..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
+              className="text-gray-900 bg-white border-gray-300"
             />
           </div>
 
@@ -134,13 +135,13 @@ export default function ReportUserModal({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel} disabled={isSubmitting}>
+          <Button variant="outline" onClick={handleCancel} disabled={isSubmitting} className="text-gray-900 border-gray-300">
             Cancel
           </Button>
           <Button 
             onClick={handleSubmit} 
             disabled={isSubmitting || !reason}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-red-600 hover:bg-red-700 text-white"
           >
             {isSubmitting ? (
               <>
