@@ -268,8 +268,8 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto py-8 px-4 max-w-7xl overflow-x-hidden [&_.card:hover]:transform-none [&_.shadow-xl:hover]:transform-none [&_.card:hover]:translate-y-0 [&_.shadow-xl:hover]:translate-y-0 [&_.card:hover]:scale-100 [&_.shadow-xl:hover]:scale-100">
+    <div className="min-h-screen bg-gray-50 admin-dashboard">
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
