@@ -153,10 +153,10 @@ input:focus, select:focus, textarea:focus, button:focus {
 .admin-dashboard .fade-out-0,
 .admin-dashboard .zoom-in-95,
 .admin-dashboard .zoom-out-95,
-.admin-dashboard .slide-in-from-left-1/2,
-.admin-dashboard .slide-out-to-left-1/2,
-.admin-dashboard .slide-in-from-top-[48%],
-.admin-dashboard .slide-out-to-top-[48%] {
+.admin-dashboard .slide-in-from-left-1\/2,
+.admin-dashboard .slide-out-to-left-1\/2,
+.admin-dashboard .slide-in-from-top-\[48\%\],
+.admin-dashboard .slide-out-to-top-\[48\%\] {
   animation: none !important;
   transition: none !important;
   transform: none !important;
