@@ -105,6 +105,33 @@ input:focus, select:focus, textarea:focus, button:focus {
   box-shadow: var(--color-shadow) !important;
 }
 
+/* Prevent any hover effects in admin dashboard */
+.admin-dashboard *:hover {
+  transform: none !important;
+}
+
+/* Prevent button hover effects in admin dashboard */
+.admin-dashboard button:hover,
+.admin-dashboard .btn:hover {
+  transform: none !important;
+}
+
+/* Prevent dialog shifting */
+.admin-dashboard [data-radix-dialog-content] {
+  transform: none !important;
+}
+
+/* Disable all animations and transitions in admin dashboard */
+.admin-dashboard * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Ensure stable positioning */
+.admin-dashboard {
+  overflow-x: hidden;
+}
+
 .skeleton {
   background: linear-gradient(90deg, #f5f5f5 25%, #e5e5e5 50%, #f5f5f5 75%);
   background-size: 200% 100%;
