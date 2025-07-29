@@ -10,6 +10,8 @@ import { TrashureFooter } from "@/components/trashure-footer"
 import { CheckoutForm } from "@/components/checkout-form"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { motion } from "framer-motion"
+import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
@@ -17,13 +19,28 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 
 export default function CheckoutPage() {
   const searchParams = useSearchParams()
+  const { currentUser, isLoading: authLoading } = useAuth()
+  const router = useRouter()
   const [clientSecret, setClientSecret] = useState("")
   const [amount, setAmount] = useState(0)
   const [credits, setCredits] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Check authentication
   useEffect(() => {
+    if (!authLoading && !currentUser) {
+      router.push("/login?redirect=/checkout")
+      return
+    }
+  }, [authLoading, currentUser, router])
+
+  useEffect(() => {
+    // Don't proceed if not authenticated
+    if (authLoading || !currentUser) {
+      return
+    }
+
     const amountParam = Number.parseInt(searchParams.get("amount") || "0")
     const creditsParam = Number.parseInt(searchParams.get("credits") || "0")
     const descriptionParam = searchParams.get("description") || `Purchase of ${creditsParam} credits`
@@ -31,6 +48,13 @@ export default function CheckoutPage() {
     if (amountParam > 0) {
       setAmount(amountParam)
       setCredits(creditsParam)
+
+      // Check if Stripe key is available
+      if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+        setError("Stripe configuration is missing. Please contact support.")
+        setIsLoading(false)
+        return
+      }
 
       // Create PaymentIntent as soon as the page loads
       fetch("/api/create-payment-intent", {
@@ -42,12 +66,16 @@ export default function CheckoutPage() {
           if (!res.ok) {
             // API returned an error (plain-text). Read the text safely.
             const msg = await res.text()
-            throw new Error(msg || `Stripe API returned status ${res.status}`)
+            console.error("Payment intent creation failed:", res.status, msg)
+            throw new Error(msg || `Payment setup failed (${res.status}). Please try again.`)
           }
           return res.json() // Safe: we already confirmed res.ok
         })
         .then((data) => {
-          if (!data?.clientSecret) throw new Error("Missing client secret in response")
+          if (!data?.clientSecret) {
+            console.error("Missing client secret in response:", data)
+            throw new Error("Payment setup incomplete. Please try again.")
+          }
           setClientSecret(data.clientSecret)
           setIsLoading(false)
         })
@@ -60,8 +88,11 @@ export default function CheckoutPage() {
           )
           setIsLoading(false)
         })
+    } else {
+      setError("Invalid purchase amount. Please try again.")
+      setIsLoading(false)
     }
-  }, [searchParams])
+  }, [searchParams, authLoading, currentUser])
 
   const appearance = {
     theme: "stripe" as const,

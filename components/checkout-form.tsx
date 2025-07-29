@@ -1,128 +1,93 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { useState } from "react"
+import { useStripe, useElements, PaymentElement } from "@stripe/react-stripe-js"
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { useCart } from "@/contexts/cart-context"
 import { useRouter } from "next/navigation"
-
-const checkoutFormSchema = z.object({
-  name: z.string(),
-  address: z.string(),
-  city: z.string(),
-  zip: z.string(),
-  country: z.string(),
-})
-
-interface CheckoutFormValues {
-  name: string
-  address: string
-  city: string
-  zip: string
-  country: string
-}
+import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
 export function CheckoutForm({ credits, amount }: { credits: number; amount: number }) {
-  const { clearCart } = useCart()
+  const stripe = useStripe()
+  const elements = useElements()
   const router = useRouter()
+  const [isProcessing, setIsProcessing] = useState(false)
 
-  const form = useForm<CheckoutFormValues>({
-    resolver: zodResolver(checkoutFormSchema),
-    defaultValues: {
-      name: "",
-      address: "",
-      city: "",
-      zip: "",
-      country: "",
-    },
-    mode: "onChange",
-  })
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
 
-  function onSubmit(data: CheckoutFormValues) {
-    console.log("Checkout data:", data)
-    // Here you would typically process the payment
-    alert("Checkout successful!")
-    clearCart()
-    router.push("/payment-success")
+    if (!stripe || !elements) {
+      toast.error("Stripe has not loaded yet. Please try again.")
+      return
+    }
+
+    setIsProcessing(true)
+
+    try {
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/payment-success?credits=${credits}&amount=${amount}`,
+        },
+        redirect: "if_required",
+      })
+
+      if (error) {
+        toast.error(error.message || "Payment failed. Please try again.")
+        setIsProcessing(false)
+        return
+      }
+
+      if (paymentIntent && paymentIntent.status === "succeeded") {
+        // Call our API to add credits
+        const response = await fetch("/api/payment-success", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            paymentIntentId: paymentIntent.id,
+          }),
+        })
+
+        if (response.ok) {
+          const result = await response.json()
+          toast.success(result.message || `Successfully added ${credits} credits!`)
+          router.push("/payment-success?credits=" + credits)
+        } else {
+          toast.error("Payment succeeded but failed to add credits. Please contact support.")
+        }
+      }
+    } catch (error) {
+      console.error("Payment error:", error)
+      toast.error("An unexpected error occurred. Please try again.")
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Full Name</FormLabel>
-              <FormControl>
-                <Input placeholder="John Doe" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Street Address</FormLabel>
-              <FormControl>
-                <Input placeholder="123 Main St" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>City</FormLabel>
-                <FormControl>
-                  <Input placeholder="New York" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="zip"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ZIP Code</FormLabel>
-                <FormControl>
-                  <Input placeholder="10001" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="country"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Country</FormLabel>
-                <FormControl>
-                  <Input placeholder="USA" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <Button type="submit" className="w-full">
-          Complete Purchase
-        </Button>
-      </form>
-    </Form>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <PaymentElement />
+      
+      <Button 
+        type="submit" 
+        disabled={!stripe || isProcessing} 
+        className="w-full"
+      >
+        {isProcessing ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Processing...
+          </>
+        ) : (
+          `Pay $${(amount / 100).toFixed(2)} for ${credits} Credits`
+        )}
+      </Button>
+      
+      <p className="text-xs text-gray-500 text-center">
+        Your payment is secured by Stripe. You will receive ${credits} credits upon successful payment.
+      </p>
+    </form>
   )
 }
