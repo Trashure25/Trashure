@@ -3,34 +3,27 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
 import { 
-  Shield, 
   Users, 
-  Flag, 
   Package, 
+  Flag, 
   BarChart3, 
-  Search, 
+  UserX, 
+  TrendingUp, 
   Eye, 
   Ban, 
+  UserCheck, 
   CheckCircle, 
   XCircle,
-  Loader2,
-  AlertTriangle,
-  UserCheck,
-  UserX,
-  MessageSquare,
-  DollarSign,
-  TrendingUp,
-  Activity
+  Search,
+  X
 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -78,6 +71,26 @@ interface PlatformStats {
   bannedUsers: number
   pendingReports: number
 }
+
+// Custom Dialog component without animations
+const CustomDialog = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
+      <div className="relative bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+        >
+          <X className="h-4 w-4" />
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+};
 
 export default function AdminPage() {
   const { currentUser } = useAuth()
@@ -257,7 +270,7 @@ export default function AdminPage() {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="flex items-center justify-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin" />
+          <X className="h-8 w-8 animate-spin" />
         </div>
       </div>
     )
@@ -387,7 +400,7 @@ export default function AdminPage() {
                       <p className="text-sm font-medium text-gray-600">Total Reports</p>
                       <p className="text-2xl font-bold">{stats.totalReports}</p>
                     </div>
-                    <AlertTriangle className="w-8 h-8 text-yellow-500" />
+                    <X className="w-8 h-8 text-yellow-500" />
                   </div>
                 </CardContent>
               </Card>
@@ -395,12 +408,6 @@ export default function AdminPage() {
 
             {/* Recent Activity */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="w-5 h-5" />
-                  Recent Activity
-                </CardTitle>
-              </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {reports.slice(0, 5).map((report) => (
@@ -499,21 +506,20 @@ export default function AdminPage() {
                             )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setSelectedUser(user)}
-                                >
-                                  <Eye className="w-4 h-4 mr-1" />
-                                  Actions
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="bg-white border border-gray-200 shadow-xl">
-                                <DialogHeader>
-                                  <DialogTitle>Manage User: {user.firstName} {user.lastName}</DialogTitle>
-                                </DialogHeader>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setSelectedUser(user)}
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              Actions
+                            </Button>
+                            <CustomDialog
+                              isOpen={selectedUser?.id === user.id}
+                              onClose={() => setSelectedUser(null)}
+                            >
+                              <div>
+                                <h3 className="text-lg font-semibold mb-4">Manage User: {user.firstName} {user.lastName}</h3>
                                 <div className="space-y-4">
                                   <div className="grid grid-cols-2 gap-4">
                                     <Button
@@ -542,8 +548,8 @@ export default function AdminPage() {
                                     </div>
                                   )}
                                 </div>
-                              </DialogContent>
-                            </Dialog>
+                              </div>
+                            </CustomDialog>
                           </td>
                         </tr>
                       ))}
@@ -602,21 +608,20 @@ export default function AdminPage() {
                         )}
                       </div>
                       <div className="flex gap-2 ml-4">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setSelectedReport(report)}
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              Review
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="bg-white border border-gray-200 shadow-xl">
-                            <DialogHeader>
-                              <DialogTitle>Review Report</DialogTitle>
-                            </DialogHeader>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedReport(report)}
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          Review
+                        </Button>
+                        <CustomDialog
+                          isOpen={selectedReport?.id === report.id}
+                          onClose={() => setSelectedReport(null)}
+                        >
+                          <div>
+                            <h3 className="text-lg font-semibold mb-4">Review Report</h3>
                             <div className="space-y-4">
                               <div>
                                 <h4 className="font-medium mb-2">Report Details</h4>
@@ -654,8 +659,8 @@ export default function AdminPage() {
                                 </Button>
                               </div>
                             </div>
-                          </DialogContent>
-                        </Dialog>
+                          </div>
+                        </CustomDialog>
                       </div>
                     </div>
                   </CardContent>
