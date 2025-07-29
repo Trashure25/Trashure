@@ -66,6 +66,7 @@ export interface User {
   passwordHash: string
   avatarUrl?: string
   trustScore: number
+  credits: number
   role: string
   isBanned: boolean
   banReason?: string

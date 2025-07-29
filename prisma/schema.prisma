@@ -17,6 +17,7 @@ model User {
   lastName   String
   avatarUrl  String?
   trustScore Int      @default(70)
+  credits    Int      @default(0)
   role       String   @default("user") // user, admin, moderator
   isBanned   Boolean  @default(false)
   banReason  String?

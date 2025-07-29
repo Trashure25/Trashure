@@ -50,6 +50,7 @@ export async function GET(req: NextRequest) {
           lastName: true,
           avatarUrl: true,
           trustScore: true,
+          credits: true,
           role: true,
           isBanned: true,
           banReason: true,
