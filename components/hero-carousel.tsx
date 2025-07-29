@@ -16,27 +16,27 @@ import Autoplay from "embla-carousel-autoplay"
 const carouselItems = [
   {
     src: "/hero-images/hero-1.png",
-    alt: "Abstract blurry photo of a field with yellow flowers",
-    title: "Trending: Eco-Threads",
-    subtitle: "Discover unique, upcycled & sustainable pieces.",
-    buttonText: "Shop Eco-Threads",
-    buttonLink: "/collections/eco-threads",
+    alt: "La Lune Reve - Sustainable Fashion",
+    title: "La Lune Reve",
+    subtitle: "Sponsored by sustainable fashion pioneers",
+    buttonText: "Discover La Lune Reve",
+    buttonLink: "/sponsors/la-lune-reve",
   },
   {
     src: "/hero-images/hero-2.png",
-    alt: "Minimalist image of a grassy hill with colored squares",
-    title: "Vintage Denim Drop",
-    subtitle: "Rare finds and classic cuts.",
-    buttonText: "Explore Denim",
-    buttonLink: "/collections/vintage-denim",
+    alt: "La Lune Reve - Eco-Friendly Collection",
+    title: "Eco-Friendly Collection",
+    subtitle: "Curated by La Lune Reve",
+    buttonText: "Shop Collection",
+    buttonLink: "/collections/la-lune-reve",
   },
   {
     src: "/hero-images/hero-3.png",
-    alt: "Painting of a desert landscape with a pinkish mesa",
-    title: "Streetwear Essentials",
-    subtitle: "Curated streetwear for the modern minimalist.",
-    buttonText: "View Streetwear",
-    buttonLink: "/collections/streetwear",
+    alt: "La Lune Reve - Sustainable Style",
+    title: "Sustainable Style",
+    subtitle: "Brought to you by La Lune Reve",
+    buttonText: "Learn More",
+    buttonLink: "/about/la-lune-reve",
   },
 ]
 
@@ -77,6 +77,16 @@ export function HeroCarousel() {
                   priority={index === 0}
                 />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-black/30 p-8">
+                  <div className="mb-4">
+                    <Image
+                      src="/sponsors/la-lune-reve.png"
+                      alt="La Lune Reve"
+                      width={80}
+                      height={40}
+                      className="mx-auto mb-2"
+                    />
+                    <p className="text-sm text-white/80 uppercase tracking-wider">Sponsored by</p>
+                  </div>
                   <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold my-4">{item.title}</h2>
                   <p className="text-lg md:text-xl font-light tracking-wider uppercase">{item.subtitle}</p>
                   <Link

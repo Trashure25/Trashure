@@ -70,23 +70,13 @@ export function Footer() {
             <h3 className="font-semibold mb-4">Help</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="#" className="hover:text-primary">
-                  Help Center
+                <Link href="/faq" className="hover:text-primary">
+                  FAQ
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-primary">
+                <Link href="/contact" className="hover:text-primary">
                   Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-primary">
-                  Shipping
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-primary">
-                  Returns
                 </Link>
               </li>
             </ul>
@@ -96,7 +86,7 @@ export function Footer() {
             <h3 className="font-semibold mb-4">Follow Us</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="#" className="hover:text-primary">
+                <Link href="https://instagram.com/trashure" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
                   Instagram
                 </Link>
               </li>
