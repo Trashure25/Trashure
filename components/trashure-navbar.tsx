@@ -9,6 +9,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { useState, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 import { MessageCircle } from "lucide-react"
+import { CreditCard } from "lucide-react"
 
 function TrashureNavbar() {
   const { currentUser, logout, reloadUser, isLoading } = useAuth()
@@ -168,7 +169,13 @@ function TrashureNavbar() {
           ) : currentUser ? (
             <>
               <Link href="/list-item" className="px-3 h-8 flex items-center justify-center font-bold uppercase border border-black bg-white text-black hover:bg-gray-100 text-xs">List Item</Link>
-              <Link href="/purchase-credits" className="px-3 h-8 flex items-center justify-center font-bold uppercase bg-accent text-white border border-black hover:bg-[#04331f] text-xs ml-1">Purchase Credits</Link>
+              <div className="flex items-center gap-1 ml-1">
+                <div className="px-2 h-8 flex items-center justify-center text-xs bg-green-50 border border-green-200 text-green-700 rounded">
+                  <CreditCard className="w-3 h-3 mr-1" />
+                  {currentUser.credits || 0}
+                </div>
+                <Link href="/purchase-credits" className="px-3 h-8 flex items-center justify-center font-bold uppercase bg-accent text-white border border-black hover:bg-[#04331f] text-xs">Purchase Credits</Link>
+              </div>
               <Link 
                 href="/messages" 
                 className="h-8 w-8 rounded-full border border-gray-300 flex items-center justify-center bg-white text-black hover:bg-gray-50 transition-colors ml-2"
