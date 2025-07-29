@@ -268,19 +268,13 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+    <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Shield className="w-8 h-8 text-red-600" />
-            Admin Dashboard
-          </h1>
-          <p className="text-gray-600 mt-1">Manage users, reports, and platform statistics</p>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600">Manage users, reports, and platform statistics</p>
         </div>
-        <Badge variant="outline" className="text-sm">
-          Admin Access
-        </Badge>
+        <div className="text-sm text-gray-500">Admin Access</div>
       </div>
 
       <Tabs value={activeTab} onValueChange={(value: any) => setActiveTab(value)} className="space-y-6">
@@ -454,7 +448,7 @@ export default function AdminPage() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50">
+                      <tr key={user.id}>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
                             <div className="text-sm font-medium text-gray-900">
@@ -692,7 +686,7 @@ export default function AdminPage() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredListings.map((listing) => (
-                      <tr key={listing.id} className="hover:bg-gray-50">
+                      <tr key={listing.id}>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
                             <div className="text-sm font-medium text-gray-900">
