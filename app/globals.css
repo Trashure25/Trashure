@@ -132,6 +132,36 @@ input:focus, select:focus, textarea:focus, button:focus {
   overflow-x: hidden;
 }
 
+/* Override Dialog component animations in admin dashboard */
+.admin-dashboard [data-radix-dialog-content] {
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Disable Dialog animations */
+.admin-dashboard [data-state="open"],
+.admin-dashboard [data-state="closed"] {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Disable all Tailwind animations in admin dashboard */
+.admin-dashboard .animate-in,
+.admin-dashboard .animate-out,
+.admin-dashboard .fade-in-0,
+.admin-dashboard .fade-out-0,
+.admin-dashboard .zoom-in-95,
+.admin-dashboard .zoom-out-95,
+.admin-dashboard .slide-in-from-left-1/2,
+.admin-dashboard .slide-out-to-left-1/2,
+.admin-dashboard .slide-in-from-top-[48%],
+.admin-dashboard .slide-out-to-top-[48%] {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
 .skeleton {
   background: linear-gradient(90deg, #f5f5f5 25%, #e5e5e5 50%, #f5f5f5 75%);
   background-size: 200% 100%;
