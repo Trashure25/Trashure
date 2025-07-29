@@ -162,6 +162,41 @@ input:focus, select:focus, textarea:focus, button:focus {
   transform: none !important;
 }
 
+/* Nuclear option: Disable ALL transforms and transitions in admin dashboard */
+.admin-dashboard,
+.admin-dashboard *,
+.admin-dashboard *::before,
+.admin-dashboard *::after {
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+  will-change: auto !important;
+}
+
+/* Specifically target table elements that might be shifting */
+.admin-dashboard table,
+.admin-dashboard tr,
+.admin-dashboard td,
+.admin-dashboard th {
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Target button elements specifically */
+.admin-dashboard button,
+.admin-dashboard .btn,
+.admin-dashboard [role="button"] {
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Target dialog and modal elements */
+.admin-dashboard [role="dialog"],
+.admin-dashboard [data-radix-portal] {
+  transform: none !important;
+  transition: none !important;
+}
+
 .skeleton {
   background: linear-gradient(90deg, #f5f5f5 25%, #e5e5e5 50%, #f5f5f5 75%);
   background-size: 200% 100%;

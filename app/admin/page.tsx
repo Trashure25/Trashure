@@ -268,7 +268,25 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 admin-dashboard">
+    <div className="min-h-screen bg-gray-50 admin-dashboard" style={{
+      overflowX: 'hidden',
+      position: 'relative'
+    }}>
+      <style jsx>{`
+        .admin-dashboard * {
+          transform: none !important;
+          transition: none !important;
+          animation: none !important;
+        }
+        .admin-dashboard *:hover {
+          transform: none !important;
+        }
+        .admin-dashboard [data-radix-dialog-content] {
+          transform: none !important;
+          transition: none !important;
+          animation: none !important;
+        }
+      `}</style>
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         <div className="flex justify-between items-center mb-8">
           <div>
