@@ -264,4 +264,4 @@ export default function PurchasePage() {
       </div>
     </div>
   )
-} 
+}
