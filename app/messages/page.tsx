@@ -307,6 +307,30 @@ export default function MessagesPage() {
                   )}
                   <div ref={messagesEndRef} />
                 </div>
+                {/* Trade Offer Buttons */}
+                {selectedConv && selectedConv.listing && (
+                  <div className="border-t p-4 bg-gray-50">
+                    <div className="flex gap-2 mb-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => router.push(`/trade-offer?conversation=${selectedConv.id}&listing=${selectedConv.listing?.id}`)}
+                        className="flex-1"
+                      >
+                        💰 Make Trade Offer
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => router.push(`/purchase?listing=${selectedConv.listing?.id}`)}
+                        className="flex-1"
+                      >
+                        🛒 Purchase with Credits
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="border-t p-4">
                   <div className="flex gap-2">
                     <Input

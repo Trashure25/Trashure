@@ -70,9 +70,7 @@ export function HeroCarousel() {
             <CarouselItem key={index}>
               <div className="relative w-full h-[220px] md:h-[320px] bg-gray-100 flex items-center justify-center">
                 {/* Small circular element at bottom */}
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-white rounded-full border-2 border-gray-300 flex items-center justify-center">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-                </div>
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-gray-400 rounded-full shadow-sm"></div>
               </div>
             </CarouselItem>
           ))}

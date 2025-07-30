@@ -281,6 +281,50 @@ export default function ListingDetailPage() {
     handleAuthCheck(() => setIsTradeModalOpen(true))
   }
 
+  const handlePurchaseWithCredits = async () => {
+    handleAuthCheck(async () => {
+      if (!currentUser || !listing) return
+
+      if (currentUser.credits < listing.price) {
+        toast({
+          title: "Insufficient Credits",
+          description: `You need ${listing.price - currentUser.credits} more credits to purchase this item.`,
+          variant: "destructive",
+        })
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/listings/${listing.id}/purchase`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!response.ok) {
+          const error = await response.json()
+          throw new Error(error.error || 'Failed to purchase item')
+        }
+
+        toast({
+          title: "Purchase Successful!",
+          description: "Item has been purchased with credits.",
+        })
+
+        // Refresh the page to show updated status
+        window.location.reload()
+      } catch (error) {
+        console.error('Error purchasing item:', error)
+        toast({
+          title: "Purchase Failed",
+          description: error instanceof Error ? error.message : "Failed to purchase item. Please try again.",
+          variant: "destructive",
+        })
+      }
+    })
+  }
+
   if (loading) {
     return (
       <div className="container mx-auto py-12 px-4">
@@ -486,7 +530,16 @@ export default function ListingDetailPage() {
 
             {!isOwner && (
               <div className="space-y-3">
-                <Button onClick={handleMakeOffer} className="w-full" size="lg">
+                <Button 
+                  onClick={() => handlePurchaseWithCredits()} 
+                  className="w-full" 
+                  size="lg"
+                  variant="default"
+                  disabled={!currentUser || (currentUser && currentUser.credits < listing.price)}
+                >
+                  🛒 Purchase with {listing.price} Credits
+                </Button>
+                <Button onClick={handleMakeOffer} className="w-full" size="lg" variant="outline">
                   <Package className="w-4 h-4 mr-2" />
                   Make Trade Offer
                 </Button>
