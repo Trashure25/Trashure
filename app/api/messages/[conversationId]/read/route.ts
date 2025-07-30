@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma, withRetry, testDatabaseConnection } from '@/lib/prisma'
 import { getCurrentUserFromRequest } from '@/lib/auth-server'
 
+export const dynamic = 'force-dynamic';
+
 // POST /api/messages/[conversationId]/read - Mark messages as read
 export async function POST(
   request: NextRequest,

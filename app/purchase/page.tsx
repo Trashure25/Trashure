@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,7 +11,7 @@ import { listingsService, type Listing } from "@/lib/listings"
 import Image from "next/image"
 import { Label } from "@/components/ui/label"
 
-export default function PurchasePage() {
+function PurchasePageContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { toast } = useToast()
@@ -263,5 +263,19 @@ export default function PurchasePage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function PurchasePage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto py-12 px-4">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </div>
+    }>
+      <PurchasePageContent />
+    </Suspense>
   )
 }

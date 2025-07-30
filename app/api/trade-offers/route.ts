@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUserFromRequest } from '@/lib/auth-server'
 
+export const dynamic = 'force-dynamic';
+
 // Helper function to expire old trade offers
 async function expireOldTradeOffers() {
   await prisma.tradeOffer.updateMany({

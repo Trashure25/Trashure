@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma, withRetry, testDatabaseConnection } from '@/lib/prisma'
 import { getCurrentUserFromRequest } from '@/lib/auth-server'
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/admin/dashboard/stats - Get admin dashboard statistics
 export async function GET(request: NextRequest) {
   try {

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma, withRetry, testDatabaseConnection } from '@/lib/prisma'
 import { getCurrentUserFromRequest } from '@/lib/auth-server'
 
+export const dynamic = 'force-dynamic';
+
 // POST /api/users/credits - Update user credits
 export async function POST(request: NextRequest) {
   try {

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma, withRetry, testDatabaseConnection } from '@/lib/prisma'
 import { getCurrentUserFromRequest } from '@/lib/auth-server'
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/messages/unread-count - Get unread message count for a user
 export async function GET(request: NextRequest) {
   try {
