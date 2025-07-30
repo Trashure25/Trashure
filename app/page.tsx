@@ -78,7 +78,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Trending Items */}
           <div>
-            <div className="text-xs uppercase text-gray-400 mb-1">Most viewed and popular items</div>
+            <div className="text-xs uppercase text-gray-400 mb-1 truncate">Most viewed and popular items...</div>
             <div className="text-lg font-bold mb-2 text-black">Trending Items</div>
             <div className="grid grid-cols-2 gap-2">
               {loading ? (
@@ -89,16 +89,19 @@ export default function HomePage() {
               ) : trendingItems.length > 0 ? (
                 trendingItems.map((item, idx) => (
                   <div key={item.id} className="relative w-full aspect-square bg-gray-100 overflow-hidden">
-                    <img 
-                      src={item.images[0] || "/placeholder.jpg"} 
-                      alt={item.title} 
-                      className="object-cover w-full h-full" 
-                    />
-                    {idx === 3 && (
+                    {idx === 3 ? (
                       <Link href="/trending">
-                        <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs font-mono uppercase tracking-wider cursor-pointer hover:bg-black/70 transition-colors">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs font-mono uppercase tracking-wider cursor-pointer hover:bg-black/70 transition-colors">
                           + View More
-                        </span>
+                        </div>
+                      </Link>
+                    ) : (
+                      <Link href={`/listing/${item.id}`}>
+                        <img 
+                          src={item.images[0] || "/placeholder.jpg"} 
+                          alt={item.title} 
+                          className="object-cover w-full h-full cursor-pointer hover:scale-105 transition-transform duration-200" 
+                        />
                       </Link>
                     )}
                   </div>
@@ -122,7 +125,7 @@ export default function HomePage() {
 
           {/* Luxury Sector */}
           <div>
-            <div className="text-xs uppercase text-gray-400 mb-1">Louis Vuitton, Dior, Gucci, Prada, Saint Laurent, Balenciaga, Chanel, Miu Miu, Fendi, Celine, Bottega Veneta, Hermès, Givenchy, Valentino, Versace, Dolce & Gabbana, Alexander McQueen, Stella McCartney, Chloé, Loewe, Balmain +more</div>
+            <div className="text-xs uppercase text-gray-400 mb-1 truncate">Louis Vuitton, Dior, Gucci, Prada, Saint Laurent, Balenciaga, Chanel, Miu Miu, Fendi, Celine, Bottega Veneta, Hermès, Givenchy, Valentino, Versace, Dolce & Gabbana, Alexander McQueen, Stella McCartney, Chloé, Loewe, Balmain +more...</div>
             <div className="text-lg font-bold mb-2 text-black">Luxury Sector</div>
             <div className="grid grid-cols-2 gap-2">
               {loading ? (
@@ -133,16 +136,19 @@ export default function HomePage() {
               ) : luxuryItems.length > 0 ? (
                 luxuryItems.map((item, idx) => (
                   <div key={item.id} className="relative w-full aspect-square bg-gray-100 overflow-hidden">
-                    <img 
-                      src={item.images[0] || "/placeholder.jpg"} 
-                      alt={item.title} 
-                      className="object-cover w-full h-full" 
-                    />
-                    {idx === 3 && (
+                    {idx === 3 ? (
                       <Link href="/luxury">
-                        <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs font-mono uppercase tracking-wider cursor-pointer hover:bg-black/70 transition-colors">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs font-mono uppercase tracking-wider cursor-pointer hover:bg-black/70 transition-colors">
                           + View More
-                        </span>
+                        </div>
+                      </Link>
+                    ) : (
+                      <Link href={`/listing/${item.id}`}>
+                        <img 
+                          src={item.images[0] || "/placeholder.jpg"} 
+                          alt={item.title} 
+                          className="object-cover w-full h-full cursor-pointer hover:scale-105 transition-transform duration-200" 
+                        />
                       </Link>
                     )}
                   </div>
@@ -166,7 +172,7 @@ export default function HomePage() {
 
           {/* Vintage & Archive */}
           <div>
-            <div className="text-xs uppercase text-gray-400 mb-1">Vintage, Archive, Retro, Classic, Heritage, Legacy, 90s, 80s, 70s, 60s, 50s, 40s, 30s, 20s, Y2K, Millennium, Pre-2000, Old School, Throwback +more</div>
+            <div className="text-xs uppercase text-gray-400 mb-1 truncate">Vintage, Archive, Retro, Classic, Heritage, Legacy, 90s, 80s, 70s, 60s, 50s, 40s, 30s, 20s, Y2K, Millennium, Pre-2000, Old School, Throwback +more...</div>
             <div className="text-lg font-bold mb-2 text-black">Vintage & Archive</div>
             <div className="grid grid-cols-2 gap-2">
               {loading ? (
@@ -177,16 +183,19 @@ export default function HomePage() {
               ) : vintageItems.length > 0 ? (
                 vintageItems.map((item, idx) => (
                   <div key={item.id} className="relative w-full aspect-square bg-gray-100 overflow-hidden">
-                    <img 
-                      src={item.images[0] || "/placeholder.jpg"} 
-                      alt={item.title} 
-                      className="object-cover w-full h-full" 
-                    />
-                    {idx === 3 && (
+                    {idx === 3 ? (
                       <Link href="/vintage">
-                        <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs font-mono uppercase tracking-wider cursor-pointer hover:bg-black/70 transition-colors">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs font-mono uppercase tracking-wider cursor-pointer hover:bg-black/70 transition-colors">
                           + View More
-                        </span>
+                        </div>
+                      </Link>
+                    ) : (
+                      <Link href={`/listing/${item.id}`}>
+                        <img 
+                          src={item.images[0] || "/placeholder.jpg"} 
+                          alt={item.title} 
+                          className="object-cover w-full h-full cursor-pointer hover:scale-105 transition-transform duration-200" 
+                        />
                       </Link>
                     )}
                   </div>
