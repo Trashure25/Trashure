@@ -11,7 +11,9 @@ import { Badge } from "@/components/ui/badge"
 import { useRouter } from "next/navigation"
 import { MessageCircle, Send, Search, Loader2 } from "lucide-react"
 import { messagesService, type Conversation, type Message } from "@/lib/messages"
+import { listingsService, type Listing } from "@/lib/listings"
 import { toast } from "sonner"
+import TradeOfferModal from "@/components/trade-offer-modal"
 
 export default function MessagesPage() {
   const router = useRouter()
@@ -24,6 +26,9 @@ export default function MessagesPage() {
   const [newMessage, setNewMessage] = useState("")
   const [sending, setSending] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [isTradeModalOpen, setIsTradeModalOpen] = useState(false)
+  const [userListings, setUserListings] = useState<Listing[]>([])
+  const [targetListing, setTargetListing] = useState<Listing | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Fetch conversations
@@ -36,6 +41,42 @@ export default function MessagesPage() {
     } catch (error) {
       console.error('Failed to fetch conversations:', error)
       toast.error('Failed to load conversations')
+    }
+  }
+
+  // Fetch user listings for trade offers
+  const fetchUserListings = async () => {
+    if (!currentUser) return
+    
+    try {
+      const data = await listingsService.getUserListings(currentUser.id)
+      setUserListings(data.filter(listing => listing.status === 'active'))
+    } catch (error) {
+      console.error('Failed to fetch user listings:', error)
+      toast.error('Failed to load your listings')
+    }
+  }
+
+  // Handle trade offer button click
+  const handleMakeTradeOffer = async (listingId: string) => {
+    if (!currentUser) {
+      toast.error('Please log in to make trade offers')
+      return
+    }
+
+    try {
+      // Fetch the target listing
+      const listing = await listingsService.getListingById(listingId)
+      setTargetListing(listing)
+      
+      // Fetch user's active listings
+      await fetchUserListings()
+      
+      // Open the trade modal
+      setIsTradeModalOpen(true)
+    } catch (error) {
+      console.error('Failed to load listing for trade offer:', error)
+      toast.error('Failed to load listing details')
     }
   }
 
@@ -314,7 +355,7 @@ export default function MessagesPage() {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => router.push(`/trade-offer?conversation=${selectedConv.id}&listing=${selectedConv.listing?.id}`)}
+                        onClick={() => handleMakeTradeOffer(selectedConv.listing.id)}
                         className="flex-1"
                       >
                         💰 Make Trade Offer
@@ -365,6 +406,14 @@ export default function MessagesPage() {
           )}
         </Card>
       </div>
+      {targetListing && (
+        <TradeOfferModal
+          isOpen={isTradeModalOpen}
+          onOpenChange={setIsTradeModalOpen}
+          userListings={userListings}
+          targetListing={targetListing}
+        />
+      )}
     </div>
   )
 }
