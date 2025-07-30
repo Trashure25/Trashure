@@ -15,7 +15,7 @@ interface AuthContextType {
   currentUser: User | null
   isLoading: boolean
   login: (data: LoginData) => Promise<void>
-  signup: (data: SignupData) => Promise<void>
+  signup: (data: SignupData) => Promise<any>
   logout: () => Promise<void>
   updateProfile: (data: ProfileUpdateData) => Promise<void>
   changePassword: (data: PasswordChangeData) => Promise<void>
@@ -105,9 +105,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const result = await auth.signup(data)
       if (result.verificationLink) {
-        toast.success('Account created! Please check your email for verification link.')
         console.log('Verification link:', result.verificationLink)
+        return result // Return the result so the signup page can access the verification link
       }
+      return result
     } catch (error: any) {
       toast.error(error.message || 'Signup failed')
       throw error

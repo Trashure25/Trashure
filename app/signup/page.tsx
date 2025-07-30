@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "sonner"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -30,18 +31,82 @@ export default function SignupPage() {
     },
   })
 
+  const [signupSuccess, setSignupSuccess] = useState(false)
+  const [verificationLink, setVerificationLink] = useState<string | null>(null)
+
   const onSubmit = async (data: SignupData) => {
     try {
-      await signup(data)
-      toast.success("Account created successfully!", {
-        description: "Please log in to continue.",
-      })
-      router.push("/login")
+      const result = await signup(data)
+      if (result?.verificationLink) {
+        setVerificationLink(result.verificationLink)
+        setSignupSuccess(true)
+      } else {
+        toast.success("Account created successfully!", {
+          description: "Please check your email for verification link.",
+        })
+        router.push("/login")
+      }
     } catch (error: any) {
       toast.error("Signup Failed", {
         description: error?.message ?? "An unexpected error occurred.",
       })
     }
+  }
+
+  if (signupSuccess) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-green-600">Account Created!</CardTitle>
+            <CardDescription>Please verify your email address to continue.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-center space-y-2">
+              <p className="text-sm text-gray-600">
+                We've sent a verification link to your email address. Please check your inbox and click the verification link.
+              </p>
+              
+              {verificationLink && (
+                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-xs text-blue-800 mb-2 font-medium">Demo Verification Link:</p>
+                  <p className="text-xs text-blue-600 break-all">{verificationLink}</p>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(verificationLink);
+                      toast.success("Link copied to clipboard!");
+                    }}
+                    className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
+                  >
+                    Copy Link
+                  </button>
+                </div>
+              )}
+              
+              <div className="mt-4 space-y-2">
+                <Button 
+                  onClick={() => router.push("/login")} 
+                  className="w-full"
+                >
+                  Go to Login
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    setSignupSuccess(false);
+                    setVerificationLink(null);
+                    form.reset();
+                  }}
+                  className="w-full"
+                >
+                  Create Another Account
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
