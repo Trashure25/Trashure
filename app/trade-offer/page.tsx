@@ -56,7 +56,11 @@ export default function TradeOfferPage() {
         setTargetListing(listing)
         
         // Load conversation
-        const conv = await messagesService.getConversation(conversationId)
+        const conversations = await messagesService.getConversations(currentUser.id)
+        const conv = conversations.find(c => c.id === conversationId)
+        if (!conv) {
+          throw new Error('Conversation not found')
+        }
         setConversation(conv)
         
         // Load user's listings
