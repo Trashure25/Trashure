@@ -159,6 +159,31 @@ function TrashureNavbar() {
             <button type="submit" className="px-4 font-bold uppercase border-l border-gray-300 bg-white text-[#06402B] hover:bg-[#06402B] hover:text-white text-xs transition-colors">Search</button>
           </div>
         </form>
+        {/* Email Verification Banner */}
+        {currentUser && !currentUser.emailVerified && (
+          <div className="absolute top-full left-0 right-0 bg-yellow-50 border-b border-yellow-200 px-4 py-2 text-center">
+            <div className="flex items-center justify-center gap-2 text-sm text-yellow-800">
+              <span>⚠️ Please verify your email address to access all features</span>
+              <button 
+                onClick={async () => {
+                  try {
+                    await fetch('/api/auth/send-verification-email', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ email: currentUser.email })
+                    });
+                    alert('Verification email sent! Check your inbox.');
+                  } catch (error) {
+                    alert('Failed to send verification email. Please try again.');
+                  }
+                }}
+                className="text-yellow-600 hover:text-yellow-800 underline text-xs"
+              >
+                Resend
+              </button>
+            </div>
+          </div>
+        )}
         {/* Actions */}
         <div className="flex items-center gap-1">
           {isLoading ? (

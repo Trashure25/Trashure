@@ -42,6 +42,7 @@ export default function ProfilePage() {
   const router = useRouter()
   const { toast } = useToast()
   const [userListings, setUserListings] = useState<Listing[]>([])
+  const [favorites, setFavorites] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'listings' | 'favorites' | 'settings'>('overview')
 
@@ -60,6 +61,13 @@ export default function ProfilePage() {
         if (listingsResponse.ok) {
           const listingsData = await listingsResponse.json()
           setUserListings(listingsData.listings || listingsData)
+        }
+
+        // Fetch user's favorites
+        const favoritesResponse = await fetch('/api/favorites')
+        if (favoritesResponse.ok) {
+          const favoritesData = await favoritesResponse.json()
+          setFavorites(favoritesData.favorites || favoritesData || [])
         }
       } catch (error) {
         console.error('Failed to fetch user data:', error)
@@ -110,7 +118,7 @@ export default function ProfilePage() {
     totalListings: userListings.length,
     activeListings: userListings.filter(l => l.status === 'active').length,
     soldListings: userListings.filter(l => l.status === 'sold').length,
-    totalFavorites: 0, // TODO: Implement favorites count
+    totalFavorites: favorites.length,
     memberSince: currentUser ? new Date(currentUser.createdAt).toLocaleDateString() : ''
   }
 
@@ -197,7 +205,7 @@ export default function ProfilePage() {
 
                 <Separator />
 
-                <div className="grid grid-cols-2 gap-4 text-center">
+                <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
                     <div className="text-2xl font-bold text-blue-600">{userStats.totalListings}</div>
                     <div className="text-sm text-gray-600">Listings</div>
@@ -205,6 +213,10 @@ export default function ProfilePage() {
                   <div>
                     <div className="text-2xl font-bold text-green-600">{userStats.activeListings}</div>
                     <div className="text-sm text-gray-600">Active</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-red-600">{userStats.totalFavorites}</div>
+                    <div className="text-sm text-gray-600">Favorites</div>
                   </div>
                 </div>
 

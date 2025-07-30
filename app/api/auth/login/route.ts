@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma, withRetry, testDatabaseConnection } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,14 +32,29 @@ export async function POST(req: NextRequest) {
           lastName: true,
           avatarUrl: true,
           trustScore: true,
+          emailVerified: true,
           createdAt: true,
           updatedAt: true,
         }
       });
     });
 
-    if (!user || user.password !== password) {
+    if (!user) {
       return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
+    }
+
+    // Check if email is verified
+    if (!user.emailVerified) {
+      return NextResponse.json({ 
+        message: 'Please verify your email address before logging in. Check your inbox for a verification link.',
+        requiresVerification: true 
+      }, { status: 403 });
     }
 
     // Remove password from user object

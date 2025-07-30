@@ -88,12 +88,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // }, [reloadUser])
 
   const login = async (data: LoginData) => {
-    const user = await auth.login(data)
-    setCurrentUser(user)
+    try {
+      const user = await auth.login(data)
+      setCurrentUser(user)
+    } catch (error: any) {
+      if (error.message?.includes('verify your email')) {
+        toast.error('Please verify your email address before logging in. Check your inbox for a verification link.')
+      } else {
+        toast.error(error.message || 'Login failed')
+      }
+      throw error
+    }
   }
 
   const signup = async (data: SignupData) => {
-    await auth.signup(data)
+    try {
+      const result = await auth.signup(data)
+      if (result.verificationLink) {
+        toast.success('Account created! Please check your email for verification link.')
+        console.log('Verification link:', result.verificationLink)
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Signup failed')
+      throw error
+    }
   }
 
   const logout = async () => {

@@ -70,6 +70,7 @@ export interface User {
   role: string
   isBanned: boolean
   banReason?: string
+  emailVerified: boolean
   createdAt: string
   updatedAt: string
 }
@@ -190,7 +191,7 @@ export const auth = {
   },
 
   async requestPasswordReset(email: string): Promise<{ success: boolean; error?: string }> {
-    const response = await fetch('/api/auth/forgot-password', {
+    const response = await fetch('/api/auth/request-password-reset', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -221,8 +222,42 @@ export const auth = {
     }
   },
 
-  async resetPassword(data: { email: string; newPassword: string }): Promise<{ success: boolean; error?: string }> {
+  async resetPassword(data: { email: string; newPassword: string; token: string }): Promise<{ success: boolean; error?: string }> {
     const response = await fetch('/api/auth/reset-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return { success: false, error: error.message }
+    }
+
+    return { success: true }
+  },
+
+  async sendVerificationEmail(email: string): Promise<{ success: boolean; error?: string }> {
+    const response = await fetch('/api/auth/send-verification-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      return { success: false, error: error.message }
+    }
+
+    return { success: true }
+  },
+
+  async verifyEmail(data: { email: string; token: string }): Promise<{ success: boolean; error?: string }> {
+    const response = await fetch('/api/auth/verify-email', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

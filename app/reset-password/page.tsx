@@ -23,7 +23,7 @@ export default function ResetPasswordPage() {
   const [isValidLink, setIsValidLink] = useState(false)
 
   useEffect(() => {
-    if (email && token && token.startsWith("MOCK_RESET_")) {
+    if (email && token) {
       setIsValidLink(true)
     } else if (!email || !token) {
       setError("This password reset link is missing required information.")
@@ -56,7 +56,7 @@ export default function ResetPasswordPage() {
 
     setLoading(true)
     try {
-      const result = await auth.resetPassword({ email, newPassword: password })
+      const result = await auth.resetPassword({ email, newPassword: password, token })
       if (result.success) {
         setSuccess("Your password has been reset successfully! You will be redirected to the homepage shortly.")
         setTimeout(() => {

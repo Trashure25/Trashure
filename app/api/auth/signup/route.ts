@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma, withRetry, testDatabaseConnection } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,15 +37,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'User already exists' }, { status: 409 });
     }
 
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
     // Create new user with retry logic
     const newUser = await withRetry(async () => {
       return await prisma.user.create({
         data: {
           email,
-          password,
+          password: hashedPassword,
           username,
           firstName,
           lastName,
+          emailVerified: false, // Users start unverified
           // trustScore will use the default value of 70 from the schema
         },
         select: {
@@ -54,17 +60,37 @@ export async function POST(req: NextRequest) {
           lastName: true,
           avatarUrl: true,
           trustScore: true,
+          emailVerified: true,
           createdAt: true,
           updatedAt: true,
         }
       });
     });
 
+    // Create email verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    await prisma.emailVerificationToken.create({
+      data: {
+        userId: newUser.id,
+        token: verificationToken,
+        expiresAt
+      }
+    });
+
+    // Create verification link for demo purposes
+    const verificationLink = `${req.nextUrl.origin}/verify-email?token=${verificationToken}&email=${encodeURIComponent(email)}`;
+    console.log('Email verification link for demo:', verificationLink);
+
     // Create JWT
     const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET!, { expiresIn: '30d' });
 
     // Set cookie
-    const response = NextResponse.json(newUser);
+    const response = NextResponse.json({
+      ...newUser,
+      verificationLink // Remove this in production
+    });
     const secureFlag = process.env.NODE_ENV === 'production';
     response.cookies.set('trashure_jwt', token, {
       httpOnly: true,
