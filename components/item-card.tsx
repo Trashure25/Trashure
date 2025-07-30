@@ -14,6 +14,7 @@ interface ItemCardProps {
     imageUrl: string
     designer: string
     size: string
+    userId: string
     isNew?: boolean
   }
 }
@@ -23,6 +24,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
   const [isFavorited, setIsFavorited] = useState(false)
   const [favoriteId, setFavoriteId] = useState<string | null>(null)
   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false)
+  const [isPurchaseLoading, setIsPurchaseLoading] = useState(false)
 
   useEffect(() => {
     if (currentUser) {
@@ -87,6 +89,63 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
     }
   }
 
+  const handlePurchaseWithCredits = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    if (isPurchaseLoading) return // Prevent multiple rapid clicks
+    
+    if (!currentUser) {
+      toast({
+        title: "Please log in",
+        description: "You must be logged in to purchase items.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (currentUser.credits < item.price) {
+      toast({
+        title: "Insufficient credits",
+        description: `You need ${item.price - currentUser.credits} more credits to purchase this item.`,
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsPurchaseLoading(true)
+    try {
+      const response = await fetch(`/api/listings/${item.id}/purchase`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to purchase item')
+      }
+
+      toast({
+        title: "Purchase successful!",
+        description: "Item has been purchased with credits.",
+      })
+
+      // Refresh the page or update the UI
+      window.location.reload()
+    } catch (error) {
+      console.error('Error purchasing item:', error)
+      toast({
+        title: "Purchase failed",
+        description: error instanceof Error ? error.message : "Failed to purchase item. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsPurchaseLoading(false)
+    }
+  }
+
   return (
     <Link
       href={`/listing/${item.id}`}
@@ -113,10 +172,21 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item }) => {
         >
           <Heart className={`w-4 h-4 ${isFavorited ? "fill-red-500 text-red-500" : ""}`} />
         </Button>
+        {currentUser && currentUser.id !== item.userId && (
+          <Button
+            variant="default"
+            size="sm"
+            className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity bg-accent text-white"
+            onClick={handlePurchaseWithCredits}
+            disabled={isPurchaseLoading}
+          >
+            {isPurchaseLoading ? "Purchasing..." : `Buy ${item.price} credits`}
+          </Button>
+        )}
       </div>
       <div className="flex flex-col gap-1 p-4 bg-white rounded-b-2xl">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-lg font-bold text-gray-900">${item.price}</span>
+          <span className="text-lg font-bold text-gray-900">{item.price} Credits</span>
           <span className="text-xs text-gray-400 font-semibold uppercase tracking-wide">{item.size}</span>
         </div>
         <div className="text-base font-semibold text-gray-900 truncate" title={item.name}>{item.name}</div>

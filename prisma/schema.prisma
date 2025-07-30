@@ -18,6 +18,7 @@ model User {
   avatarUrl  String?
   trustScore Int      @default(70)
   credits    Int      @default(0)
+  manualCredits Int   @default(0) // Manually added credits (0-10000)
   role       String   @default("user") // user, admin, moderator
   isBanned   Boolean  @default(false)
   banReason  String?
@@ -34,6 +35,9 @@ model User {
   reportsReceived      Report[] @relation("ReportedUser")
   // Admin actions
   reportsReviewed      Report[] @relation("ReviewedByAdmin")
+  // Trade offers
+  tradeOffersSent      TradeOffer[] @relation("TradeOfferSender")
+  tradeOffersReceived  TradeOffer[] @relation("TradeOfferReceiver")
 
   @@index([email])
   @@index([username])
@@ -61,6 +65,9 @@ model Listing {
   favorites   Favorite[]
   // Messaging relationship
   conversations Conversation[]
+  // Trade offers
+  tradeOffersOffered TradeOffer[] @relation("OfferedListing")
+  tradeOffersRequested TradeOffer[] @relation("RequestedListing")
 
   @@index([userId])
   @@index([category])
@@ -101,6 +108,7 @@ model Conversation {
   user2     User     @relation("User2Conversations", fields: [user2Id], references: [id], onDelete: Cascade)
   listing   Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
   messages  Message[]
+  tradeOffers TradeOffer[]
 
   @@unique([user1Id, user2Id, listingId])
   @@index([user1Id])
@@ -152,4 +160,33 @@ model Report {
   @@index([status])
   @@index([createdAt])
   @@index([reviewedBy])
+}
+
+// Trade Offer model
+model TradeOffer {
+  id              String   @id @default(uuid())
+  conversationId  String
+  senderId        String
+  receiverId      String
+  offeredListingId String? // The listing being offered by sender
+  requestedListingId String // The listing being requested
+  additionalCredits Int    @default(0) // Additional credits needed
+  status          String   @default("pending") // pending, accepted, declined, expired
+  expiresAt       DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relationships
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender          User         @relation("TradeOfferSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver        User         @relation("TradeOfferReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  offeredListing  Listing?     @relation("OfferedListing", fields: [offeredListingId], references: [id], onDelete: SetNull)
+  requestedListing Listing     @relation("RequestedListing", fields: [requestedListingId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([createdAt])
 }

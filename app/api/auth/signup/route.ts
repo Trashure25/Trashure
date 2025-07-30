@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
           username,
           firstName,
           lastName,
-          trustScore: 0,
+          // trustScore will use the default value of 70 from the schema
         },
         select: {
           id: true,

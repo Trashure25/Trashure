@@ -14,10 +14,10 @@ export async function PATCH(
     }
 
     const { id } = params
-    const { action, banReason } = await request.json()
+    const { action, banReason, trustScore } = await request.json()
 
     // Validate action
-    if (!['ban', 'unban', 'promote', 'demote'].includes(action)) {
+    if (!['ban', 'unban', 'promote', 'demote', 'updateTrustScore'].includes(action)) {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
     }
 
@@ -58,6 +58,14 @@ export async function PATCH(
       case 'demote':
         updateData = {
           role: 'user'
+        }
+        break
+      case 'updateTrustScore':
+        if (typeof trustScore !== 'number' || trustScore < 0 || trustScore > 100) {
+          return NextResponse.json({ error: 'Invalid trust score' }, { status: 400 })
+        }
+        updateData = {
+          trustScore
         }
         break
     }

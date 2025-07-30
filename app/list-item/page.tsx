@@ -341,7 +341,8 @@ export default function ListItemPage() {
     )
   }
 
-  const isDetailsFormValid = formData.title && formData.description && formData.category && formData.condition
+  const isDetailsFormValid = formData.title && formData.description && formData.category && formData.condition && 
+    (pricingStatus === "evaluated" || (pricingStatus === "manual_fallback" && manualPrice && Number(manualPrice) > 0))
 
   return (
     <div className="container mx-auto py-12 px-4">
@@ -480,11 +481,53 @@ export default function ListItemPage() {
                   </div>
                 </div>
 
+                {/* --- Pricing Options --- */}
+                {pricingStatus === "idle" && (
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <h4 className="font-semibold text-gray-800 mb-2">Choose Pricing Method</h4>
+                      <p className="text-sm text-gray-600 mb-4">Select how you'd like to price your item</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-20 flex flex-col items-center justify-center space-y-2"
+                        onClick={() => setPricingStatus("evaluating")}
+                      >
+                        <Sparkles className="w-6 h-6" />
+                        <span className="font-medium">AI Price Evaluation</span>
+                        <span className="text-xs text-gray-500">Get an automatic estimate</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-20 flex flex-col items-center justify-center space-y-2"
+                        onClick={() => setPricingStatus("manual_fallback")}
+                      >
+                        <Plus className="w-6 h-6" />
+                        <span className="font-medium">Manual Pricing</span>
+                        <span className="text-xs text-gray-500">Set your own price</span>
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 {/* --- Dynamic Pricing Section --- */}
                 {pricingStatus === "evaluated" && evaluatedPrice !== null && (
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
                     <h4 className="font-semibold text-green-800">Estimated Value</h4>
                     <p className="text-2xl font-bold text-green-600">{evaluatedPrice} Credits</p>
+                    <div className="mt-4">
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => setPricingStatus("manual_fallback")}
+                        className="text-sm"
+                      >
+                        Set Manual Price Instead
+                      </Button>
+                    </div>
                   </div>
                 )}
                 {pricingStatus === "manual_fallback" && (
@@ -498,6 +541,18 @@ export default function ListItemPage() {
                       onChange={(e) => setManualPrice(e.target.value)}
                       required
                     />
+                    {evaluatedPrice !== null && (
+                      <div className="mt-2">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => setPricingStatus("evaluated")}
+                          className="text-sm"
+                        >
+                          Use AI Estimate ({evaluatedPrice} credits)
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
                 {/* --- End Dynamic Pricing Section --- */}
@@ -507,18 +562,18 @@ export default function ListItemPage() {
                     <ArrowLeft className="w-4 h-4 mr-2" /> Back
                   </Button>
 
-                  {pricingStatus === "idle" || pricingStatus === "evaluating" ? (
+                  {pricingStatus === "idle" ? (
+                    <div className="text-sm text-gray-500">
+                      Choose a pricing method above
+                    </div>
+                  ) : pricingStatus === "evaluating" ? (
                     <Button
                       type="submit"
                       className="w-48"
-                      disabled={!isDetailsFormValid || pricingStatus === "evaluating"}
+                      disabled={!isDetailsFormValid}
                     >
-                      {pricingStatus === "evaluating" ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Sparkles className="w-4 h-4 mr-2" />
-                      )}
-                      {pricingStatus === "evaluating" ? "Evaluating..." : "Evaluate Price"}
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Evaluating...
                     </Button>
                   ) : (
                     <Button type="button" onClick={handleConfirmAndList} className="w-48" disabled={isSubmitting}>

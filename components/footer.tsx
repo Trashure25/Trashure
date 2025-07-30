@@ -86,7 +86,7 @@ export function Footer() {
             <h3 className="font-semibold mb-4">Follow Us</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="https://instagram.com/trashure" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+                <Link href="https://instagram.com/trashure_app" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
                   Instagram
                 </Link>
               </li>

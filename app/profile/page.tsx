@@ -491,6 +491,49 @@ export default function ProfilePage() {
                       </Button>
                     </Link>
 
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Manual Credits (if you don't like AI evaluation)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          min="0"
+                          placeholder="Enter credits"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
+                          value={currentUser.manualCredits || 0}
+                          onChange={async (e) => {
+                            const value = parseInt(e.target.value) || 0
+                            try {
+                              const response = await fetch('/api/users/manual-credits', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ manualCredits: value })
+                              })
+                              if (response.ok) {
+                                toast({
+                                  title: "Manual credits updated",
+                                  description: "Your manual credits have been updated.",
+                                })
+                              }
+                            } catch (error) {
+                              toast({
+                                title: "Error",
+                                description: "Failed to update manual credits.",
+                                variant: "destructive",
+                              })
+                            }
+                          }}
+                        />
+                        <Button variant="outline" size="sm">
+                          Update
+                        </Button>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Current manual credits: {currentUser.manualCredits || 0}
+                      </p>
+                    </div>
+
                     <Link href="/messages">
                       <Button variant="outline" className="w-full justify-start">
                         <MessageCircle className="w-4 h-4 mr-2" />
