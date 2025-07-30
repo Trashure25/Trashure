@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
+import { sendVerificationEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,16 +53,23 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // In a real implementation, you would send an email here
-    // For now, we'll return the token in the response for demo purposes
+    // Create verification link
     const verificationLink = `${req.nextUrl.origin}/verify-email?token=${token}&email=${encodeURIComponent(email)}`;
     
-    console.log('Email verification link for demo:', verificationLink);
+    // Send verification email
+    const emailResult = await sendVerificationEmail(email, verificationLink, user.firstName);
+    
+    if (!emailResult.success) {
+      console.error('Failed to send verification email:', emailResult.error);
+      return NextResponse.json({ 
+        error: 'Failed to send verification email. Please try again.' 
+      }, { status: 500 });
+    }
 
     return NextResponse.json({ 
       success: true, 
       message: 'Verification email sent successfully.',
-      demoLink: verificationLink // Remove this in production
+      demoLink: verificationLink // Keep for demo purposes
     });
 
   } catch (error) {

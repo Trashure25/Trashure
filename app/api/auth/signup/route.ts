@@ -3,6 +3,7 @@ import { prisma, withRetry, testDatabaseConnection } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import { sendVerificationEmail } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
   try {
@@ -79,9 +80,16 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // Create verification link for demo purposes
+    // Create verification link
     const verificationLink = `${req.nextUrl.origin}/verify-email?token=${verificationToken}&email=${encodeURIComponent(email)}`;
-    console.log('Email verification link for demo:', verificationLink);
+    
+    // Send verification email
+    const emailResult = await sendVerificationEmail(email, verificationLink, firstName);
+    
+    if (!emailResult.success) {
+      console.error('Failed to send verification email:', emailResult.error);
+      // Continue with signup even if email fails - user can request resend later
+    }
 
     // Create JWT
     const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET!, { expiresIn: '30d' });
@@ -89,7 +97,7 @@ export async function POST(req: NextRequest) {
     // Set cookie
     const response = NextResponse.json({
       ...newUser,
-      verificationLink // Remove this in production
+      verificationLink // Keep for demo purposes
     });
     const secureFlag = process.env.NODE_ENV === 'production';
     response.cookies.set('trashure_jwt', token, {
