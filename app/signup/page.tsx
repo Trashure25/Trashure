@@ -39,9 +39,9 @@ export default function SignupPage() {
       return "Password must be at least 8 characters long"
     }
     
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]/
     if (!passwordRegex.test(password)) {
-      return "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)"
+      return "Password must contain at least one uppercase letter, one lowercase letter, and one number"
     }
     
     const weakPasswords = ['12345678', 'password', 'password123', 'qwerty', 'abc123', '123456789']
@@ -251,9 +251,7 @@ export default function SignupPage() {
                         <div className={/\d/.test(field.value) ? 'text-green-600' : 'text-red-600'}>
                           ✓ One number
                         </div>
-                        <div className={/[@$!%*?&]/.test(field.value) ? 'text-green-600' : 'text-red-600'}>
-                          ✓ One special character (@$!%*?&)
-                        </div>
+
                       </div>
                     )}
                   </FormItem>
