@@ -74,15 +74,7 @@ export async function POST(req: NextRequest) {
       maxAge: 60 * 60 * 24 * 30 // 30 days
     });
 
-    console.log('[LOGIN DEBUG] NODE_ENV:', process.env.NODE_ENV);
-    console.log('[LOGIN DEBUG] Setting cookie trashure_jwt:', token.slice(0, 10) + '...');
-    console.log('[LOGIN DEBUG] Cookie options:', {
-      httpOnly: true,
-      secure: secureFlag,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 30
-    });
+
 
     return response;
   } catch (error) {

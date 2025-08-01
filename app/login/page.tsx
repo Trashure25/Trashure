@@ -30,9 +30,15 @@ export default function LoginPage() {
       toast.success("Login successful! Redirecting …")
       router.push("/account-settings") // go straight to account settings
     } catch (error: any) {
-      toast.error("Login failed", {
-        description: error?.message ?? "Please check your credentials and try again.",
-      })
+      if (error?.message?.includes('verify your email')) {
+        toast.error("Email verification required", {
+          description: "Please verify your email address before logging in. Check your inbox for a verification link.",
+        })
+      } else {
+        toast.error("Login failed", {
+          description: error?.message ?? "Please check your credentials and try again.",
+        })
+      }
     }
   }
 

@@ -88,7 +88,6 @@ export async function GET(req: NextRequest) {
 
     // Test database connection first (but be lenient in development)
     const isConnected = await testDatabaseConnection();
-    console.log('Database connection test result:', isConnected);
     
     if (!isConnected && process.env.NODE_ENV === 'production') {
       console.error('Database connection failed, returning error')

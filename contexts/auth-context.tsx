@@ -51,20 +51,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const user = await auth.getCurrentUser()
         if (!isMounted) return
-        console.log('Auth context loaded user:', user)
+
         setCurrentUser(user)
       } catch (error: any) {
         if (!isMounted) return
-        console.log('Auth context error loading user:', error)
+
         setCurrentUser(null)
         // Edge case: session expired, user deleted, or invalid token
         if (error?.status === 401 || error?.message?.includes('Not authenticated')) {
-          console.log('Session expired or not authenticated')
+  
         }
       } finally {
         if (isMounted) {
           setIsLoading(false)
-          console.log('Auth context loading finished')
+
         }
       }
     }
@@ -92,11 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const user = await auth.login(data)
       setCurrentUser(user)
     } catch (error: any) {
-      if (error.message?.includes('verify your email')) {
-        toast.error('Please verify your email address before logging in. Check your inbox for a verification link.')
-      } else {
-        toast.error(error.message || 'Login failed')
-      }
+      // Don't show toast here - let the login page handle it
       throw error
     }
   }
@@ -105,7 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const result = await auth.signup(data)
       if (result.verificationLink) {
-        console.log('Verification link:', result.verificationLink)
+
         return result // Return the result so the signup page can access the verification link
       }
       return result
