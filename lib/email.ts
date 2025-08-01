@@ -39,9 +39,15 @@ const getProductionConfig = () => {
 export const sendVerificationEmail = async (email: string, verificationLink: string, firstName: string) => {
   try {
     // Get email configuration
-    const config = process.env.NODE_ENV === 'production' 
-      ? getProductionConfig() 
-      : await createTestAccount();
+    let config;
+    
+    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+      // Use production SMTP if credentials are provided
+      config = getProductionConfig();
+    } else if (process.env.NODE_ENV === 'development') {
+      // Fallback to test account for development
+      config = await createTestAccount();
+    }
 
     if (!config) {
       // Fallback: just log the email for development
@@ -54,7 +60,7 @@ export const sendVerificationEmail = async (email: string, verificationLink: str
     }
 
     // Create transporter
-    const transporter = nodemailer.createTransporter(config);
+    const transporter = nodemailer.createTransport(config);
 
     // Email content
     const mailOptions = {
@@ -156,9 +162,15 @@ The Trashure Team
 export const sendPasswordResetEmail = async (email: string, resetLink: string, firstName: string) => {
   try {
     // Get email configuration
-    const config = process.env.NODE_ENV === 'production' 
-      ? getProductionConfig() 
-      : await createTestAccount();
+    let config;
+    
+    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+      // Use production SMTP if credentials are provided
+      config = getProductionConfig();
+    } else if (process.env.NODE_ENV === 'development') {
+      // Fallback to test account for development
+      config = await createTestAccount();
+    }
 
     if (!config) {
       // Fallback: just log the email for development
@@ -171,7 +183,7 @@ export const sendPasswordResetEmail = async (email: string, resetLink: string, f
     }
 
     // Create transporter
-    const transporter = nodemailer.createTransporter(config);
+    const transporter = nodemailer.createTransport(config);
 
     // Email content
     const mailOptions = {

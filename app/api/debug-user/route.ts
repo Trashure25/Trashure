@@ -1,39 +1,61 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentUserFromRequest } from '@/lib/auth-server'
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const currentUser = await getCurrentUserFromRequest(request)
-    
-    if (!currentUser) {
-      return NextResponse.json({ 
-        authenticated: false,
-        message: 'Not authenticated'
-      })
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get('email');
+
+    if (!email) {
+      return NextResponse.json({ error: 'Email parameter is required' }, { status: 400 });
     }
 
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        emailVerified: true,
+        createdAt: true,
+        updatedAt: true,
+      }
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Check for verification tokens
+    const verificationTokens = await prisma.emailVerificationToken.findMany({
+      where: { userId: user.id },
+      select: {
+        id: true,
+        token: true,
+        expiresAt: true,
+        used: true,
+        createdAt: true,
+      }
+    });
+
     return NextResponse.json({
-      authenticated: true,
-      user: {
-        id: currentUser.id,
-        email: currentUser.email,
-        username: currentUser.username,
-        firstName: currentUser.firstName,
-        lastName: currentUser.lastName,
-        role: currentUser.role,
-        isBanned: currentUser.isBanned,
-        trustScore: currentUser.trustScore
-      },
-      isAdmin: currentUser.role === 'admin',
-      message: `User role: ${currentUser.role}`
-    })
+      user,
+      verificationTokens,
+      debug: {
+        emailVerified: user.emailVerified,
+        tokenCount: verificationTokens.length,
+        usedTokens: verificationTokens.filter(t => t.used).length,
+        unusedTokens: verificationTokens.filter(t => !t.used).length,
+        expiredTokens: verificationTokens.filter(t => t.expiresAt < new Date()).length,
+      }
+    });
+
   } catch (error) {
-    console.error('Error in debug-user:', error)
+    console.error('Debug user error:', error);
     return NextResponse.json({ 
-      authenticated: false,
-      error: 'Failed to get user info'
-    })
+      error: 'An error occurred while debugging user.' 
+    }, { status: 500 });
   }
 } 
