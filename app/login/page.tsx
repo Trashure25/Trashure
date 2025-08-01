@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { useState } from "react"
+import { Eye, EyeOff } from "lucide-react"
 
 import { useAuth } from "@/contexts/auth-context"
 // Zod removed – we’ll do plain HTML/React-Hook-Form validation
@@ -16,6 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 export default function LoginPage() {
   const router = useRouter()
   const { login } = useAuth()
+  const [showPassword, setShowPassword] = useState(false)
 
   // ─── RHF & Zod setup ────────────────────────────────────────────────────────
   type LoginFormValues = { email: string; password: string }
@@ -74,7 +77,28 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} required minLength={1} />
+                      <div className="relative">
+                        <Input 
+                          type={showPassword ? "text" : "password"} 
+                          placeholder="••••••••" 
+                          {...field} 
+                          required 
+                          minLength={1} 
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </FormControl>
                     {form.formState.errors.password && (
                       <p className="text-xs text-red-600">{form.formState.errors.password.message}</p>

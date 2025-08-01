@@ -155,7 +155,7 @@ The Trashure Team
     console.log('Verification Link:', verificationLink);
     console.log('============================================');
     
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 };
 
@@ -278,6 +278,6 @@ The Trashure Team
     console.log('Reset Link:', resetLink);
     console.log('==========================================');
     
-    return { success: false, error: error.message };
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }; 

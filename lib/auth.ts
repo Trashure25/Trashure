@@ -63,7 +63,6 @@ export interface User {
   lastName: string
   username: string
   email: string
-  passwordHash: string
   avatarUrl?: string
   trustScore: number
   credits: number
@@ -107,7 +106,8 @@ export const auth = {
       const error = await response.json()
       throw new Error(error.message || 'Invalid email or password')
     }
-    return await response.json()
+    const user = await response.json()
+    return user
   },
 
   async logout(): Promise<void> {

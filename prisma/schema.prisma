@@ -37,6 +37,7 @@ model User {
   reportsReviewed           Report[]                  @relation("ReviewedByAdmin")
   tradeOffersReceived       TradeOffer[]              @relation("TradeOfferReceiver")
   tradeOffersSent           TradeOffer[]              @relation("TradeOfferSender")
+  savedSearches             SavedSearch[]
 
   @@index([email])
   @@index([username])
@@ -60,6 +61,20 @@ model Listing {
   status               String         @default("active")
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
+  
+  // Advanced search fields
+  style                String?        // luxury, vintage, avant-garde, streetwear, workwear, gorpcore, sportswear, basics, western
+  color                String?        // primary color
+  material             String?        // cotton, leather, denim, etc.
+  season               String?        // spring, summer, fall, winter
+  era                  String?        // 90s, 2000s, 2010s, etc.
+  releaseYear          Int?           // for sneakers and limited items
+  collaboration        String?        // collaboration details
+  exclusivity          String?        // limited edition, rare, exclusive, etc.
+  department           String?        // menswear, womenswear, unisex
+  location             String?        // country/region
+  designer             String?        // specific designer name
+  
   conversations        Conversation[]
   favorites            Favorite[]
   user                 User           @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -75,6 +90,15 @@ model Listing {
   @@index([category, status])
   @@index([userId, status])
   @@index([category, brand])
+  @@index([style])
+  @@index([color])
+  @@index([material])
+  @@index([season])
+  @@index([era])
+  @@index([releaseYear])
+  @@index([department])
+  @@index([location])
+  @@index([designer])
 }
 
 model Favorite {
@@ -205,4 +229,20 @@ model EmailVerificationToken {
   @@index([token])
   @@index([expiresAt])
   @@index([used])
+}
+
+model SavedSearch {
+  id          String   @id @default(uuid())
+  userId      String
+  name        String
+  query       String
+  filters     Json     // Store all search filters as JSON
+  emailNotifications Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([emailNotifications])
 }

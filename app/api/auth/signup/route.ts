@@ -22,6 +22,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'All fields are required' }, { status: 400 });
     }
 
+    // Password validation
+    if (password.length < 8) {
+      return NextResponse.json({ message: 'Password must be at least 8 characters long' }, { status: 400 });
+    }
+
+    // Check for at least one uppercase letter, one lowercase letter, one number, and one special character
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+    if (!passwordRegex.test(password)) {
+      return NextResponse.json({ 
+        message: 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)' 
+      }, { status: 400 });
+    }
+
+    // Check for common weak passwords
+    const weakPasswords = ['12345678', 'password', 'password123', 'qwerty', 'abc123', '123456789'];
+    if (weakPasswords.includes(password.toLowerCase())) {
+      return NextResponse.json({ message: 'Please choose a stronger password' }, { status: 400 });
+    }
+
     // Check if user already exists
     const existingUser = await withRetry(async () => {
       return await prisma.user.findFirst({

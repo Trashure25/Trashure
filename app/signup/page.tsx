@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "sonner"
 import { useState } from "react"
+import { Eye, EyeOff } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -29,10 +30,32 @@ export default function SignupPage() {
       password: "",
       confirmPassword: "",
     },
+    mode: "onChange",
   })
+
+  // Custom password validation
+  const validatePassword = (password: string) => {
+    if (password.length < 8) {
+      return "Password must be at least 8 characters long"
+    }
+    
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/
+    if (!passwordRegex.test(password)) {
+      return "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)"
+    }
+    
+    const weakPasswords = ['12345678', 'password', 'password123', 'qwerty', 'abc123', '123456789']
+    if (weakPasswords.includes(password.toLowerCase())) {
+      return "Please choose a stronger password"
+    }
+    
+    return true
+  }
 
   const [signupSuccess, setSignupSuccess] = useState(false)
   const [verificationLink, setVerificationLink] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const onSubmit = async (data: SignupData) => {
     try {
@@ -183,9 +206,56 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <div className="relative">
+                        <Input 
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••" 
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            const validation = validatePassword(e.target.value)
+                            if (validation !== true) {
+                              form.setError('password', { message: validation })
+                            } else {
+                              form.clearErrors('password')
+                            }
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
+                    {field.value && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        <div className={field.value.length >= 8 ? 'text-green-600' : 'text-red-600'}>
+                          ✓ At least 8 characters
+                        </div>
+                        <div className={/[A-Z]/.test(field.value) ? 'text-green-600' : 'text-red-600'}>
+                          ✓ One uppercase letter
+                        </div>
+                        <div className={/[a-z]/.test(field.value) ? 'text-green-600' : 'text-red-600'}>
+                          ✓ One lowercase letter
+                        </div>
+                        <div className={/\d/.test(field.value) ? 'text-green-600' : 'text-red-600'}>
+                          ✓ One number
+                        </div>
+                        <div className={/[@$!%*?&]/.test(field.value) ? 'text-green-600' : 'text-red-600'}>
+                          ✓ One special character (@$!%*?&)
+                        </div>
+                      </div>
+                    )}
                   </FormItem>
                 )}
               />
@@ -197,7 +267,35 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <div className="relative">
+                        <Input 
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="••••••••" 
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            const password = form.getValues('password')
+                            if (e.target.value !== password) {
+                              form.setError('confirmPassword', { message: 'Passwords do not match' })
+                            } else {
+                              form.clearErrors('confirmPassword')
+                            }
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

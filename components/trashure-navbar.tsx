@@ -10,6 +10,7 @@ import { useState, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 import { MessageCircle } from "lucide-react"
 import { CreditCard } from "lucide-react"
+import { NavbarSearch } from "@/components/navbar-search"
 
 function TrashureNavbar() {
   const { currentUser, logout, reloadUser, isLoading } = useAuth()
@@ -145,20 +146,7 @@ function TrashureNavbar() {
           <Image src="/trashure-wordmark.png" alt="Trashure logo" width={80} height={20} priority style={{ background: 'transparent' }} />
         </Link>
         {/* Search Bar */}
-        <form className="flex-1 flex justify-center" onSubmit={e => { e.preventDefault(); const q = e.currentTarget.query.value.trim(); if(q) window.location.href = `/search?q=${encodeURIComponent(q)}`; }}>
-          <div className="flex w-full max-w-sm border border-gray-300 rounded-full overflow-hidden h-9 relative focus-within:border-accent focus-within:ring-2 focus-within:ring-accent focus-within:ring-offset-0 transition-all">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-[#06402B]" />
-            </span>
-            <input
-              name="query"
-              type="search"
-              placeholder="Search for anything"
-              className="flex-1 pl-10 pr-4 py-2 text-sm bg-white focus:outline-none border-none rounded-none placeholder:text-gray-400"
-            />
-            <button type="submit" className="px-4 font-bold uppercase border-l border-gray-300 bg-white text-[#06402B] hover:bg-[#06402B] hover:text-white text-xs transition-colors">Search</button>
-          </div>
-        </form>
+        <NavbarSearch />
         {/* Email Verification Banner */}
         {currentUser && !currentUser.emailVerified && (
           <div className="absolute top-full left-0 right-0 bg-yellow-50 border-b border-yellow-200 px-4 py-2 text-center">
