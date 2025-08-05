@@ -63,8 +63,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Password reset link sent successfully.',
-      demoLink: resetLink // Keep for demo purposes
+      message: 'Password reset link sent successfully.'
     });
 
   } catch (error) {
