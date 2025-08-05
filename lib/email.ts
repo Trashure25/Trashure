@@ -43,7 +43,15 @@ export const sendVerificationEmail = async (email: string, verificationLink: str
     
     // Priority 1: Use production SMTP if credentials are provided
     if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-      config = getProductionConfig();
+      config = {
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      };
       console.log('Using production SMTP configuration');
     }
     // Priority 2: Use Gmail SMTP with app password
@@ -160,7 +168,15 @@ export const sendPasswordResetEmail = async (email: string, resetLink: string, f
     
     // Priority 1: Use production SMTP if credentials are provided
     if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-      config = getProductionConfig();
+      config = {
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      };
       console.log('Using production SMTP configuration for password reset');
     }
     // Priority 2: Use Gmail SMTP with app password
