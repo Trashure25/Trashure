@@ -41,16 +41,13 @@ export const sendVerificationEmail = async (email: string, verificationLink: str
     // Get email configuration
     let config;
     
+    // Priority 1: Use production SMTP if credentials are provided
     if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-      // Use production SMTP if credentials are provided
       config = getProductionConfig();
-    } else if (process.env.NODE_ENV === 'development') {
-      // Try to create test account for development
-      config = await createTestAccount();
+      console.log('Using production SMTP configuration');
     }
-
-    // If no config available, try to use Gmail SMTP with environment variables
-    if (!config && process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    // Priority 2: Use Gmail SMTP with app password
+    else if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
       config = {
         host: 'smtp.gmail.com',
         port: 587,
@@ -60,6 +57,12 @@ export const sendVerificationEmail = async (email: string, verificationLink: str
           pass: process.env.GMAIL_APP_PASSWORD,
         },
       };
+      console.log('Using Gmail SMTP configuration');
+    }
+    // Priority 3: Try to create test account for development (only if no other config)
+    else if (process.env.NODE_ENV === 'development') {
+      config = await createTestAccount();
+      console.log('Using development test account');
     }
 
     if (!config) {
@@ -147,6 +150,7 @@ The Trashure Team
     };
 
     // Send email
+    console.log('Attempting to send email to:', email);
     const info = await transporter.sendMail(mailOptions);
     
     console.log('Email sent successfully:', info.messageId);
@@ -160,6 +164,21 @@ The Trashure Team
     
   } catch (error) {
     console.error('Failed to send verification email:', error);
+    
+    // Log specific error details
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      
+      // Check for common SMTP errors
+      if (error.message.includes('Invalid login')) {
+        console.error('SMTP Authentication failed - check your username and password');
+      } else if (error.message.includes('Connection timeout')) {
+        console.error('SMTP Connection timeout - check your host and port');
+      } else if (error.message.includes('ENOTFOUND')) {
+        console.error('SMTP Host not found - check your SMTP_HOST');
+      }
+    }
     
     // Fallback: log the email for debugging
     console.log('=== EMAIL VERIFICATION (Fallback Mode) ===');
@@ -177,16 +196,13 @@ export const sendPasswordResetEmail = async (email: string, resetLink: string, f
     // Get email configuration
     let config;
     
+    // Priority 1: Use production SMTP if credentials are provided
     if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-      // Use production SMTP if credentials are provided
       config = getProductionConfig();
-    } else if (process.env.NODE_ENV === 'development') {
-      // Try to create test account for development
-      config = await createTestAccount();
+      console.log('Using production SMTP configuration for password reset');
     }
-
-    // If no config available, try to use Gmail SMTP with environment variables
-    if (!config && process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    // Priority 2: Use Gmail SMTP with app password
+    else if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
       config = {
         host: 'smtp.gmail.com',
         port: 587,
@@ -196,6 +212,12 @@ export const sendPasswordResetEmail = async (email: string, resetLink: string, f
           pass: process.env.GMAIL_APP_PASSWORD,
         },
       };
+      console.log('Using Gmail SMTP configuration for password reset');
+    }
+    // Priority 3: Try to create test account for development (only if no other config)
+    else if (process.env.NODE_ENV === 'development') {
+      config = await createTestAccount();
+      console.log('Using development test account for password reset');
     }
 
     if (!config) {
@@ -283,6 +305,7 @@ The Trashure Team
     };
 
     // Send email
+    console.log('Attempting to send password reset email to:', email);
     const info = await transporter.sendMail(mailOptions);
     
     console.log('Password reset email sent successfully:', info.messageId);
@@ -296,6 +319,21 @@ The Trashure Team
     
   } catch (error) {
     console.error('Failed to send password reset email:', error);
+    
+    // Log specific error details
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      
+      // Check for common SMTP errors
+      if (error.message.includes('Invalid login')) {
+        console.error('SMTP Authentication failed - check your username and password');
+      } else if (error.message.includes('Connection timeout')) {
+        console.error('SMTP Connection timeout - check your host and port');
+      } else if (error.message.includes('ENOTFOUND')) {
+        console.error('SMTP Host not found - check your SMTP_HOST');
+      }
+    }
     
     // Fallback: log the email for debugging
     console.log('=== PASSWORD RESET (Fallback Mode) ===');
