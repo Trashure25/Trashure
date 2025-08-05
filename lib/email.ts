@@ -80,7 +80,7 @@ export const sendVerificationEmail = async (email: string, verificationLink: str
 
     // Email content
     const mailOptions = {
-      from: process.env.SMTP_FROM || '"Trashure" <noreply@trashure.com>',
+      from: process.env.SMTP_USER || 'noreply@trashure.com', // Use simple email address
       to: email,
       subject: 'Verify your Trashure account',
       html: `
@@ -235,7 +235,7 @@ export const sendPasswordResetEmail = async (email: string, resetLink: string, f
 
     // Email content
     const mailOptions = {
-      from: process.env.SMTP_FROM || '"Trashure" <noreply@trashure.com>',
+      from: process.env.SMTP_USER || 'noreply@trashure.com', // Use simple email address
       to: email,
       subject: 'Reset your Trashure password',
       html: `
