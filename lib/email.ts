@@ -85,52 +85,14 @@ export const sendVerificationEmail = async (email: string, verificationLink: str
       subject: 'Verify your Trashure account',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white;">
-            <h1 style="margin: 0; font-size: 28px;">Welcome to Trashure!</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px;">Your sustainable fashion marketplace</p>
-          </div>
-          
-          <div style="padding: 30px; background: #f9f9f9;">
-            <h2 style="color: #333; margin-bottom: 20px;">Hi ${firstName}!</h2>
-            
-            <p style="color: #666; line-height: 1.6; margin-bottom: 25px;">
-              Thank you for creating your Trashure account! To start trading your treasures, 
-              please verify your email address by clicking the button below.
-            </p>
-            
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${verificationLink}" 
-                 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                        color: white; 
-                        padding: 15px 30px; 
-                        text-decoration: none; 
-                        border-radius: 25px; 
-                        display: inline-block; 
-                        font-weight: bold;
-                        font-size: 16px;">
-                Verify Email Address
-              </a>
-            </div>
-            
-            <p style="color: #666; line-height: 1.6; margin-bottom: 15px;">
-              If the button doesn't work, you can copy and paste this link into your browser:
-            </p>
-            
-            <p style="background: #e9ecef; padding: 15px; border-radius: 5px; word-break: break-all; color: #495057;">
-              <a href="${verificationLink}" style="color: #667eea;">${verificationLink}</a>
-            </p>
-            
-            <p style="color: #666; line-height: 1.6; margin-top: 25px; font-size: 14px;">
-              This verification link will expire in 24 hours. If you didn't create a Trashure account, 
-              you can safely ignore this email.
-            </p>
-          </div>
-          
-          <div style="background: #333; padding: 20px; text-align: center; color: white;">
-            <p style="margin: 0; font-size: 14px;">
-              © 2024 Trashure. All rights reserved.
-            </p>
-          </div>
+          <h1>Welcome to Trashure!</h1>
+          <p>Hi ${firstName}!</p>
+          <p>Thank you for creating your Trashure account! To start trading your treasures, please verify your email address by clicking the link below:</p>
+          <p><a href="${verificationLink}">Verify Email Address</a></p>
+          <p>If the link doesn't work, copy and paste this into your browser:</p>
+          <p>${verificationLink}</p>
+          <p>This verification link will expire in 24 hours.</p>
+          <p>Best regards,<br>The Trashure Team</p>
         </div>
       `,
       text: `
@@ -240,52 +202,14 @@ export const sendPasswordResetEmail = async (email: string, resetLink: string, f
       subject: 'Reset your Trashure password',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white;">
-            <h1 style="margin: 0; font-size: 28px;">Password Reset</h1>
-            <p style="margin: 10px 0 0 0; font-size: 16px;">Trashure Account Security</p>
-          </div>
-          
-          <div style="padding: 30px; background: #f9f9f9;">
-            <h2 style="color: #333; margin-bottom: 20px;">Hi ${firstName}!</h2>
-            
-            <p style="color: #666; line-height: 1.6; margin-bottom: 25px;">
-              We received a request to reset your Trashure account password. 
-              Click the button below to create a new password.
-            </p>
-            
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${resetLink}" 
-                 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                        color: white; 
-                        padding: 15px 30px; 
-                        text-decoration: none; 
-                        border-radius: 25px; 
-                        display: inline-block; 
-                        font-weight: bold;
-                        font-size: 16px;">
-                Reset Password
-              </a>
-            </div>
-            
-            <p style="color: #666; line-height: 1.6; margin-bottom: 15px;">
-              If the button doesn't work, you can copy and paste this link into your browser:
-            </p>
-            
-            <p style="background: #e9ecef; padding: 15px; border-radius: 5px; word-break: break-all; color: #495057;">
-              <a href="${resetLink}" style="color: #667eea;">${resetLink}</a>
-            </p>
-            
-            <p style="color: #666; line-height: 1.6; margin-top: 25px; font-size: 14px;">
-              This reset link will expire in 24 hours. If you didn't request a password reset, 
-              you can safely ignore this email.
-            </p>
-          </div>
-          
-          <div style="background: #333; padding: 20px; text-align: center; color: white;">
-            <p style="margin: 0; font-size: 14px;">
-              © 2024 Trashure. All rights reserved.
-            </p>
-          </div>
+          <h1>Password Reset</h1>
+          <p>Hi ${firstName}!</p>
+          <p>We received a request to reset your Trashure account password. Click the link below to create a new password:</p>
+          <p><a href="${resetLink}">Reset Password</a></p>
+          <p>If the link doesn't work, copy and paste this into your browser:</p>
+          <p>${resetLink}</p>
+          <p>This reset link will expire in 24 hours. If you didn't request a password reset, you can safely ignore this email.</p>
+          <p>Best regards,<br>The Trashure Team</p>
         </div>
       `,
       text: `
