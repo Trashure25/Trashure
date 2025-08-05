@@ -53,22 +53,13 @@ export default function SignupPage() {
   }
 
   const [signupSuccess, setSignupSuccess] = useState(false)
-  const [verificationLink, setVerificationLink] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const onSubmit = async (data: SignupData) => {
     try {
-      const result = await signup(data)
-      if (result?.verificationLink) {
-        setVerificationLink(result.verificationLink)
-        setSignupSuccess(true)
-      } else {
-        toast.success("Account created successfully!", {
-          description: "Please check your email for verification link.",
-        })
-        router.push("/login")
-      }
+      await signup(data)
+      setSignupSuccess(true)
     } catch (error: any) {
       toast.error("Signup Failed", {
         description: error?.message ?? "An unexpected error occurred.",
@@ -90,21 +81,7 @@ export default function SignupPage() {
                 We've sent a verification link to your email address. Please check your inbox and click the verification link.
               </p>
               
-              {verificationLink && (
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-xs text-blue-800 mb-2 font-medium">Demo Verification Link:</p>
-                  <p className="text-xs text-blue-600 break-all">{verificationLink}</p>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(verificationLink);
-                      toast.success("Link copied to clipboard!");
-                    }}
-                    className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
-                  >
-                    Copy Link
-                  </button>
-                </div>
-              )}
+
               
               <div className="mt-4 space-y-2">
                 <Button 
@@ -117,7 +94,6 @@ export default function SignupPage() {
                   variant="outline"
                   onClick={() => {
                     setSignupSuccess(false);
-                    setVerificationLink(null);
                     form.reset();
                   }}
                   className="w-full"

@@ -68,8 +68,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Verification email sent successfully.',
-      demoLink: verificationLink // Keep for demo purposes
+      message: 'Verification email sent successfully.'
     });
 
   } catch (error) {

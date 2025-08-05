@@ -115,8 +115,7 @@ export async function POST(req: NextRequest) {
 
     // Set cookie
     const response = NextResponse.json({
-      ...newUser,
-      verificationLink // Keep for demo purposes
+      ...newUser
     });
     const secureFlag = process.env.NODE_ENV === 'production';
     response.cookies.set('trashure_jwt', token, {

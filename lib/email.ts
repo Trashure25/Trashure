@@ -45,12 +45,25 @@ export const sendVerificationEmail = async (email: string, verificationLink: str
       // Use production SMTP if credentials are provided
       config = getProductionConfig();
     } else if (process.env.NODE_ENV === 'development') {
-      // Fallback to test account for development
+      // Try to create test account for development
       config = await createTestAccount();
     }
 
+    // If no config available, try to use Gmail SMTP with environment variables
+    if (!config && process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+      config = {
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_APP_PASSWORD,
+        },
+      };
+    }
+
     if (!config) {
-      // Fallback: just log the email for development
+      // Final fallback: just log the email for development
       console.log('=== EMAIL VERIFICATION (Development Mode) ===');
       console.log('To:', email);
       console.log('Subject: Verify your Trashure account');
@@ -168,12 +181,25 @@ export const sendPasswordResetEmail = async (email: string, resetLink: string, f
       // Use production SMTP if credentials are provided
       config = getProductionConfig();
     } else if (process.env.NODE_ENV === 'development') {
-      // Fallback to test account for development
+      // Try to create test account for development
       config = await createTestAccount();
     }
 
+    // If no config available, try to use Gmail SMTP with environment variables
+    if (!config && process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+      config = {
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_APP_PASSWORD,
+        },
+      };
+    }
+
     if (!config) {
-      // Fallback: just log the email for development
+      // Final fallback: just log the email for development
       console.log('=== PASSWORD RESET (Development Mode) ===');
       console.log('To:', email);
       console.log('Subject: Reset your Trashure password');

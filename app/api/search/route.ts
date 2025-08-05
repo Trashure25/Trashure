@@ -49,22 +49,67 @@ export async function GET(req: NextRequest) {
       ];
     }
     
-    // Apply filters
-    if (category) where.category = category;
-    if (brand) where.brand = brand;
-    if (designer) where.designer = designer;
-    if (condition) where.condition = condition;
-    if (size) where.size = size;
-    if (style) where.style = style;
-    if (color) where.color = color;
-    if (material) where.material = material;
-    if (season) where.season = season;
-    if (era) where.era = era;
-    if (releaseYear) where.releaseYear = parseInt(releaseYear);
-    if (collaboration) where.collaboration = { contains: collaboration, mode: 'insensitive' };
-    if (exclusivity) where.exclusivity = exclusivity;
-    if (department) where.department = department;
-    if (location) where.location = location;
+    // Apply filters - handle arrays of values
+    if (category) {
+      const categories = category.split(',');
+      where.category = { in: categories };
+    }
+    if (brand) {
+      const brands = brand.split(',');
+      where.brand = { in: brands };
+    }
+    if (designer) {
+      const designers = designer.split(',');
+      where.designer = { in: designers };
+    }
+    if (condition) {
+      const conditions = condition.split(',');
+      where.condition = { in: conditions };
+    }
+    if (size) {
+      const sizes = size.split(',');
+      where.size = { in: sizes };
+    }
+    if (style) {
+      const styles = style.split(',');
+      where.style = { in: styles };
+    }
+    if (color) {
+      const colors = color.split(',');
+      where.color = { in: colors };
+    }
+    if (material) {
+      const materials = material.split(',');
+      where.material = { in: materials };
+    }
+    if (season) {
+      const seasons = season.split(',');
+      where.season = { in: seasons };
+    }
+    if (era) {
+      const eras = era.split(',');
+      where.era = { in: eras };
+    }
+    if (releaseYear) {
+      const years = releaseYear.split(',').map(y => parseInt(y));
+      where.releaseYear = { in: years };
+    }
+    if (collaboration) {
+      const collaborations = collaboration.split(',');
+      where.collaboration = { in: collaborations };
+    }
+    if (exclusivity) {
+      const exclusivities = exclusivity.split(',');
+      where.exclusivity = { in: exclusivities };
+    }
+    if (department) {
+      const departments = department.split(',');
+      where.department = { in: departments };
+    }
+    if (location) {
+      const locations = location.split(',');
+      where.location = { in: locations };
+    }
     
     // Price range
     if (minPrice || maxPrice) {

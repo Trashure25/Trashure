@@ -321,6 +321,26 @@ export function AdvancedSearch() {
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
           </Button>
           
+          <Select
+            value={searchParams.get('sortBy') || 'newest'}
+            onValueChange={(value) => {
+              const params = new URLSearchParams(searchParams.toString());
+              params.set('sortBy', value);
+              router.push(`/search?${params.toString()}`);
+            }}
+          >
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Newest</SelectItem>
+              <SelectItem value="oldest">Oldest</SelectItem>
+              <SelectItem value="price-low">Price: Low to High</SelectItem>
+              <SelectItem value="price-high">Price: High to Low</SelectItem>
+              <SelectItem value="name">Name: A-Z</SelectItem>
+            </SelectContent>
+          </Select>
+          
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
@@ -425,6 +445,25 @@ export function AdvancedSearch() {
                 </div>
               </div>
 
+              {/* Brand */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">Brand</label>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {['Nike', 'Adidas', 'Jordan', 'Supreme', 'Palace', 'Off-White', 'Balenciaga', 'Gucci', 'Louis Vuitton', 'Vintage', 'Maison Margiela'].map(brand => (
+                    <div key={brand} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`brand-${brand}`}
+                        checked={filters.brand.includes(brand)}
+                        onCheckedChange={() => handleFilterChange('brand', brand)}
+                      />
+                      <label htmlFor={`brand-${brand}`} className="text-sm">
+                        {brand}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Condition */}
               <div>
                 <label className="text-sm font-medium mb-2 block">Condition</label>
@@ -514,6 +553,63 @@ export function AdvancedSearch() {
                       />
                       <label htmlFor={`era-${era}`} className="text-sm">
                         {era}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Size */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">Size</label>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'].map(size => (
+                    <div key={size} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`size-${size}`}
+                        checked={filters.size.includes(size)}
+                        onCheckedChange={() => handleFilterChange('size', size)}
+                      />
+                      <label htmlFor={`size-${size}`} className="text-sm">
+                        {size}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Color */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">Color</label>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {['Black', 'White', 'Blue', 'Red', 'Green', 'Yellow', 'Pink', 'Purple', 'Brown', 'Gray', 'Orange', 'Multi'].map(color => (
+                    <div key={color} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`color-${color}`}
+                        checked={filters.color.includes(color)}
+                        onCheckedChange={() => handleFilterChange('color', color)}
+                      />
+                      <label htmlFor={`color-${color}`} className="text-sm">
+                        {color}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Material */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">Material</label>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {['Cotton', 'Leather', 'Denim', 'Wool', 'Silk', 'Polyester', 'Linen', 'Suede', 'Canvas', 'Mesh'].map(material => (
+                    <div key={material} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`material-${material}`}
+                        checked={filters.material.includes(material)}
+                        onCheckedChange={() => handleFilterChange('material', material)}
+                      />
+                      <label htmlFor={`material-${material}`} className="text-sm">
+                        {material}
                       </label>
                     </div>
                   ))}

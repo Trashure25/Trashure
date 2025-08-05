@@ -37,8 +37,6 @@ export default function ForgotPasswordPage() {
         setSuccess(
           "If an account with this email exists, we&apos;ve sent password reset instructions. Please check your email.",
         )
-        // For demo purposes, show the reset link in console
-        console.log("Password reset requested for:", email)
       } else {
         setError(result.error || "Failed to send reset instructions.")
       }
