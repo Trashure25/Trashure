@@ -71,6 +71,7 @@ export function ItemGridSection({ title, subtitle, items = [], className, loadin
               imageUrl: item.images[0] || "/placeholder.svg",
               designer: item.brand || "Unknown",
               size: item.size || "N/A",
+              userId: item.userId,
             }} 
           />
         ))}

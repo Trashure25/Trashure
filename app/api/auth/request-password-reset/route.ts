@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
-import { sendPasswordResetEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,15 +50,11 @@ export async function POST(req: NextRequest) {
     // Create reset link
     const resetLink = `${req.nextUrl.origin}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
     
-    // Send password reset email
-    const emailResult = await sendPasswordResetEmail(email, resetLink, user.firstName);
-    
-    if (!emailResult.success) {
-      console.error('Failed to send password reset email:', emailResult.error);
-      return NextResponse.json({ 
-        error: 'Failed to send password reset email. Please try again.' 
-      }, { status: 500 });
-    }
+    // For now, just log the reset link (email functionality removed)
+    console.log('=== PASSWORD RESET (Development Mode) ===');
+    console.log('To:', email);
+    console.log('Reset Link:', resetLink);
+    console.log('==========================================');
 
     return NextResponse.json({ 
       success: true, 

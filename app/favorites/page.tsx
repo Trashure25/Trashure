@@ -162,6 +162,7 @@ export default function FavoritesPage() {
                   imageUrl: favorite.listing?.images?.[0] || '/placeholder.svg',
                   designer: favorite.listing?.brand || '',
                   size: favorite.listing?.size || '',
+                  userId: currentUser.id,
                 }}
               />
               <Button

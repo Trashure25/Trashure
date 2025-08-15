@@ -420,6 +420,7 @@ export default function MenswearPage() {
                     imageUrl: listing.images[0] || "/placeholder.svg?height=400&width=300",
                     designer: listing.brand || "Unknown Brand",
                     size: listing.size || "N/A",
+                    userId: listing.userId,
                     isNew: new Date(listing.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // New if created within 7 days
                   }} 
                 />

@@ -69,7 +69,6 @@ export interface User {
   role: string
   isBanned: boolean
   banReason?: string
-  emailVerified: boolean
   createdAt: string
   updatedAt: string
 }
@@ -239,37 +238,5 @@ export const auth = {
     return { success: true }
   },
 
-  async sendVerificationEmail(email: string): Promise<{ success: boolean; error?: string }> {
-    const response = await fetch('/api/auth/send-verification-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    })
 
-    if (!response.ok) {
-      const error = await response.json()
-      return { success: false, error: error.message }
-    }
-
-    return { success: true }
-  },
-
-  async verifyEmail(data: { email: string; token: string }): Promise<{ success: boolean; error?: string }> {
-    const response = await fetch('/api/auth/verify-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      return { success: false, error: error.message }
-    }
-
-    return { success: true }
-  },
 }

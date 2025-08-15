@@ -4,7 +4,7 @@ A sustainable fashion marketplace for trading pre-loved items.
 
 ## Email Configuration
 
-To enable email sending (verification emails, password resets), you need to configure one of the following options:
+To enable email sending (password resets), you need to configure one of the following options:
 
 ### Option 1: Gmail SMTP (Recommended for development)
 Add these environment variables to your `.env.local` file:

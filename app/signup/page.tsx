@@ -73,15 +73,13 @@ export default function SignupPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-green-600">Account Created!</CardTitle>
-            <CardDescription>Please verify your email address to continue.</CardDescription>
+            <CardDescription>Welcome to Trashure! Your account is ready to use.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center space-y-2">
               <p className="text-sm text-gray-600">
-                We've sent a verification link to your email address. Please check your inbox and click the verification link.
+                Your account has been created successfully. You can now start using all features of Trashure.
               </p>
-              
-
               
               <div className="mt-4 space-y-2">
                 <Button 

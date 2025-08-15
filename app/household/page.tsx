@@ -413,18 +413,19 @@ export default function HouseholdPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredListings.map((listing) => (
-                <ItemCard 
-                  key={listing.id} 
-                  item={{
-                    id: listing.id,
-                    name: listing.title,
-                    price: listing.price,
-                    imageUrl: listing.images[0] || "/placeholder.svg?height=400&width=300",
-                    designer: listing.brand || "Unknown Brand",
-                    size: listing.size || "N/A",
-                    isNew: new Date(listing.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-                  }} 
-                />
+                                  <ItemCard
+                    key={listing.id}
+                    item={{
+                      id: listing.id,
+                      name: listing.title,
+                      price: listing.price,
+                      imageUrl: listing.images[0] || "/placeholder.svg?height=400&width=300",
+                      designer: listing.brand || "Unknown Brand",
+                      size: listing.size || "N/A",
+                      userId: listing.userId,
+                      isNew: new Date(listing.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                    }}
+                  />
               ))}
             </div>
           )}

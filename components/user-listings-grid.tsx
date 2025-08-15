@@ -57,6 +57,7 @@ export function UserListingsGrid() {
             imageUrl: listing.images[0] || "/placeholder.svg",
             designer: listing.brand || "Unbranded",
             size: listing.size || "One Size",
+            userId: listing.userId,
           }}
         />
       ))}

@@ -100,10 +100,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signup = async (data: SignupData) => {
     try {
       const result = await auth.signup(data)
-      if (result.verificationLink) {
-
-        return result // Return the result so the signup page can access the verification link
-      }
       return result
     } catch (error: any) {
       toast.error(error.message || 'Signup failed')

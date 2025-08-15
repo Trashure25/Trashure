@@ -32,7 +32,6 @@ export async function POST(req: NextRequest) {
           lastName: true,
           avatarUrl: true,
           trustScore: true,
-          emailVerified: true,
           createdAt: true,
           updatedAt: true,
         }
@@ -49,13 +48,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
     }
 
-    // Check if email is verified
-    if (!user.emailVerified) {
-      return NextResponse.json({ 
-        message: 'Please verify your email address before logging in. Check your inbox for a verification link.',
-        requiresVerification: true 
-      }, { status: 403 });
-    }
+
 
     // Remove password from user object
     const { password: _, ...userWithoutPassword } = user;

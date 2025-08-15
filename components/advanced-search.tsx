@@ -182,10 +182,12 @@ export function AdvancedSearch() {
     setFilters(prev => {
       const current = prev[filterType]
       if (Array.isArray(current)) {
-        const newArray = current.includes(value as string)
-          ? current.filter((item: any) => item !== value)
-          : [...current, value as string]
-        return { ...prev, [filterType]: newArray }
+        if (typeof value === 'string') {
+          const newArray = current.includes(value)
+            ? current.filter((item: string) => item !== value)
+            : [...current, value]
+          return { ...prev, [filterType]: newArray }
+        }
       }
       return { ...prev, [filterType]: value }
     })

@@ -50,7 +50,7 @@ const faqData: { [key: string]: FAQItem[] } = {
   "Account & Security": [
     {
       question: "How do I create an account?",
-      answer: "Click the 'Sign Up' button and provide your email, username, and password. You'll need to verify your email address before you can start using the platform."
+      answer: "Click the 'Sign Up' button and provide your email, username, and password. Your account will be ready to use immediately after signup."
     },
     {
       question: "What is a trust score and how does it work?",

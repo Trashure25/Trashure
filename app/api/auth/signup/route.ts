@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma, withRetry, testDatabaseConnection } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-import { sendVerificationEmail } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
   try {
@@ -69,7 +67,6 @@ export async function POST(req: NextRequest) {
           username,
           firstName,
           lastName,
-          emailVerified: false, // Users start unverified
           // trustScore will use the default value of 70 from the schema
         },
         select: {
@@ -80,35 +77,13 @@ export async function POST(req: NextRequest) {
           lastName: true,
           avatarUrl: true,
           trustScore: true,
-          emailVerified: true,
           createdAt: true,
           updatedAt: true,
         }
       });
     });
 
-    // Create email verification token
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-    await prisma.emailVerificationToken.create({
-      data: {
-        userId: newUser.id,
-        token: verificationToken,
-        expiresAt
-      }
-    });
-
-    // Create verification link
-    const verificationLink = `${req.nextUrl.origin}/verify-email?token=${verificationToken}&email=${encodeURIComponent(email)}`;
-    
-    // Send verification email
-    const emailResult = await sendVerificationEmail(email, verificationLink, firstName);
-    
-    if (!emailResult.success) {
-      console.error('Failed to send verification email:', emailResult.error);
-      // Continue with signup even if email fails - user can request resend later
-    }
 
     // Create JWT
     const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET!, { expiresIn: '30d' });
