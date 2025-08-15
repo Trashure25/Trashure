@@ -404,12 +404,12 @@ export function AdvancedSearch() {
 
       {/* Advanced Filters */}
       {showFilters && (
-        <Card className="mb-4">
-          <CardHeader>
+        <Card className="mb-4 bg-gray-50 border-gray-200">
+          <CardHeader className="bg-gray-100 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <CardTitle>Advanced Filters</CardTitle>
+              <CardTitle className="text-gray-900">Advanced Filters</CardTitle>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={clearFilters}>
+                <Button variant="outline" size="sm" onClick={clearFilters} className="text-gray-700 hover:text-gray-900 hover:bg-gray-200">
                   Clear All
                 </Button>
                 {currentUser && (
@@ -418,6 +418,7 @@ export function AdvancedSearch() {
                     size="sm"
                     onClick={saveSearch}
                     disabled={savingSearch}
+                    className="text-gray-700 hover:text-gray-900 hover:bg-gray-200"
                   >
                     {savingSearch ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     Save Search
@@ -426,11 +427,11 @@ export function AdvancedSearch() {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-gray-50">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Category */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Category</label>
+                <label className="text-sm font-medium mb-2 block text-gray-800">Category</label>
                 <div className="space-y-2">
                   {['Apparel', 'Footwear', 'Accessories', 'Household'].map(category => (
                     <div key={category} className="flex items-center space-x-2">
@@ -439,7 +440,7 @@ export function AdvancedSearch() {
                         checked={filters.category.includes(category)}
                         onCheckedChange={() => handleFilterChange('category', category)}
                       />
-                      <label htmlFor={`category-${category}`} className="text-sm">
+                      <label htmlFor={`category-${category}`} className="text-sm text-gray-700">
                         {category}
                       </label>
                     </div>
@@ -449,7 +450,7 @@ export function AdvancedSearch() {
 
               {/* Brand */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Brand</label>
+                <label className="text-sm font-medium mb-2 block text-gray-800">Brand</label>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {['Nike', 'Adidas', 'Jordan', 'Supreme', 'Palace', 'Off-White', 'Balenciaga', 'Gucci', 'Louis Vuitton', 'Vintage', 'Maison Margiela'].map(brand => (
                     <div key={brand} className="flex items-center space-x-2">
@@ -458,7 +459,7 @@ export function AdvancedSearch() {
                         checked={filters.brand.includes(brand)}
                         onCheckedChange={() => handleFilterChange('brand', brand)}
                       />
-                      <label htmlFor={`brand-${brand}`} className="text-sm">
+                      <label htmlFor={`brand-${brand}`} className="text-sm text-gray-700">
                         {brand}
                       </label>
                     </div>
@@ -468,7 +469,7 @@ export function AdvancedSearch() {
 
               {/* Condition */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Condition</label>
+                <label className="text-sm font-medium mb-2 block text-gray-800">Condition</label>
                 <div className="space-y-2">
                   {CONDITION_OPTIONS.map(condition => (
                     <div key={condition} className="flex items-center space-x-2">
@@ -477,7 +478,7 @@ export function AdvancedSearch() {
                         checked={filters.condition.includes(condition)}
                         onCheckedChange={() => handleFilterChange('condition', condition)}
                       />
-                      <label htmlFor={`condition-${condition}`} className="text-sm">
+                      <label htmlFor={`condition-${condition}`} className="text-sm text-gray-700">
                         {condition}
                       </label>
                     </div>
@@ -487,7 +488,7 @@ export function AdvancedSearch() {
 
               {/* Style */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Style</label>
+                <label className="text-sm font-medium mb-2 block text-gray-800">Style</label>
                 <div className="space-y-2">
                   {STYLE_OPTIONS.map(style => (
                     <div key={style} className="flex items-center space-x-2">
@@ -496,7 +497,7 @@ export function AdvancedSearch() {
                         checked={filters.style.includes(style)}
                         onCheckedChange={() => handleFilterChange('style', style)}
                       />
-                      <label htmlFor={`style-${style}`} className="text-sm capitalize">
+                      <label htmlFor={`style-${style}`} className="text-sm capitalize text-gray-700">
                         {style}
                       </label>
                     </div>
@@ -506,7 +507,7 @@ export function AdvancedSearch() {
 
               {/* Department */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Department</label>
+                <label className="text-sm font-medium mb-2 block text-gray-800">Department</label>
                 <div className="space-y-2">
                   {DEPARTMENT_OPTIONS.map(dept => (
                     <div key={dept} className="flex items-center space-x-2">
@@ -515,7 +516,7 @@ export function AdvancedSearch() {
                         checked={filters.department.includes(dept)}
                         onCheckedChange={() => handleFilterChange('department', dept)}
                       />
-                      <label htmlFor={`dept-${dept}`} className="text-sm capitalize">
+                      <label htmlFor={`dept-${dept}`} className="text-sm capitalize text-gray-700">
                         {dept}
                       </label>
                     </div>
@@ -525,7 +526,7 @@ export function AdvancedSearch() {
 
               {/* Season */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Season</label>
+                <label className="text-sm font-medium mb-2 block text-gray-800">Season</label>
                 <div className="space-y-2">
                   {SEASON_OPTIONS.map(season => (
                     <div key={season} className="flex items-center space-x-2">
@@ -534,7 +535,7 @@ export function AdvancedSearch() {
                         checked={filters.season.includes(season)}
                         onCheckedChange={() => handleFilterChange('season', season)}
                       />
-                      <label htmlFor={`season-${season}`} className="text-sm capitalize">
+                      <label htmlFor={`season-${season}`} className="text-sm capitalize text-gray-700">
                         {season}
                       </label>
                     </div>
@@ -544,7 +545,7 @@ export function AdvancedSearch() {
 
               {/* Era */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Era</label>
+                <label className="text-sm font-medium mb-2 block text-gray-800">Era</label>
                 <div className="space-y-2">
                   {ERA_OPTIONS.map(era => (
                     <div key={era} className="flex items-center space-x-2">
@@ -553,7 +554,7 @@ export function AdvancedSearch() {
                         checked={filters.era.includes(era)}
                         onCheckedChange={() => handleFilterChange('era', era)}
                       />
-                      <label htmlFor={`era-${era}`} className="text-sm">
+                      <label htmlFor={`era-${era}`} className="text-sm text-gray-700">
                         {era}
                       </label>
                     </div>
@@ -563,7 +564,7 @@ export function AdvancedSearch() {
 
               {/* Size */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Size</label>
+                <label className="text-sm font-medium mb-2 block text-gray-800">Size</label>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'].map(size => (
                     <div key={size} className="flex items-center space-x-2">
@@ -572,7 +573,7 @@ export function AdvancedSearch() {
                         checked={filters.size.includes(size)}
                         onCheckedChange={() => handleFilterChange('size', size)}
                       />
-                      <label htmlFor={`size-${size}`} className="text-sm">
+                      <label htmlFor={`size-${size}`} className="text-sm text-gray-700">
                         {size}
                       </label>
                     </div>
@@ -582,7 +583,7 @@ export function AdvancedSearch() {
 
               {/* Color */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Color</label>
+                <label className="text-sm font-medium mb-2 block text-gray-800">Color</label>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {['Black', 'White', 'Blue', 'Red', 'Green', 'Yellow', 'Pink', 'Purple', 'Brown', 'Gray', 'Orange', 'Multi'].map(color => (
                     <div key={color} className="flex items-center space-x-2">
@@ -591,7 +592,7 @@ export function AdvancedSearch() {
                         checked={filters.color.includes(color)}
                         onCheckedChange={() => handleFilterChange('color', color)}
                       />
-                      <label htmlFor={`color-${color}`} className="text-sm">
+                      <label htmlFor={`color-${color}`} className="text-sm text-gray-700">
                         {color}
                       </label>
                     </div>
@@ -601,7 +602,7 @@ export function AdvancedSearch() {
 
               {/* Material */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Material</label>
+                <label className="text-sm font-medium mb-2 block text-gray-800">Material</label>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {['Cotton', 'Leather', 'Denim', 'Wool', 'Silk', 'Polyester', 'Linen', 'Suede', 'Canvas', 'Mesh'].map(material => (
                     <div key={material} className="flex items-center space-x-2">
@@ -610,7 +611,7 @@ export function AdvancedSearch() {
                         checked={filters.material.includes(material)}
                         onCheckedChange={() => handleFilterChange('material', material)}
                       />
-                      <label htmlFor={`material-${material}`} className="text-sm">
+                      <label htmlFor={`material-${material}`} className="text-sm text-gray-700">
                         {material}
                       </label>
                     </div>
@@ -623,7 +624,7 @@ export function AdvancedSearch() {
 
             {/* Price Range */}
             <div>
-              <label className="text-sm font-medium mb-4 block">Price Range</label>
+              <label className="text-sm font-medium mb-4 block text-gray-800">Price Range</label>
               <div className="space-y-4">
                 <Slider
                   value={[filters.minPrice, filters.maxPrice]}
@@ -659,7 +660,7 @@ export function AdvancedSearch() {
 
             {/* Release Year */}
             <div className="mt-6">
-              <label className="text-sm font-medium mb-2 block">Release Year</label>
+              <label className="text-sm font-medium mb-2 block text-gray-800">Release Year</label>
               <Input
                 type="number"
                 placeholder="e.g., 2020"

@@ -68,24 +68,24 @@ export function CategoryFilters({
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="bg-gray-50 border-gray-200">
+      <CardHeader className="pb-3 bg-gray-100 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
+          <CardTitle className="text-lg flex items-center gap-2 text-gray-900">
             <Filter className="h-4 w-4" />
             Filters
           </CardTitle>
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-gray-700 hover:text-gray-900 hover:bg-gray-200">
             Clear
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 bg-gray-50">
         {/* Sort By */}
         <div>
-          <label className="text-sm font-medium mb-2 block">Sort By</label>
+          <label className="text-sm font-medium mb-2 block text-gray-800">Sort By</label>
           <Select value={sortBy} onValueChange={handleSortChange}>
-            <SelectTrigger className={sortBy ? "!bg-[#06402B] !text-white !border-[#06402B]" : ""}>
+            <SelectTrigger className={sortBy ? "!bg-[#06402B] !text-white !border-[#06402B]" : "bg-white border-gray-300"}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -121,7 +121,7 @@ export function CategoryFilters({
 
         {/* Category Filter (Autocomplete + Checkboxes) */}
         <div>
-          <label className="text-sm font-medium mb-2 block">Category</label>
+          <label className="text-sm font-medium mb-2 block text-gray-800">Category</label>
           <AdvancedAutocomplete
             options={categoryOptions}
             value={filters.category[0] || ""}
@@ -144,7 +144,7 @@ export function CategoryFilters({
                     })
                   }
                 />
-                <label htmlFor={`category-${category}`} className="text-sm">
+                <label htmlFor={`category-${category}`} className="text-sm text-gray-700">
                   {category}
                 </label>
               </div>
@@ -156,7 +156,7 @@ export function CategoryFilters({
 
         {/* Brand Filter (Autocomplete + Checkboxes) */}
         <div>
-          <label className="text-sm font-medium mb-2 block">Brand</label>
+          <label className="text-sm font-medium mb-2 block text-gray-800">Brand</label>
           <AdvancedAutocomplete
             options={uniqueBrands}
             value={filters.brand[0] || ""}
@@ -179,7 +179,7 @@ export function CategoryFilters({
                     })
                   }
                 />
-                <label htmlFor={`brand-${brand}`} className="text-sm">
+                <label htmlFor={`brand-${brand}`} className="text-sm text-gray-700">
                   {brand}
                 </label>
               </div>
@@ -191,7 +191,7 @@ export function CategoryFilters({
 
         {/* Condition Filter */}
         <div>
-          <label className="text-sm font-medium mb-2 block">Condition</label>
+          <label className="text-sm font-medium mb-2 block text-gray-800">Condition</label>
           <div className="space-y-2">
             {uniqueConditions.map((condition) => (
               <div key={condition} className="flex items-center space-x-2">
@@ -207,7 +207,7 @@ export function CategoryFilters({
                     })
                   }
                 />
-                <label htmlFor={`condition-${condition}`} className="text-sm">
+                <label htmlFor={`condition-${condition}`} className="text-sm text-gray-700">
                   {condition}
                 </label>
               </div>
@@ -220,7 +220,7 @@ export function CategoryFilters({
         {/* Size Filter (Autocomplete + Checkboxes) */}
         {uniqueSizes.length > 0 && (
           <div>
-            <label className="text-sm font-medium mb-2 block">Size</label>
+            <label className="text-sm font-medium mb-2 block text-gray-800">Size</label>
             <AdvancedAutocomplete
               options={uniqueSizes}
               value={filters.size[0] || ""}
@@ -243,7 +243,7 @@ export function CategoryFilters({
                       })
                     }
                   />
-                  <label htmlFor={`size-${size}`} className="text-sm">
+                  <label htmlFor={`size-${size}`} className="text-sm text-gray-700">
                     {size}
                   </label>
                 </div>
